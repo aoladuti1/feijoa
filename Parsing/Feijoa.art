@@ -1,2 +1,28 @@
-S ::= #
-      { System.out.println("FEIJOA!"); }
+(*******************************************************************************
+*
+* feijoa (by antonio oladuti - 2022/23)
+* computer science dept. @ royal holloway, university of london
+*
+*******************************************************************************)
+prelude {import java.util.HashMap;}
+
+support { 
+	HashMap<String, Object> symbols = new HashMap<String, Object>(); (* key, value = identifier, value *)
+	HashMap<String, String> types = new HashMap<String, String>(); (* key, value = identifier, type *)
+}
+
+whitespace &WHITESPACE
+whitespace &COMMENT_LINE_C
+whitespace &COMMENT_BLOCK_C
+
+ID <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &ID {ID.lexeme = artLexeme(ID.leftExtent, ID.rightExtent); ID.v = artLexemeAsID(ID.leftExtent, ID.rightExtent); }  
+
+INTEGER <leftExtent:int rightExtent:int lexeme:String v:int> ::= 
+  &INTEGER {INTEGER.lexeme = artLexeme(INTEGER.leftExtent, INTEGER.rightExtent); INTEGER.v = artLexemeAsInteger(INTEGER.leftExtent, INTEGER.rightExtent); }  
+
+REAL <leftExtent:int rightExtent:int lexeme:String v:double> ::= 
+  &REAL {REAL.lexeme = artLexeme(REAL.leftExtent, REAL.rightExtent); REAL.v = artLexemeAsInteger(REAL.leftExtent, REAL.rightExtent); }
+  
+STRING_SQ <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &STRING_SQ {STRING_SQ.lexeme = artLexeme(STRING_SQ.leftExtent, STRING_SQ.rightExtent); STRING_SQ.v = artLexemeAsString(STRING_SQ.leftExtent, STRING_SQ.rightExtent); }
