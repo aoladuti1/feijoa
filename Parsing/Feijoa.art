@@ -11,6 +11,10 @@ support {
 	HashMap<String, String> types = new HashMap<String, String>();
 }
 
+whitespace &WHITESPACE
+whitespace &COMMENT_LINE_C
+whitespace &COMMENT_BLOCK_C
+
 ID <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
   &ID {ID.lexeme = artLexeme(ID.leftExtent, ID.rightExtent); ID.v = artLexemeAsID(ID.leftExtent, ID.rightExtent); }  
 
