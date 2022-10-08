@@ -1,2 +1,12 @@
-S ::= #
-      { System.out.println("FEIJOA!"); }
+(*******************************************************************************
+*
+* feijoa (by antonio oladuti - 2022/23)
+* computer science dept. @ royal holloway, university of london
+*
+*******************************************************************************)
+prelude {import java.util.HashMap;}
+
+support { 
+	HashMap<String, Integer> symbols = new HashMap<String, Integer>();
+	HashMap<String, String> types = new HashMap<String, String>();
+}
