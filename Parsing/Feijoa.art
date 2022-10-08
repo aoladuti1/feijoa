@@ -10,3 +10,15 @@ support {
 	HashMap<String, Integer> symbols = new HashMap<String, Integer>();
 	HashMap<String, String> types = new HashMap<String, String>();
 }
+
+ID <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &ID {ID.lexeme = artLexeme(ID.leftExtent, ID.rightExtent); ID.v = artLexemeAsID(ID.leftExtent, ID.rightExtent); }  
+
+INTEGER <leftExtent:int rightExtent:int lexeme:String v:int> ::= 
+  &INTEGER {INTEGER.lexeme = artLexeme(INTEGER.leftExtent, INTEGER.rightExtent); INTEGER.v = artLexemeAsInteger(INTEGER.leftExtent, INTEGER.rightExtent); }  
+
+REAL <leftExtent:int rightExtent:int lexeme:String v:double> ::= 
+  &REAL {REAL.lexeme = artLexeme(REAL.leftExtent, REAL.rightExtent); REAL.v = artLexemeAsInteger(REAL.leftExtent, REAL.rightExtent); }
+  
+STRING_SQ <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &STRING_SQ {STRING_SQ.lexeme = artLexeme(STRING_SQ.leftExtent, STRING_SQ.rightExtent); STRING_SQ.v = artLexemeAsString(STRING_SQ.leftExtent, STRING_SQ.rightExtent); }
