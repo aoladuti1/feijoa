@@ -7,8 +7,8 @@
 prelude {import java.util.HashMap;}
 
 support { 
-	HashMap<String, Integer> symbols = new HashMap<String, Integer>();
-	HashMap<String, String> types = new HashMap<String, String>();
+	HashMap<String, Object> symbols = new HashMap<String, Object>(); (* key, value = identifier, value *)
+	HashMap<String, String> types = new HashMap<String, String>(); (* key, value = identifier, type *)
 }
 
 whitespace &WHITESPACE
