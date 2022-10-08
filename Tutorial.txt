@@ -1,0 +1,14 @@
+Hi there! This text will show you how to regenerate the parser (generator) for 
+newer versions of the Feijoa language (as specified by ./Parsing/Feijoa.art)
+and run Feijoa (.fj) files.
+
+--- Regenerate .fj parser ---
+
+./fj -p [file]
+	update the parser (generator) for Feijoa
+	if file is specified, run it
+
+--- Run .fj files ---
+
+./fj -r <name>
+	run name.fj
