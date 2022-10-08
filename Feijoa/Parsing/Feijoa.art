@@ -1,0 +1,2 @@
+S ::= #
+      { System.out.println("FEIJOA!"); }
