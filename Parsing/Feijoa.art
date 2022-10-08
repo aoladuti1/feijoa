@@ -7,11 +7,10 @@
 prelude {import java.util.HashMap;}
 
 support { 
-	HashMap<String, Object> symbols = new HashMap<String, Object>(); // key, value = identifier, value *)
-	HashMap<String, String> types = new HashMap<String, String>(); // key, value = identifier, type *)
+	HashMap<String, Object> symbols = new HashMap<String, Object>(); // key, value = identifier, value
 }
 
-( * ONLY INTEGERS WORK AT THE MOMENT *)
+(* ONLY INTEGERS WORK AT THE MOMENT *)
 
 whitespace &SIMPLE_WHITESPACE
 whitespace &COMMENT_LINE_C
