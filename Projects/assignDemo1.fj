@@ -1,0 +1,12 @@
+
+// Hello
+/* The comments are...
+	working! */
+	
+x <- 10+50;
+b <- 60;
+70 -> b;
+c <- (b + x + (60 + 20));
+
+sysline(c + 70); // prints 280
+sysout(12); sysout(34); // prints 1234
