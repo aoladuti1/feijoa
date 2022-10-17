@@ -1,8 +1,11 @@
 @echo off
 set fei=Feijoa
 for %%Q in ("%~dp0.") DO set "arthome=%%~fQ"
-set arthome=%arthome%\Parsing
-set project=%cd%\%2.fj
+set "arthome=%arthome%\Parsing"
+set "project=%cd%\%2"
+if /I "%project:~-3%" neq ".fj" (
+	set "project=%project%.fj"
+)
 cd Parsing
 if '%1'=='-p' (
 java -classpath .;%arthome%/art.jar uk.ac.rhul.cs.csle.art.v3.ARTV3 %arthome%\%fei%.art
