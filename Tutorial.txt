@@ -1,4 +1,4 @@
-Hi there! This text will show you how to regenerate the parser (generator) for 
+Hi there! This text will show you how to regenerate the parser for 
 newer versions of the Feijoa language (as specified by ./Parsing/Feijoa.art)
 and run Feijoa (.fj) files.
 
@@ -12,3 +12,5 @@ and run Feijoa (.fj) files.
 
 ./fj -r <name>
 	run name.fj
+
+Note: adding the directory of fj.bat to your PATH removes the need of './' in commands
