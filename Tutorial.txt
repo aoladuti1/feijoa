@@ -1,14 +1,19 @@
-Hi there! This text will show you how to regenerate the parser (generator) for 
-newer versions of the Feijoa language (as specified by ./Parsing/Feijoa.art)
+Hi there! This text will show you how to regenerate the parser for 
+newer versions of the Feijoa language (as specified by Parsing/Feijoa.art)
 and run Feijoa (.fj) files.
 
 --- Regenerate .fj parser ---
 
-./fj -p [file]
-	update the parser (generator) for Feijoa
+./feijoa -p [file]
+	update the parser or Feijoa
 	if file is specified, run it
 
 --- Run .fj files ---
 
-./fj -r <name>
+./feijoa -r <qualified name>
 	run name.fj
+
+Note: adding the directory of feijoa.bat to your PATH removes the need of './' in commands
+
+Example command: ./feijoa -r Projects/Demos/assignDemo
+Note: the .fj extension is optional
