@@ -1,0 +1,10 @@
+
+[10/10/2022] 
+Since first committing to this project a few days ago, 
+I have managed to set up scripts for generating parsers and parsing/running .fj files.
+Further to this, I have implemented and provided a basis for a duck-typing system,
+and added assignment (-> or <-) and addition (+) operators which are fully functional. Parentheses are supported.
+
+Next Steps:
+   1 - Add all mathematical operations
+   2 - Add comparison / extra operators
