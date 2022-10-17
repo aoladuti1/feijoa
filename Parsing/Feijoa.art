@@ -32,22 +32,26 @@ assign ::= ID '<-' mainExpr ';'
  
 mainExpr <o: Object> ::= subExpr 
 		{ mainExpr.o = subExpr1.o; }
+		
+subExpr <o: Object> ::= plus
+		{ subExpr.o = plus1.o; } 
+	| operand
+		{ subExpr.o = operand1.o; }
+		
 	
-subExpr <o: Object> ::= operand '+' subExpr
+plus <o: Object> ::= operand '+' subExpr
 		{ 	try {
-				subExpr.o = Integer.valueOf(operand1.o.toString()) + Integer.valueOf(subExpr1.o.toString());
+				plus.o = Integer.valueOf(operand1.o.toString()) + Integer.valueOf(subExpr1.o.toString());
 			} 
 			catch (Exception FjException) {
 				try {
-					subExpr.o = Double.valueOf(operand1.o.toString()) + Double.valueOf(subExpr1.o.toString());
+					plus.o = Double.valueOf(operand1.o.toString()) + Double.valueOf(subExpr1.o.toString());
 				} 
 				catch (Exception FJException2) {
-					subExpr.o = (String) operand1.o + (String) subExpr1.o;	
+					plus.o = (String) operand1.o + (String) subExpr1.o;	
 				}
 			}
 		}	
-	| operand
-		{ subExpr.o = operand1.o; }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
@@ -62,6 +66,8 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = STRING_SQ1.v; }
 	| '(' subExpr ')'
 		{ operand.o = subExpr1.o; }
+	| #
+	
 		
 deref <v: String> ::= ID
 	{ deref.v = ID1.v; }
