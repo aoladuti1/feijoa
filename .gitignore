@@ -24,3 +24,7 @@ Parsing/ARTGeneratedParser$ARTAT_ART_STRING_SQ.class
 Parsing/ARTGeneratedParser$ARTAT_ART_sub.class
 
 Parsing/ARTGeneratedParser$ARTAT_ART_subExpr.class
+
+Parsing/ARTGeneratedParser$ARTAT_ART_exponentiate.class
+
+Parsing/ARTGeneratedParser$ARTAT_ART_plus.class
