@@ -2,7 +2,10 @@
 
 x <- 7;
 sysout('The following prints 49: ');
-sysout(x ** 2); // 49
-sysout('\nThe following prints 5: ');
+sysline(x ** 2); // 49
+sysout('The following prints 5: ');
 sysline(25 ** 0.5);
 
+// not
+sysout('Prints true: ');
+sysline(!false);
