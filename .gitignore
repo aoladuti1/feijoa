@@ -1,30 +1,5 @@
 
-Parsing/ARTGeneratedLexer.class
+!Parsing
+Parsing/*
+!Parsing/Feijoa.art
 
-Parsing/ARTGeneratedLexer.java
-
-Parsing/ARTGeneratedParser.class
-
-Parsing/ARTGeneratedParser.java
-
-Parsing/ARTGeneratedParser$ARTAT_ART_deref.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_ID.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_INTEGER.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_mainExpr.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_operand.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_REAL.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_STRING_SQ.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_sub.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_subExpr.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_exponentiate.class
-
-Parsing/ARTGeneratedParser$ARTAT_ART_plus.class

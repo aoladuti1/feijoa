@@ -8,3 +8,10 @@ and added assignment (-> or <-) and addition (+) operators which are fully funct
 Next Steps:
    1 - Add all mathematical operations
    2 - Add comparison / extra operators
+
+[31/10/2022]
+Since my last diary entry I have improved my scripts, BNF structure and added exponentiation. 
+
+Next Steps:
+   1 - Continue adding operations
+   2 - remove the -> operator for now. Use for function chaining later.
