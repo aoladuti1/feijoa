@@ -35,6 +35,8 @@ mainExpr <o: Object> ::= subExpr
 		
 subExpr <o: Object> ::= plus
 		{ subExpr.o = plus1.o; } 
+	| exponentiate
+		{ subExpr.o = exponentiate1.o; }
 	| operand
 		{ subExpr.o = operand1.o; }
 		
@@ -52,6 +54,19 @@ plus <o: Object> ::= operand '+' subExpr
 				}
 			}
 		}	
+		
+exponentiate <o: Object> ::= operand '**' subExpr
+		{ 	try {
+				exponentiate.o = Math.pow(
+					Integer.valueOf(operand1.o.toString())
+						, Integer.valueOf(subExpr1.o.toString()));
+			} 
+			catch (Exception FjException) {
+				exponentiate.o = Math.pow(
+					Double.valueOf(operand1.o.toString())
+						, Double.valueOf(subExpr1.o.toString()));
+			}
+		}
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
