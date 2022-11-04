@@ -1,0 +1,107 @@
+(*******************************************************************************
+*
+* feijoa (by antonio oladuti - 2022/23)
+* computer science dept. @ royal holloway, university of london
+*
+*******************************************************************************)
+prelude {import java.util.HashMap;}
+
+support { 
+	HashMap<String, Object> symbols = new HashMap<String, Object>(); // key, value = identifier, value
+}
+
+(* ONLY INTEGERS WORK AT THE MOMENT *)
+
+whitespace &SIMPLE_WHITESPACE
+whitespace &COMMENT_LINE_C
+whitespace &COMMENT_BLOCK_C
+
+statements ::= statement | statement statements
+statement ::= assign | sysout | sysline 
+
+sysout ::= 'sysout' '(' mainExpr ')'
+	{ System.out.print(mainExpr1.o); } ';'
+	
+sysline ::= 'sysline' '(' mainExpr ')'
+	{ System.out.println(mainExpr1.o); } ';'
+	
+assign ::= ID '<-' mainExpr ';' 
+		{ symbols.put(ID1.v, mainExpr1.o); }
+	| mainExpr '->' ID ';'
+		{ symbols.put(ID1.v, mainExpr1.o); }
+ 
+mainExpr <o: Object> ::= subExpr 
+		{ mainExpr.o = subExpr1.o; }
+		
+subExpr <o: Object> ::= plus
+		{ subExpr.o = plus1.o; } 
+	| exponentiate
+		{ subExpr.o = exponentiate1.o; }
+	| not
+		{ subExpr.o = not1.o; }
+	| operand
+		{ subExpr.o = operand1.o; }
+		
+	
+plus <o: Object> ::= operand '+' subExpr
+	{ 	try {
+			plus.o = (Integer.valueOf(operand1.o.toString())
+					+ Integer.valueOf(subExpr1.o.toString()));
+		} 
+		catch (Exception FjException) {
+			try {
+				plus.o = (Double.valueOf(operand1.o.toString())
+						+ Double.valueOf(subExpr1.o.toString()));
+			} 
+			catch (Exception FJException2) {
+				plus.o = (String) operand1.o + (String) subExpr1.o;	
+			}
+		}
+	}
+		
+exponentiate <o: Object> ::= operand '**' subExpr
+		{ 	try {
+				exponentiate.o = Math.pow(
+					Integer.valueOf(operand1.o.toString())
+						, Integer.valueOf(subExpr1.o.toString()));
+			} 
+			catch (Exception FjException) {
+				exponentiate.o = Math.pow(
+					Double.valueOf(operand1.o.toString())
+						, Double.valueOf(subExpr1.o.toString()));
+			}
+		}
+
+not <o: Object> ::= '!' operand
+	{ not.o = !(Boolean.valueOf(operand1.o.toString())); }
+	
+operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
+	| INTEGER
+		{ operand.o = INTEGER1.v; }
+	| REAL
+		{ operand.o = REAL1.v; }
+	| 'true'
+		{ operand.o = Boolean.valueOf(true); }
+	| 'false'
+		{ operand.o = Boolean.valueOf(false); }
+	| STRING_SQ
+		{ operand.o = STRING_SQ1.v; }
+	| '(' subExpr ')'
+		{ operand.o = subExpr1.o; }
+	| #
+	
+		
+deref <v: String> ::= ID
+	{ deref.v = ID1.v; }
+
+ID <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &ID {ID.lexeme = artLexeme(ID.leftExtent, ID.rightExtent); ID.v = artLexemeAsID(ID.leftExtent, ID.rightExtent); }  
+
+INTEGER <leftExtent:int rightExtent:int lexeme:String v:int> ::= 
+  &INTEGER {INTEGER.lexeme = artLexeme(INTEGER.leftExtent, INTEGER.rightExtent); INTEGER.v = artLexemeAsInteger(INTEGER.leftExtent, INTEGER.rightExtent); }  
+
+REAL <leftExtent:int rightExtent:int lexeme:String v:Double> ::= 
+  &REAL {REAL.lexeme = artLexeme(REAL.leftExtent, REAL.rightExtent); REAL.v = artLexemeAsReal(REAL.leftExtent, REAL.rightExtent); }
+  
+STRING_SQ <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &STRING_SQ {STRING_SQ.lexeme = artLexeme(STRING_SQ.leftExtent, STRING_SQ.rightExtent); STRING_SQ.v = artLexemeAsString(STRING_SQ.leftExtent, STRING_SQ.rightExtent); }
