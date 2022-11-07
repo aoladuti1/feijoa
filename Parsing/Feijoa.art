@@ -35,6 +35,7 @@ subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
 	| plus { subExprB.o = plus1.o; }
+	| minus { subExprB.o = minus1.o; }
 	
 subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
 	| multiply { subExprC.o = multiply1.o; }
@@ -74,6 +75,24 @@ plus <o: Object> ::= subExprB '+' subExprC
 		}
 	}
 					
+minus <o: Object> ::= subExprB '-' subExprC
+	{ 	try {
+			minus.o = (Integer.valueOf(subExprB1.o.toString())
+					- Integer.valueOf(subExprC1.o.toString()));
+		} 
+		catch (Exception FjException) {
+			try {
+				minus.o = (Double.valueOf(subExprB1.o.toString())
+						- Double.valueOf(subExprC1.o.toString()));
+			} 
+			catch (Exception FJException2) {
+				String str1 = (String) subExprB1.o;
+				String str2 = (String) subExprC1.o;
+				minus.o = str1.replace(str2, "");
+			}
+		}
+	}
+	
 multiply <o: Object> ::= subExprC '*' subExprD
 	{ 	try {
 			multiply.o = (Integer.valueOf(subExprC1.o.toString())
