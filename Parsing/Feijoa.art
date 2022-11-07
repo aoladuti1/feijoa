@@ -17,7 +17,7 @@ whitespace &COMMENT_LINE_C
 whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
-statement ::= assign | sysout | sysline 
+statement ::= mainExpr | sysout | sysline 
 
 sysout ::= 'sysout' '(' mainExpr ')'
 	{ System.out.print(mainExpr1.o); } ';'
@@ -25,55 +25,78 @@ sysout ::= 'sysout' '(' mainExpr ')'
 sysline ::= 'sysline' '(' mainExpr ')'
 	{ System.out.println(mainExpr1.o); } ';'
 	
-assign ::= ID '<-' mainExpr ';' 
-		{ symbols.put(ID1.v, mainExpr1.o); }
-	| mainExpr '->' ID ';'
-		{ symbols.put(ID1.v, mainExpr1.o); }
- 
-mainExpr <o: Object> ::= subExpr 
-		{ mainExpr.o = subExpr1.o; }
-		
-subExpr <o: Object> ::= plus
-		{ subExpr.o = plus1.o; } 
-	| exponentiate
-		{ subExpr.o = exponentiate1.o; }
-	| not
-		{ subExpr.o = not1.o; }
-	| operand
-		{ subExpr.o = operand1.o; }
-		
+mainExpr <o: Object> ::= assign 
+	| subExprA { mainExpr.o = subExprA1.o; }
+
+
+subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
+	| gtr { subExprA.o = gtr1.o; }
+	| not { subExprA.o = not1.o; }
+
+subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
+	| plus { subExprB.o = plus1.o; }
 	
-plus <o: Object> ::= operand '+' subExpr
+subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
+	| multiply { subExprC.o = multiply1.o; }
+
+subExprD <o: Object> ::= operand { subExprD.o = operand1.o; }
+	| exponentiate { subExprD.o = exponentiate1.o; }
+		
+gtr <o: Object> ::= subExprB '>' subExprB
+		{ 	try {
+				gtr.o = (Integer.compare(Integer.valueOf(subExprB1.o.toString()),
+										 Integer.valueOf(subExprB2.o.toString()))) > 0;
+			} catch (Exception FjException) {
+				gtr.o = (Double.compare(Double.valueOf(subExprB1.o.toString()),
+										Double.valueOf(subExprB2.o.toString()))) > 0;
+			}
+		}
+		
+not <o: Object> ::= '!' subExprA
+	{ not.o = !(Boolean.valueOf(subExprA1.o.toString())); }
+		
+assign <o: Object> ::= ID '<-' subExprA ';' 
+		{ symbols.put(ID1.v, subExprA1.o); }
+		
+plus <o: Object> ::= subExprB '+' subExprC
 	{ 	try {
-			plus.o = (Integer.valueOf(operand1.o.toString())
-					+ Integer.valueOf(subExpr1.o.toString()));
+			plus.o = (Integer.valueOf(subExprB1.o.toString())
+					+ Integer.valueOf(subExprC1.o.toString()));
 		} 
 		catch (Exception FjException) {
 			try {
-				plus.o = (Double.valueOf(operand1.o.toString())
-						+ Double.valueOf(subExpr1.o.toString()));
+				plus.o = (Double.valueOf(subExprB1.o.toString())
+						+ Double.valueOf(subExprC1.o.toString()));
 			} 
 			catch (Exception FJException2) {
-				plus.o = (String) operand1.o + (String) subExpr1.o;	
+				plus.o = (String) subExprB1.o + (String) subExprC1.o;
 			}
 		}
 	}
+					
+multiply <o: Object> ::= subExprC '*' subExprD
+	{ 	try {
+			multiply.o = (Integer.valueOf(subExprC1.o.toString())
+					    * Integer.valueOf(subExprD1.o.toString()));
+		} 
+		catch (Exception FjException) {
+			multiply.o = (Double.valueOf(subExprC1.o.toString())
+					    * Double.valueOf(subExprD1.o.toString()));
+		}
+	}
 		
-exponentiate <o: Object> ::= operand '**' subExpr
+exponentiate <o: Object> ::= operand '**' subExprD
 		{ 	try {
 				exponentiate.o = Math.pow(
 					Integer.valueOf(operand1.o.toString())
-						, Integer.valueOf(subExpr1.o.toString()));
+						, Integer.valueOf(subExprD1.o.toString()));
 			} 
 			catch (Exception FjException) {
 				exponentiate.o = Math.pow(
 					Double.valueOf(operand1.o.toString())
-						, Double.valueOf(subExpr1.o.toString()));
+						, Double.valueOf(subExprD1.o.toString()));
 			}
 		}
-
-not <o: Object> ::= '!' operand
-	{ not.o = !(Boolean.valueOf(operand1.o.toString())); }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
@@ -86,8 +109,8 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = Boolean.valueOf(false); }
 	| STRING_SQ
 		{ operand.o = STRING_SQ1.v; }
-	| '(' subExpr ')'
-		{ operand.o = subExpr1.o; }
+	| '(' mainExpr ')'
+		{ operand.o = mainExpr1.o; }
 	| #
 	
 		
