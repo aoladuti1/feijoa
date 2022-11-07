@@ -15,3 +15,13 @@ Since my last diary entry I have improved my scripts, BNF structure and added ex
 Next Steps:
    1 - Continue adding operations
    2 - remove the -> operator for now. Use for function chaining later.
+
+[07/11/2022]
+Since my last diary entry I have implemented a better structure for my BNF that respects operation order.
+I added multiply functionality too, and ensured the not operator would work when applied repeatedly (!!false == false).
+It was tricky to find a good way to make the order of operations not too verbose and fit with duck typing.
+
+Next steps:
+   1 - Finish adding all operations
+   2 - Make helper functions / class for duck typing
+   3 - Change strings to double quotes instead of single quotes
