@@ -126,8 +126,8 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = Boolean.valueOf(true); }
 	| 'false'
 		{ operand.o = Boolean.valueOf(false); }
-	| STRING_SQ
-		{ operand.o = STRING_SQ1.v; }
+	| STRING_DQ
+		{ operand.o = STRING_DQ1.v; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 	| #
@@ -145,5 +145,5 @@ INTEGER <leftExtent:int rightExtent:int lexeme:String v:int> ::=
 REAL <leftExtent:int rightExtent:int lexeme:String v:Double> ::= 
   &REAL {REAL.lexeme = artLexeme(REAL.leftExtent, REAL.rightExtent); REAL.v = artLexemeAsReal(REAL.leftExtent, REAL.rightExtent); }
   
-STRING_SQ <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
-  &STRING_SQ {STRING_SQ.lexeme = artLexeme(STRING_SQ.leftExtent, STRING_SQ.rightExtent); STRING_SQ.v = artLexemeAsString(STRING_SQ.leftExtent, STRING_SQ.rightExtent); }
+STRING_DQ <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
+  &STRING_DQ {STRING_DQ.lexeme = artLexeme(STRING_DQ.leftExtent, STRING_DQ.rightExtent); STRING_DQ.v = artLexemeAsString(STRING_DQ.leftExtent, STRING_DQ.rightExtent); }
