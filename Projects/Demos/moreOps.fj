@@ -42,3 +42,7 @@ F <- false;
 sysout("Prints true: ");
 sysline(T * F + T);
 
+// or 	
+sysout("Prints false: ");
+sysline(true || false && false);
+

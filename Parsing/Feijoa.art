@@ -48,6 +48,7 @@ mainExpr <o: Object> ::= assign
 
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
+	| or  { subExprA.o = or1.o;  }
 	| gtr { subExprA.o = gtr1.o; }
 	
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
@@ -156,6 +157,9 @@ not <o: Object> ::= '!' subExprE
 and <o: Object> ::= subExprA '&&' subExprA 
 	{ and.o = (bv(subExprA1.o)
 			&& bv(subExprA2.o)); }
+			
+or <o: Object> ::= subExprA '||' subExprA 
+	{ or.o = bv(subExprA1.o) || bv(subExprA2.o); }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
