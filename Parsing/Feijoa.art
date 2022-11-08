@@ -31,8 +31,7 @@ mainExpr <o: Object> ::= assign
 
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 	| gtr { subExprA.o = gtr1.o; }
-	| not { subExprA.o = not1.o; }
-
+	
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
 	| plus { subExprB.o = plus1.o; }
 	| minus { subExprB.o = minus1.o; }
@@ -40,8 +39,12 @@ subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
 subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
 	| multiply { subExprC.o = multiply1.o; }
 
-subExprD <o: Object> ::= operand { subExprD.o = operand1.o; }
+subExprD <o: Object> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
+	
+subExprE <o: Object> ::= operand { subExprE.o = operand1.o; }
+	| not { subExprE.o = not1.o; }
+
 		
 gtr <o: Object> ::= subExprB '>' subExprB
 		{ 	try {
@@ -52,9 +55,6 @@ gtr <o: Object> ::= subExprB '>' subExprB
 										Double.valueOf(subExprB2.o.toString()))) > 0;
 			}
 		}
-		
-not <o: Object> ::= '!' subExprA
-	{ not.o = !(Boolean.valueOf(subExprA1.o.toString())); }
 		
 assign <o: Object> ::= ID '<-' subExprA ';' 
 		{ symbols.put(ID1.v, subExprA1.o); }
@@ -116,6 +116,9 @@ exponentiate <o: Object> ::= operand '**' subExprD
 						, Double.valueOf(subExprD1.o.toString()));
 			}
 		}
+		
+not <o: Object> ::= '!' operand
+	{ not.o = !(Boolean.valueOf(operand1.o.toString())); }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
