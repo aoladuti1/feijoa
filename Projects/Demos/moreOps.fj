@@ -26,3 +26,12 @@ sysout("Prints false: ");
 sysline(!(x > 2));
 
 // gives error: sysline(!x > 2); (which is what we want)
+
+
+// and
+
+sysout("Prints true: ");
+sysline(!((x > 2) && (x > 100)));
+
+sysout("Prints false: ");
+sysline(!((x > 2) && (x > 1)));
