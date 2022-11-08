@@ -8,6 +8,19 @@ prelude {import java.util.HashMap;}
 
 support { 
 	HashMap<String, Object> symbols = new HashMap<String, Object>(); // key, value = identifier, value
+	
+	Integer iv(Object obj) {
+		return Integer.valueOf(obj.toString());
+	}
+	
+	Boolean bv(Object obj) {
+		String s = obj.toString();
+		if (s.equalsIgnoreCase("true"))
+			return true;
+		if (s.equalsIgnoreCase("false"))
+			return false;
+		throw new IllegalArgumentException();
+	}
 }
 
 (* ONLY INTEGERS WORK AT THE MOMENT *)
@@ -30,6 +43,7 @@ mainExpr <o: Object> ::= assign
 
 
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
+	| and { subExprA.o = and1.o; }
 	| gtr { subExprA.o = gtr1.o; }
 	
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
@@ -46,7 +60,7 @@ subExprE <o: Object> ::= subExprF { subExprE.o = subExprF1.o; }
 	| not { subExprE.o = not1.o; }
 	
 subExprF <o: Object> ::= operand { subExprF.o = operand1.o; }
-	| and { subExprF.o = and1.o; }
+
 
 		
 gtr <o: Object> ::= subExprB '>' subExprB
@@ -64,19 +78,25 @@ assign <o: Object> ::= ID '<-' subExprA ';'
 		
 plus <o: Object> ::= subExprB '+' subExprC
 	{ 	try {
-			plus.o = (Integer.valueOf(subExprB1.o.toString())
+			plus.o = (iv(subExprB1.o)
 					+ Integer.valueOf(subExprC1.o.toString()));
 		} 
 		catch (Exception FjException) {
 			try {
 				plus.o = (Double.valueOf(subExprB1.o.toString())
 						+ Double.valueOf(subExprC1.o.toString()));
+			}
+		catch (Exception FjException2) {
+			try {
+				plus.o = (bv(subExprB1.o)
+					   || bv(subExprC1.o));
 			} 
-			catch (Exception FJException2) {
+		catch (Exception FJException3) {
 				plus.o = (String) subExprB1.o + (String) subExprC1.o;
 			}
 		}
-	}
+		}
+	}	
 					
 minus <o: Object> ::= subExprB '-' subExprC
 	{ 	try {
@@ -102,8 +122,14 @@ multiply <o: Object> ::= subExprC '*' subExprD
 					    * Integer.valueOf(subExprD1.o.toString()));
 		} 
 		catch (Exception FjException) {
-			multiply.o = (Double.valueOf(subExprC1.o.toString())
-					    * Double.valueOf(subExprD1.o.toString()));
+			try {
+				multiply.o = (Double.valueOf(subExprC1.o.toString())
+							* Double.valueOf(subExprD1.o.toString()));
+			}
+		catch (Exception FJException2) {
+			multiply.o = (Boolean.valueOf(subExprC1.o.toString())
+						&& Boolean.valueOf(subExprD1.o.toString()));
+			}
 		}
 	}
 		
@@ -123,9 +149,9 @@ exponentiate <o: Object> ::= subExprE '**' subExprD
 not <o: Object> ::= '!' subExprE
 	{ not.o = !(Boolean.valueOf(subExprE1.o.toString())); }
 	
-and <o: Object> ::= subExprF '&&' operand 
-	{ and.o = (Boolean.valueOf(subExprF1.o.toString())
-			&& Boolean.valueOf(operand1.o.toString())); }
+and <o: Object> ::= subExprA '&&' subExprA 
+	{ and.o = (Boolean.valueOf(subExprA1.o.toString())
+			&& Boolean.valueOf(subExprA2.o.toString())); }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER

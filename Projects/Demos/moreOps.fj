@@ -29,9 +29,16 @@ sysline(!(x > 2));
 
 
 // and
-
 sysout("Prints true: ");
 sysline(!((x > 2) && (x > 100)));
 
 sysout("Prints false: ");
 sysline(!((x > 2) && (x > 1)));
+
+
+// boolean algebra
+T <- true;
+F <- false;
+sysout("Prints true: ");
+sysline(T * F + T);
+
