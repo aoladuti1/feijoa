@@ -42,8 +42,11 @@ subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
 subExprD <o: Object> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
 	
-subExprE <o: Object> ::= operand { subExprE.o = operand1.o; }
+subExprE <o: Object> ::= subExprF { subExprE.o = subExprF1.o; }
 	| not { subExprE.o = not1.o; }
+	
+subExprF <o: Object> ::= operand { subExprF.o = operand1.o; }
+	| and { subExprF.o = and1.o; }
 
 		
 gtr <o: Object> ::= subExprB '>' subExprB
@@ -104,21 +107,25 @@ multiply <o: Object> ::= subExprC '*' subExprD
 		}
 	}
 		
-exponentiate <o: Object> ::= operand '**' subExprD
+exponentiate <o: Object> ::= subExprE '**' subExprD
 		{ 	try {
 				exponentiate.o = Math.pow(
-					Integer.valueOf(operand1.o.toString())
+					Integer.valueOf(subExprE1.o.toString())
 						, Integer.valueOf(subExprD1.o.toString()));
 			} 
 			catch (Exception FjException) {
 				exponentiate.o = Math.pow(
-					Double.valueOf(operand1.o.toString())
+					Double.valueOf(subExprE1.o.toString())
 						, Double.valueOf(subExprD1.o.toString()));
 			}
 		}
 		
-not <o: Object> ::= '!' operand
-	{ not.o = !(Boolean.valueOf(operand1.o.toString())); }
+not <o: Object> ::= '!' subExprE
+	{ not.o = !(Boolean.valueOf(subExprE1.o.toString())); }
+	
+and <o: Object> ::= subExprF '&&' operand 
+	{ and.o = (Boolean.valueOf(subExprF1.o.toString())
+			&& Boolean.valueOf(operand1.o.toString())); }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
