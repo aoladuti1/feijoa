@@ -76,10 +76,34 @@ gtr <o: Object> ::= subExprB '>' subExprB
 				gtr.o = (Double.compare(dv(subExprB1.o),
 										dv(subExprB2.o))) > 0;
 			}
-		}
+		} 		
 		
 assign <o: Object> ::= ID '<-' subExprA ';' 
 		{ symbols.put(ID1.v, subExprA1.o); }
+	| plusEquals
+	
+plusEquals <o: Object> ::= ID '+<-' subExprB ';'
+	{ 	try {
+			plusEquals.o = (iv(symbols.get(ID1.v))
+					+ iv(subExprB1.o));
+		} 
+		catch (Exception FjException) {
+			try {
+				plusEquals.o = (dv(symbols.get(ID1.v))
+						+ dv(subExprB1.o));
+			}
+		catch (Exception FjException2) {
+			try {
+				plusEquals.o = (bv(symbols.get(ID1.v))
+					   || bv(subExprB1.o));
+			} 
+		catch (Exception FJException3) {
+				plusEquals.o = symbols.get(ID1.v) + (String) subExprB1.o;
+			}
+		}
+		}
+		{symbols.put(ID1.v, plusEquals.o);}
+	}	
 		
 plus <o: Object> ::= subExprB '+' subExprC
 	{ 	try {
