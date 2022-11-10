@@ -25,3 +25,14 @@ Next steps:
    1 - Finish adding all operations
    2 - Make helper functions / class for duck typing
    3 - Change strings to double quotes instead of single quotes
+
+[10/11/2022]
+Since my last diary entry, I added helper functions for duck typing, boolean algebra, 
+tighter BNF formatting and a plus-equals operator '+<-'.
+I had to avoid += due to it looking weird in this language.
+I also had a lot of trouble with the not operator priority as it was meshed with math operators.
+
+Next steps:
+   1 - Make a helper class
+   2 - Finish adding operations
+   3 - Start work on branching
