@@ -15,5 +15,5 @@ and run Feijoa (.fj) files.
 
 Note: adding the directory of feijoa.bat to your PATH removes the need of './' in commands
 
-Example command: ./feijoa -r Projects/Demos/assignDemo
+Example command: ./feijoa -r Projects/Demos/assign
 Note: the .fj extension is optional
