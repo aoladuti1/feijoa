@@ -1,0 +1,24 @@
+x <- 5;
+if x > 6 && x > 4 {
+	sysout("error");
+} elif x > 3 {
+	sysout("cos");
+}
+if x > 5 {
+	sysout("error");
+}
+elif x > 5 {
+    sysout("error"); 
+}
+elif x > 4 {
+	sysout("min");
+}
+elif x > 4 {
+	sysout("error");
+}
+elif x > 4 {
+	sysout("error");
+}
+if x > 4 {
+	sysout("!");
+}
