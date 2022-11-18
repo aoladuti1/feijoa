@@ -1,4 +1,5 @@
 @echo off
+set old=%CD%
 set fei=Feijoa
 for %%Q in ("%~dp0.") DO set "arthome=%%~fQ"
 set "arthome=%arthome%\Parsing"
@@ -19,3 +20,4 @@ if not '%2'=='' (
 if '%1'=='-r' (
 	java -classpath .;%arthome%/art.jar ARTTest %3 %4 %5 %6 %7 %8 %9 +inputFileIfExists:'%project%' +phaseAG
 )
+cd %old%
