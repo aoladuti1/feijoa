@@ -34,7 +34,34 @@ whitespace &COMMENT_LINE_C
 whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
-statement ::= mainExpr | sysout | sysline 
+compStatements ::= '{' statements '}' | statement
+statement ::= ifExpr compStatements< 
+		{	if (bv(ifExpr1.o) == true) {
+				artEvaluate(statement.compStatements1, compStatements1); 
+			}
+		}
+	| ifExpr compStatements< elifExpr compStatements<
+		{ if (bv(ifExpr1.o) == true) {
+			artEvaluate(statement.compStatements1, compStatements1); 
+			}
+		  else if (bv(elifExpr1.o)== true){
+			artEvaluate(statement.compStatements2, compStatements2);  
+		  }
+		}
+	| elifExpr compStatements< elifExpr compStatements<
+		{	
+			if (bv(elifExpr1.o) == false && bv(elifExpr2.o) == true) {
+				artEvaluate(statement.compStatements2, compStatements2); 
+			}
+		}
+    | mainExpr | sysout | sysline
+
+ifExpr <o: Object> ::= 'if' mainExpr
+	{ ifExpr.o = mainExpr1.o; }
+	
+elifExpr <o: Object> ::= 'elif' mainExpr
+	{ elifExpr.o = mainExpr1.o; }
+	
 
 sysout ::= 'sysout' '(' mainExpr ')'
 	{ System.out.print(mainExpr1.o); } ';'
