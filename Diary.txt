@@ -46,3 +46,8 @@ Next steps:
    1 - Make a helper class
    2 - Add an else branch
    3 - Finish a good chunk of operators
+
+[21/11/2022]
+Since my last diary entry, I properly implemented my FJ helper class and added
+a 'while' and 'until' loop, with code neatening. Some extra operations were also added
+(minusEquals, negate, equ [equals]...)
