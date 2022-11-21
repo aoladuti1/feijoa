@@ -147,26 +147,7 @@ plusEquals <o: Object> ::= ID '+<-' subExprB ';'
 	}	
 		
 plus <o: Object> ::= subExprB '+' subExprC
-	{ 	try {
-			plus.o = (iv(subExprB1.o)
-					+ iv(subExprC1.o));
-		} 
-		catch (Exception FjException) {
-			try {
-				plus.o = (dv(subExprB1.o)
-						+ dv(subExprC1.o));
-			}
-		catch (Exception FjException2) {
-			try {
-				plus.o = (bv(subExprB1.o)
-					   || bv(subExprC1.o));
-			} 
-		catch (Exception FJException3) {
-				plus.o = (String) subExprB1.o + (String) subExprC1.o;
-			}
-		}
-		}
-	}	
+	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
 					
 minus <o: Object> ::= subExprB '-' subExprC
 	{ 	try {
