@@ -51,3 +51,8 @@ Next steps:
 Since my last diary entry, I properly implemented my FJ helper class and added
 a 'while' and 'until' loop, with code neatening. Some extra operations were also added
 (minusEquals, negate, equ [equals]...)
+
+Next steps:
+   1 - Add a less than operator
+   2 - Implement structs
+   3 - Implement basic functions
