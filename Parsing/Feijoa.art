@@ -54,6 +54,20 @@ statement ::= ifExpr compStatements<
 				artEvaluate(statement.compStatements2, compStatements2); 
 			}
 		}
+	| ifExpr compStatements< 'else' compStatements<
+		{
+			if (bv(ifExpr1.o) == false) {
+				artEvaluate(statement.compStatements2, compStatements2);
+			} else {
+				artEvaluate(statement.compStatements1, compStatements1);
+			}
+		}
+	| elifExpr compStatements< 'else' compStatements<
+		{
+			if (bv(elifExpr1.o) == false) {
+				artEvaluate(statement.compStatements2, compStatements2);
+			}
+		}
     | mainExpr | sysout | sysline
 
 ifExpr <o: Object> ::= 'if' mainExpr
