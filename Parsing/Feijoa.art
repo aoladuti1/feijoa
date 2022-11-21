@@ -8,23 +8,6 @@ prelude {import java.util.HashMap;}
 
 support { 
 	HashMap<String, Object> symbols = new HashMap<String, Object>(); // key, value = identifier, value
-	
-	Integer iv(Object obj) {
-		return Integer.valueOf(obj.toString());
-	}
-	
-	Double dv(Object obj) {
-		return Double.valueOf(obj.toString());
-	}
-	
-	Boolean bv(Object obj) {
-		String s = obj.toString();
-		if (s.equalsIgnoreCase("true"))
-			return true;
-		if (s.equalsIgnoreCase("false"))
-			return false;
-		throw new IllegalArgumentException();
-	}
 }
 
 (* ONLY INTEGERS WORK AT THE MOMENT *)
@@ -35,48 +18,48 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= '{' statements '}' | statement
-statement ::= ifExpr compStatements< 
-		{	if (bv(ifExpr1.o) == true) {
-				artEvaluate(statement.compStatements1, compStatements1); 
+statement ::= condStatement | mainExpr | sysout | sysline
+
+condStatement ::= ifExpr compStatements< 
+		{	if (FJ.bv(ifExpr1.o) == true) {
+				artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
 		}
-	| ifExpr compStatements< elifExpr compStatements<
-		{ if (bv(ifExpr1.o) == true) {
-			artEvaluate(statement.compStatements1, compStatements1); 
+	ifExpr compStatements< elifExpr compStatements<
+		{ if (FJ.bv(ifExpr1.o) == true) {
+			artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
-		  else if (bv(elifExpr1.o)== true){
-			artEvaluate(statement.compStatements2, compStatements2);  
+		  else if (FJ.bv(elifExpr1.o)== true){
+			artEvaluate(condStatement.compStatements2, compStatements2);  
 		  }
 		}
 	| elifExpr compStatements< elifExpr compStatements<
 		{	
-			if (bv(elifExpr1.o) == false && bv(elifExpr2.o) == true) {
-				artEvaluate(statement.compStatements2, compStatements2); 
+			if (FJ.bv(elifExpr1.o) == false && FJ.bv(elifExpr2.o) == true) {
+				artEvaluate(condStatement.compStatements2, compStatements2); 
 			}
 		}
 	| ifExpr compStatements< 'else' compStatements<
 		{
-			if (bv(ifExpr1.o) == false) {
-				artEvaluate(statement.compStatements2, compStatements2);
+			if (FJ.bv(ifExpr1.o) == false) {
+				artEvaluate(condStatement.compStatements2, compStatements2);
 			} else {
-				artEvaluate(statement.compStatements1, compStatements1);
+				artEvaluate(condStatement.compStatements1, compStatements1);
 			}
 		}
 	| elifExpr compStatements< 'else' compStatements<
 		{
-			if (bv(elifExpr1.o) == false) {
-				artEvaluate(statement.compStatements2, compStatements2);
+			if (FJ.bv(elifExpr1.o) == false) {
+				artEvaluate(condStatement.compStatements2, compStatements2);
 			}
 		}
-    | mainExpr | sysout | sysline
-
+		
 ifExpr <o: Object> ::= 'if' mainExpr
 	{ ifExpr.o = mainExpr1.o; }
 	
 elifExpr <o: Object> ::= 'elif' mainExpr
 	{ elifExpr.o = mainExpr1.o; }
 	
-
 sysout ::= 'sysout' '(' mainExpr ')'
 	{ System.out.print(mainExpr1.o); } ';'
 	
@@ -86,11 +69,11 @@ sysline ::= 'sysline' '(' mainExpr ')'
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
 
-
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
 	| or  { subExprA.o = or1.o;  }
 	| gtr { subExprA.o = gtr1.o; }
+	| equ { subExprA.o = equ1.o; }
 	
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
 	| plus { subExprB.o = plus1.o; }
@@ -107,124 +90,43 @@ subExprE <o: Object> ::= subExprF { subExprE.o = subExprF1.o; }
 	
 subExprF <o: Object> ::= operand { subExprF.o = operand1.o; }
 
+equ <o: Object> ::= subExprB '==' subExprB
+	{ equ.o = FJ.equ(subExprB1.o, subExprB2.o); }
 
-		
 gtr <o: Object> ::= subExprB '>' subExprB
-		{ 	try {
-				gtr.o = (Integer.compare(iv(subExprB1.o),
-										 iv(subExprB2.o))) > 0;
-			} catch (Exception FjException) {
-				gtr.o = (Double.compare(dv(subExprB1.o),
-										dv(subExprB2.o))) > 0;
-			}
-		} 		
+	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
 		
 assign <o: Object> ::= ID '<-' subExprA ';' 
 		{ symbols.put(ID1.v, subExprA1.o); }
 	| plusEquals
 	
-plusEquals <o: Object> ::= ID '+<-' subExprB ';'
-	{ 	try {
-			plusEquals.o = (iv(symbols.get(ID1.v))
-					+ iv(subExprB1.o));
-		} 
-		catch (Exception FjException) {
-			try {
-				plusEquals.o = (dv(symbols.get(ID1.v))
-						+ dv(subExprB1.o));
-			}
-		catch (Exception FjException2) {
-			try {
-				plusEquals.o = (bv(symbols.get(ID1.v))
-					   || bv(subExprB1.o));
-			} 
-		catch (Exception FJException3) {
-				plusEquals.o = symbols.get(ID1.v) + (String) subExprB1.o;
-			}
-		}
-		}
-		{symbols.put(ID1.v, plusEquals.o);}
-	}	
+plusEquals <o: Object> ::= ID '+<-' subExprC ';'	
+	{ symbols.put(ID1.v, FJ.plus(symbols.get(ID1.v), subExprC1.o)); }
+	
+minusEquals <o: Object> ::= ID '-<-' subExprC ';'
+	{ symbols.put(ID1.v, FJ.minus(symbols.get(ID1.v), subExprC1.o)); }
 		
 plus <o: Object> ::= subExprB '+' subExprC
-	{ 	try {
-			plus.o = (iv(subExprB1.o)
-					+ iv(subExprC1.o));
-		} 
-		catch (Exception FjException) {
-			try {
-				plus.o = (dv(subExprB1.o)
-						+ dv(subExprC1.o));
-			}
-		catch (Exception FjException2) {
-			try {
-				plus.o = (bv(subExprB1.o)
-					   || bv(subExprC1.o));
-			} 
-		catch (Exception FJException3) {
-				plus.o = (String) subExprB1.o + (String) subExprC1.o;
-			}
-		}
-		}
-	}	
+	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
 					
 minus <o: Object> ::= subExprB '-' subExprC
-	{ 	try {
-			minus.o = (iv(subExprB1.o)
-					- iv(subExprC1.o));
-		} 
-		catch (Exception FjException) {
-			try {
-				minus.o = (dv(subExprB1.o)
-						- dv(subExprC1.o));
-			} 
-			catch (Exception FJException2) {
-				String str1 = (String) subExprB1.o;
-				String str2 = (String) subExprC1.o;
-				minus.o = str1.replace(str2, "");
-			}
-		}
-	}
+	{ minus.o = FJ.minus(subExprB1.o, subExprC1.o); }
 	
 multiply <o: Object> ::= subExprC '*' subExprD
-	{ 	try {
-			multiply.o = (iv(subExprC1.o)
-					    * iv(subExprD1.o));
-		} 
-		catch (Exception FjException) {
-			try {
-				multiply.o = (dv(subExprC1.o)
-							* dv(subExprD1.o));
-			}
-		catch (Exception FJException2) {
-			multiply.o = (bv(subExprC1.o)
-						&& bv(subExprD1.o));
-			}
-		}
-	}
+	{ multiply.o = FJ.multiply(subExprC1.o, subExprD1.o); }
 		
 exponentiate <o: Object> ::= subExprE '**' subExprD
-		{ 	try {
-				exponentiate.o = Math.pow(
-					iv(subExprE1.o)
-						, iv(subExprD1.o));
-			} 
-			catch (Exception FjException) {
-				exponentiate.o = Math.pow(
-					dv(subExprE1.o)
-						, dv(subExprD1.o));
-			}
-		}
+	{ exponentiate.o = FJ.exponentiate(subExprE1.o, subExprD1.o); }
 		
 not <o: Object> ::= '!' subExprE
-	{ not.o = !(bv(subExprE1.o)); }
+	{ not.o = !(FJ.bv(subExprE1.o)); }
 	
 and <o: Object> ::= subExprA '&&' subExprA 
-	{ and.o = (bv(subExprA1.o)
-			&& bv(subExprA2.o)); }
-			
+	{ and.o = (FJ.bv(subExprA1.o)
+			&& FJ.bv(subExprA2.o)); }
+
 or <o: Object> ::= subExprA '||' subExprA 
-	{ or.o = bv(subExprA1.o) || bv(subExprA2.o); }
+	{ or.o = FJ.bv(subExprA1.o) || FJ.bv(subExprA2.o); }
 	
 operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
@@ -232,15 +134,14 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| REAL
 		{ operand.o = REAL1.v; }
 	| 'true'
-		{ operand.o = bv(true); }
+		{ operand.o = FJ.bv(true); }
 	| 'false'
-		{ operand.o = bv(false); }
+		{ operand.o = FJ.bv(false); }
 	| STRING_DQ
 		{ operand.o = STRING_DQ1.v; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 	| #
-	
 		
 deref <v: String> ::= ID
 	{ deref.v = ID1.v; }
