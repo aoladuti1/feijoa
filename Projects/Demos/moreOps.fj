@@ -1,15 +1,15 @@
 // exponentiation
 x <- 7;
-sysout("The following prints 49: ");
-sysline(x ** 2); // 49
+sysout("The following prints 49.0: ");
+sysline(x ** 2);
 
-sysout("The following prints 5: ");
+sysout("The following prints 5.0: ");
 sysline(25 ** 0.5);
 
 
 // minus 
 x <- 10;
-sysout("The following also prints 5: ");
+sysout("The following prints 5: ");
 sysline(15 - x);
 
 lie <- "i don't like computer science. i really don't like it.";
@@ -24,9 +24,6 @@ sysline(!false);
 
 sysout("Prints false: ");
 sysline(!(x > 2));
-
-// gives error: sysline(!x > 2); (which is what we want)
-
 
 // and
 sysout("Prints true: ");
@@ -45,4 +42,8 @@ sysline(T * F + T);
 // or 	
 sysout("Prints false: ");
 sysline(true || false && false);
+
+// equals
+sysout("Prints true if x == x: ");
+sysline(x == x);
 
