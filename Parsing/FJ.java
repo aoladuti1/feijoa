@@ -16,25 +16,69 @@ public class FJ {
 		throw new IllegalArgumentException();
 	}
 	
+	static Object gtr(Object a, Object b) {
+		try {
+			return (Integer.compare(FJ.iv(a), FJ.iv(b))) > 0;
+		} catch (Exception FjException) {
+			return (Double.compare(FJ.dv(a), FJ.dv(b))) > 0;
+		} 	
+	}
+
+	static Object equ(Object a, Object b) {
+		try {
+			return (Integer.compare(FJ.iv(a), FJ.iv(b))) == 0;
+		} catch (Exception FjException) {
+			return (Double.compare(FJ.dv(a), FJ.dv(b))) == 0;
+		} 
+	}
+	
 	static Object plus(Object a, Object b) {
 		try {
-			 return (iv(a)
-					+ iv(b));
-		} 
-		catch (Exception FjException) {
+			return iv(a) + iv(b);
+		} catch (Exception FjException) {
 			try {
-				return (dv(a)
-						+ dv(b));
-			}
-		catch (Exception FjException2) {
-			try {
-				return (bv(a)
-					   || bv(b));
-			} 
-		catch (Exception FJException3) {
-				return (String) a + (String) b;
+				return dv(a) + dv(b);
+			} catch (Exception FjException2) {
+				try {
+					return bv(a) || bv(b);
+				} catch (Exception FJException3) {
+					return (String) a + (String) b;
+				}
 			}
 		}
 	}
+	
+	static Object minus(Object a, Object b) {
+		try {
+			return FJ.iv(a) - FJ.iv(b);
+		} catch (Exception FjException) {
+			try {
+				return FJ.dv(a) - FJ.dv(b);
+			} catch (Exception FJException2) {
+				String str1 = (String) a;
+				String str2 = (String) b;
+				return str1.replace(str2, "");
+			}
+		}
+	}
+	
+	static Object multiply(Object a, Object b) {
+		try {
+			return FJ.iv(a) * FJ.iv(b);
+		} catch (Exception FjException) {
+			try {
+				return FJ.dv(a) * FJ.dv(b);
+			} catch (Exception FJException2) {
+				return (FJ.bv(a) && FJ.bv(b));
+			}
+		}
+	}
+	
+	static Object exponentiate(Object a, Object b) {
+		try {
+			return Math.pow(FJ.iv(a), FJ.iv(b));
+		} catch (Exception FjException) {
+			return Math.pow(FJ.dv(a), FJ.dv(b));
+		}
 	}
 }
