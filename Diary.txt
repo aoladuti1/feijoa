@@ -36,3 +36,13 @@ Next steps:
    1 - Make a helper class
    2 - Finish adding operations
    3 - Start work on branching
+
+[18/11/2022]
+Since my last diary entry, I detoured from adding operators to work on branching.
+I added working if and chainable else if statements. This was done by evaluating the prior if or else if statement
+expression and exploiting the longest-match parse nature of art.
+
+Next steps:
+   1 - Make a helper class
+   2 - Add an else branch
+   3 - Finish a good chunk of operators

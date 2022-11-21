@@ -1,0 +1,42 @@
+/* Note the flexibility of using / omitting braces and also 
+   using / omitting expression parentheses */
+   
+
+sysout("The following prints 'wow it works!: ");
+
+x <- 5;
+if x > 6 && x > 4 {
+	sysout("error");
+} elif x > 3 {
+	sysout("wow ");
+}
+
+if x > 5 {
+	sysout("error");
+}
+elif x > 5 {
+    sysout("error"); 
+}
+elif x > 4 {
+	sysout("it ");
+}
+elif x > 4 {
+	sysout("error");
+}
+elif x > 4 {
+	sysout("error");
+}
+
+if (x > 4) sysline("works!");
+
+sysout("The following prints 'yo adrian!': ");
+
+if (x > 0) {
+	sysout("yo ");
+} else {
+	sysout("error");
+}
+
+if x > 10 {} 
+	elif x > 10 {}
+	else { sysout("adrian!"); }
