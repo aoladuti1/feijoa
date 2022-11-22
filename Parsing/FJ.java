@@ -5,23 +5,24 @@ public class FJ {
 	
 	static HashMap<String, HashMap<String, Object>> structsMNames 
 		= new HashMap<String, HashMap<String, Object>>();
-	static HashMap<String, ArrayList<Object>> structsMValues
-		= new HashMap<String, ArrayList<Object>>();
+	static HashMap<String, ArrayList<FJNamedObj>> structsMValues
+		= new HashMap<String, ArrayList<FJNamedObj>>();
 
 	static String curdef = ""; // whatever struct/func is currently being defined
+	static String curID = ""; // whatever  ID is currently being assigned to a struct/func
 	
 	static void declareStruct(String structID) throws Exception {
 		if (structsMValues.containsKey(structID)) {
 			throw new Exception("Struct " + structID + " already defined.");
 		} else {
-			structsMValues.put(structID, new ArrayList<Object>());
+			structsMValues.put(structID, new ArrayList<FJNamedObj>());
 			structsMNames.put(structID, new HashMap<String, Object>());
 		}
 	}
 	
 	static void addMember(
 			String structID, String memberName, Object memberValue) {
-		structsMValues.get(structID).add(memberValue);
+		structsMValues.get(structID).add(new FJNamedObj(memberName, memberValue));
 		structsMNames.get(structID).put(memberName, memberValue);
 	}
 	
@@ -30,9 +31,12 @@ public class FJ {
 	}
 	
 	static Object getMember(String structID, int memberIndex) {
-		return structsMValues.get(structID).get(memberIndex);
-	} 
+		return structsMValues.get(structID).get(memberIndex).obj;
+	}
 	
+	static Object getMemberName(String structID, int memberIndex) {
+		return structsMValues.get(structID).get(memberIndex).name;
+	}	
 	
 	static Integer iv(Object obj) {
 		return Integer.valueOf(obj.toString());
