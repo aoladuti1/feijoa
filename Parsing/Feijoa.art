@@ -4,12 +4,11 @@
 * computer science dept. @ royal holloway, university of london
 *
 *******************************************************************************)
-prelude {import java.util.HashMap;}
+prelude {import java.util.HashMap; import java.util.ArrayList;}
 
 support { 
 	HashMap<String, Object> symbols = new HashMap<String, Object>(); // key, value = identifier, value
-	HashMap<String, Object> structs = new HashMap<String, Object>();
-	String defining = "";
+
 	
 }
 
@@ -17,9 +16,24 @@ whitespace &SIMPLE_WHITESPACE
 whitespace &COMMENT_LINE_C
 whitespace &COMMENT_BLOCK_C
 
-statements ::= statement | statement statements
 compStatements ::= '{' statements '}' | statement
-statement ::= loopStatement | condStatement | mainExpr | sysout | sysline
+statements ::= statement | statement statements
+statement ::= defStruct | loopStatement | condStatement | mainExpr | sysout | sysline
+
+structDefinition ::= '{' structStatements '}' | structStatement
+structStatements ::= structStatement | structStatement structStatements
+structStatement ::= memberAssign
+
+defStruct ::= ID 
+		{	try { 
+				FJ.declareStruct(ID1.v); 
+			} catch (Exception FJException) {
+				System.err.println(FJException);
+			}
+			while (!FJ.curdef.equals(""))
+				{ try {Thread.sleep(1);} catch (Exception FJException) {} } 
+			FJ.curdef = ID1.v;
+		} '<-' structDefinition { FJ.curdef = ""; }
 
 loopStatement ::= whileExpr< compStatements<
 		{	artEvaluate(
@@ -76,6 +90,7 @@ condStatement ::= ifExpr compStatements<
 			}
 		}
 		
+		
 whileExpr <o: Object> ::= 'while' mainExpr
 	{ whileExpr.o = mainExpr1.o; }
 
@@ -88,11 +103,16 @@ ifExpr <o: Object> ::= 'if' mainExpr
 elifExpr <o: Object> ::= 'elif' mainExpr
 	{ elifExpr.o = mainExpr1.o; }
 	
+	
 sysout ::= 'sysout' '(' mainExpr ')'
 	{ System.out.print(mainExpr1.o); } ';'
 	
 sysline ::= 'sysline' '(' mainExpr ')'
 	{ System.out.println(mainExpr1.o); } ';'
+	
+
+memberAssign ::= ID '=' subExprA ';' 
+		{ FJ.addMember(FJ.curdef, ID1.v, subExprA1.o); }
 	
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
@@ -125,7 +145,7 @@ equ <o: Object> ::= subExprB '==' subExprB
 gtr <o: Object> ::= subExprB '>' subExprB
 	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
 		
-assign <o: Object> ::= ID '=' subExprA ';' 
+assign ::= ID '=' subExprA ';' 
 		{ symbols.put(ID1.v, subExprA1.o); }
 	| plusEquals
 	| minusEquals

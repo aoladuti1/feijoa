@@ -1,4 +1,39 @@
+import java.util.HashMap;
+import java.util.ArrayList;
+
 public class FJ {
+	
+	static HashMap<String, HashMap<String, Object>> structsMNames 
+		= new HashMap<String, HashMap<String, Object>>();
+	static HashMap<String, ArrayList<Object>> structsMValues
+		= new HashMap<String, ArrayList<Object>>();
+
+	static String curdef = ""; // whatever struct/func is currently being defined
+	
+	static void declareStruct(String structID) throws Exception {
+		if (structsMValues.containsKey(structID)) {
+			throw new Exception("Struct " + structID + " already defined.");
+		} else {
+			structsMValues.put(structID, new ArrayList<Object>());
+			structsMNames.put(structID, new HashMap<String, Object>());
+		}
+	}
+	
+	static void addMember(
+			String structID, String memberName, Object memberValue) {
+		structsMValues.get(structID).add(memberValue);
+		structsMNames.get(structID).put(memberName, memberValue);
+	}
+	
+	static Object getMember(String structID, String memberName) {
+		return structsMNames.get(structID).get(memberName);
+	}
+	
+	static Object getMember(String structID, int memberIndex) {
+		return structsMValues.get(structID).get(memberIndex);
+	} 
+	
+	
 	static Integer iv(Object obj) {
 		return Integer.valueOf(obj.toString());
 	}
