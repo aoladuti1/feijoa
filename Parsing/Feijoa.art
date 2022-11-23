@@ -26,14 +26,14 @@ structStatement ::= memberAssign
 
 defStruct ::= 'struct' ID 
 		{	try { 
-				FJ.declareStruct(ID1.v); 
+				FJ.declareStruct(ID1.v);
 			} catch (Exception FJException) {
 				System.err.println(FJException);
+			} finally {
+				FJArgStack.push();
 			}
-			while (!FJ.curdef.equals(""))
-				{ try {Thread.sleep(1);} catch (Exception __) {} } 
-			FJ.curdef = ID1.v;
-		} structDefinition { FJ.curdef = ""; }
+			FJArgStack.setCurType(ID1.v);
+		} structDefinition { FJArgStack.pop(); }
 
 loopStatement ::= whileExpr< compStatements<
 		{	artEvaluate(
@@ -112,7 +112,7 @@ sysline ::= 'sysline' '(' mainExpr ')'
 	
 
 memberAssign ::= ID '=' subExprA ';' 
-		{ FJ.addMember(FJ.curdef, ID1.v, subExprA1.o); }
+		{ FJ.addMember(FJArgStack.getCurType(), ID1.v, subExprA1.o); }
 	
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
@@ -153,39 +153,33 @@ assign ::= AID '=' subExprA ';'
 	
 structAssign ::= ID
 		{ FJ.putSymbol(ID1.v, new HashMap<String, Object>()); }
-	  '<-' ID {	while (!FJ.curdef.equals("") && !FJ.curID.equals(""))
-					try {Thread.sleep(1);} catch (Exception __) {}
-				FJ.curID = ID1.v;
-				FJ.curdef = ID2.v; 
-				FJ.argIndex = -1;
-				FJ.argCount = 0;
-			  }
+	  '<-' ID { FJArgStack.push();
+				FJArgStack.setCurType(ID2.v);
+				FJArgStack.setCurID(ID1.v); }
 	  '(' structArgs ')' {
-		  if (FJ.argCount < 0) {
-				FJ.symbols.remove(FJ.curID);
+		  if (FJArgStack.getArgCount() < 0) {
+				FJ.symbols.remove(FJArgStack.getCurID());
 				return;
 		  }
-	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJ.curdef);
+	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
 		  int maxArgs = classMemberVars.size();
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers
-			= (HashMap<String, Object>) FJ.symbols.get(FJ.curID);
+			= (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
 		  FJNamedObj classMember;
-		  for (int i = FJ.argCount; i < maxArgs; i++) {
+		  for (int i = FJArgStack.getArgCount(); i < maxArgs; i++) {
 		      classMember = classMemberVars.get(i);
 			  curIDMembers.put(classMember.name, classMember.obj);
 		  }
-		}
-
-	   ';' {FJ.curdef = ""; FJ.curID = ""; FJ.argIndex = -1; FJ.argCount = 0; }
+		} ';' { FJArgStack.pop(); }
 	
 structArgs <c:int> ::= arg ',' structArgs
-		{ ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJ.curdef);
+		{ ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
 	      int maxArgs = classMemberVars.size();
-		  FJ.argIndex--;
+		  FJArgStack.decrArgIndex();
 		  FJNamedObj curNamedObj;
 		  try {
-			curNamedObj = classMemberVars.get(FJ.argIndex);
+			curNamedObj = classMemberVars.get(FJArgStack.getArgIndex());
 		  } catch (Exception FJException) {
 			return;
 		  }
@@ -193,22 +187,26 @@ structArgs <c:int> ::= arg ',' structArgs
 		  Object curMemberObj = arg1.o;
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers 
-		      = (HashMap<String, Object>) FJ.symbols.get(FJ.curID);
+		      = (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
 		  curIDMembers.put(curMemberName, curMemberObj);
 		  // curIDMembers is the memberName, memberObject hashmap of the variable
 	  }
 	| arg 
-		{ if (FJ.argIndex == -1) {
-		      FJ.argIndex = FJ.argCount;
-		  }
-		  ArrayList<FJNamedObj> classMemberVars1 = FJ.structsMValues.get(FJ.curdef);
+		{ @SuppressWarnings("unchecked")
+		  Integer argc = FJArgStack.getArgCount();
+		  @SuppressWarnings("unchecked")
+		  String curType = FJArgStack.getCurType();
+		  if (FJArgStack.getArgIndex()==-1) {
+		      FJArgStack.setArgIndex(argc); // arguments start at argcount and descend.
+		  }  
+		  ArrayList<FJNamedObj> classMemberVars1 = FJ.structsMValues.get(curType);
 		  int maxArgs1 = classMemberVars1.size();
-		  if (FJ.argCount > maxArgs1) {
+		  if (argc > maxArgs1) {
 			  System.err.println(
-			      "ArgError: [" + FJ.curID
-				+ "] too many arguments for struct type " + FJ.curdef
-				+ " (got " + FJ.argCount + "; expected up to " + maxArgs1 + ")");
-			  FJ.argCount = -1;
+			      "ArgError: [" + FJArgStack.getCurID()
+				+ "] too many arguments for struct type " + curType
+				+ " (got " + argc + "; expected up to " + maxArgs1 + ")");
+			  FJArgStack.setArgCount(-1);
 			  return;
 		  }
 		  Object curMemberObj1;
@@ -216,18 +214,17 @@ structArgs <c:int> ::= arg ',' structArgs
 			  return;
 		  } else {
 	          curMemberObj1 = arg1.o;
-			  FJ.argIndex--;
+			  FJArgStack.decrArgIndex();
 		  }
-
-		  FJNamedObj curNamedObj1 = classMemberVars1.get(FJ.argIndex);
+		  FJNamedObj curNamedObj1 = classMemberVars1.get(FJArgStack.getArgIndex());
 		  String curMemberName1 = curNamedObj1.name;
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers1 
-		      = (HashMap<String, Object>) FJ.symbols.get(FJ.curID);
+		      = (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
 		  curIDMembers1.put(curMemberName1, curMemberObj1);
 	 }
 arg <o: Object> ::=  # { arg.o = NO_ARG; } 
-	| typeNote subExprA { arg.o = subExprA1.o; FJ.argCount++; }
+	| typeNote subExprA { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
 
 typeNote ::= ID ':' | #
 	

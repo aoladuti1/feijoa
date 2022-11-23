@@ -5,9 +5,6 @@ public class FJ {
 	
 	static HashMap<String, Object> symbols =
 		new HashMap<String, Object>(); // key, value = identifier, value
-
-	static HashMap<String, HashMap<String, Object>> structsMNames 
-		= new HashMap<String, HashMap<String, Object>>();
 		
 	static HashMap<String, ArrayList<FJNamedObj>> structsMValues
 		= new HashMap<String, ArrayList<FJNamedObj>>();
@@ -48,18 +45,12 @@ public class FJ {
 			throw new Exception("Struct " + structID + " already defined.");
 		} else {
 			structsMValues.put(structID, new ArrayList<FJNamedObj>());
-			structsMNames.put(structID, new HashMap<String, Object>());
 		}
 	}
 	
 	static void addMember(
 			String structID, String memberName, Object memberValue) {
 		structsMValues.get(structID).add(new FJNamedObj(memberName, memberValue));
-		structsMNames.get(structID).put(memberName, memberValue);
-	}
-	
-	static Object getMember(String structID, String memberName) {
-		return structsMNames.get(structID).get(memberName);
 	}
 	
 	static Object getMember(String structID, int memberIndex) {
