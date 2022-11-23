@@ -1,0 +1,27 @@
+struct X {
+
+	a = "1"; // to show that structs can hold different types
+	b = 2;
+	c = 3;
+
+}
+
+struct Y {
+
+	a = 0;
+
+}
+
+
+x <- X(-1000); // note that this made x.a = -1000, x.b = 2, x.c = 3
+x.a = 1; 
+
+y <- Y(LaLaLa: 34); // note the optional type hint in the constructor!
+
+sysline("The following is the result "
+	  +	"of the adding all defined member variables (40): ");
+sysline(x.a + x.b + x.c + y.a);
+
+sysline("");
+sysline("The following prints an error due to too many arguments:");
+z <- X(4,5,6,7);
