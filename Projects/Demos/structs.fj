@@ -8,7 +8,7 @@ c = 3;
 
 
 x <- X();
-y <- X(99);
+y <- X(iAmATypeNote: 99);
 x.b = 700;
 sysline("\t" + x);
 sysline(y);
