@@ -3,13 +3,45 @@ import java.util.ArrayList;
 
 public class FJ {
 	
+	static HashMap<String, Object> symbols =
+		new HashMap<String, Object>(); // key, value = identifier, value
+
 	static HashMap<String, HashMap<String, Object>> structsMNames 
 		= new HashMap<String, HashMap<String, Object>>();
+		
 	static HashMap<String, ArrayList<FJNamedObj>> structsMValues
 		= new HashMap<String, ArrayList<FJNamedObj>>();
 
+	final static String memberOp = ".";
 	static String curdef = ""; // whatever struct/func is currently being defined
 	static String curID = ""; // whatever  ID is currently being assigned to a struct/func
+	static int argIndex = -1;
+	static int argCount = 0;
+	
+	@SuppressWarnings("unchecked")
+	public static Object getSymbol(String ID) {
+		int dotIndex = ID.indexOf(memberOp);
+		if (dotIndex == -1) {
+			return symbols.get(ID);
+		} else {
+			HashMap<String, Object> subTable = 
+				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
+			return subTable.get(ID.substring(dotIndex + 1));
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void putSymbol(String ID, Object value) {
+		int dotIndex = ID.indexOf(memberOp);
+		if (dotIndex == -1) {
+			symbols.put(ID, value);
+		} else {
+			HashMap<String, Object> subTable = 
+				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
+			subTable.put(ID.substring(dotIndex + 1), value);
+		}
+		
+	}
 	
 	static void declareStruct(String structID) throws Exception {
 		if (structsMValues.containsKey(structID)) {
@@ -54,6 +86,7 @@ public class FJ {
 			return false;
 		throw new IllegalArgumentException();
 	}
+
 	
 	static Object gtr(Object a, Object b) {
 		try {
@@ -81,7 +114,7 @@ public class FJ {
 				try {
 					return bv(a) || bv(b);
 				} catch (Exception FJException3) {
-					return (String) a + (String) b;
+					return a.toString() + b.toString();
 				}
 			}
 		}
