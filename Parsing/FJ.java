@@ -18,13 +18,13 @@ public class FJ {
 	@SuppressWarnings("unchecked")
 	public static Object getSymbol(String ID) {
 		int dotIndex = ID.indexOf(memberOp);
-		if (dotIndex == -1) {
-			return symbols.get(ID);
-		} else {
-			HashMap<String, Object> subTable = 
-				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
-			return subTable.get(ID.substring(dotIndex + 1));
-		}
+			if (dotIndex == -1) {
+				return symbols.get(ID);
+			} else {
+				HashMap<String, Object> subTable = 
+					(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
+				return subTable.get(ID.substring(dotIndex + 1));
+			}
 	}
 	
 	@SuppressWarnings("unchecked")
