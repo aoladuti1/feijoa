@@ -56,3 +56,27 @@ Next steps:
    1 - Add a less than operator
    2 - Implement structs
    3 - Implement basic functions
+
+[24/11/2022]
+Since my last diary entry, I implemented structs. Doing so required extreme levels of planning and attention to detail.
+The arrow <- is the struct assignment operator now. Due to misspecification in the BNFmy first solution to struct
+implementation involved processing going from the last argument to the first one, in a convoluted way, 
+but I remedied this to be front to back.
+Later, I also implemented an argument context stack (FJArgStack.java) that uses
+pushes and pops of a context ArrayList to figure out what variable the argument(s) are being passed to, 
+what argument is currently being processed, and how many arguments there are in total.
+
+FJ.java was extended to assist with struct definition and holds a hashtable with key, value
+pairings of [the struct type name] (String) and [its member variables] (ArrayList<FJNamedObject>). Note that an FJNamedObj
+is a pair-type class for Java classes String and Object.
+FJ.java also holds a HashMap of struct typenames as keys and an ArrayList of FJNamedObj member variables as values.
+
+Python-like argument comments called argNotes were implemented too. After specifying an argument, before the comma separator,
+you can add a colon and then text equivalent to a valid variable name. e.g. z <- Donkey(10: weight_donkey). ArgNotes are purely visual
+and do nothing programmatically.
+
+Next steps:
+    1 - Add a less than operator
+    2 - Add a walrus operator
+    3:
+
