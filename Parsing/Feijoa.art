@@ -157,27 +157,28 @@ structAssign ::= ID
 				FJArgStack.setCurType(ID2.v);
 				FJArgStack.setCurID(ID1.v); }
 	  '(' structArgs ')' {
-		  if (FJArgStack.getArgCount() < 0) {
+		  int argi = FJArgStack.getArgIndex();
+	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
+		  int maxArgs = classMemberVars.size();
+		  if (argi > maxArgs - 1) {
 				FJ.symbols.remove(FJArgStack.getCurID());
 				return;
 		  }
-	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
-		  int maxArgs = classMemberVars.size();
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers
 			= (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
 		  FJNamedObj classMember;
-		  for (int i = FJArgStack.getArgCount(); i < maxArgs; i++) {
+		  for (int i = argi + 1; i < maxArgs; i++) {
 		      classMember = classMemberVars.get(i);
 			  curIDMembers.put(classMember.name, classMember.obj);
 		  }
 		} ';' { FJArgStack.pop(); }
 	
-structArgs <c:int> ::= arg ',' structArgs
+structArgs <c:int> ::= arg ','
 		{ ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
 	      int maxArgs = classMemberVars.size();
-		  FJArgStack.decrArgIndex();
-		  FJNamedObj curNamedObj;
+		  FJArgStack.incrArgIndex();
+		  FJNamedObj curNamedObj; 
 		  try {
 			curNamedObj = classMemberVars.get(FJArgStack.getArgIndex());
 		  } catch (Exception FJException) {
@@ -190,16 +191,13 @@ structArgs <c:int> ::= arg ',' structArgs
 		      = (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
 		  curIDMembers.put(curMemberName, curMemberObj);
 		  // curIDMembers is the memberName, memberObject hashmap of the variable
-	  }
+	  } structArgs
 	| arg 
 		{ @SuppressWarnings("unchecked")
-		  Integer argc = FJArgStack.getArgCount();
-		  @SuppressWarnings("unchecked")
+		  ArrayList<FJNamedObj> classMemberVars1 
+			= FJ.structsMValues.get(FJArgStack.getCurType());
 		  String curType = FJArgStack.getCurType();
-		  if (FJArgStack.getArgIndex()==-1) {
-		      FJArgStack.setArgIndex(argc); // arguments start at argcount and descend.
-		  }  
-		  ArrayList<FJNamedObj> classMemberVars1 = FJ.structsMValues.get(curType);
+		  int argc = FJArgStack.getArgCount();
 		  int maxArgs1 = classMemberVars1.size();
 		  if (argc > maxArgs1) {
 			  System.err.println(
@@ -207,6 +205,7 @@ structArgs <c:int> ::= arg ',' structArgs
 				+ "] too many arguments for struct type " + curType
 				+ " (got " + argc + "; expected up to " + maxArgs1 + ")");
 			  FJArgStack.setArgCount(-1);
+			  FJArgStack.incrArgIndex();
 			  return;
 		  }
 		  Object curMemberObj1;
@@ -214,7 +213,10 @@ structArgs <c:int> ::= arg ',' structArgs
 			  return;
 		  } else {
 	          curMemberObj1 = arg1.o;
-			  FJArgStack.decrArgIndex();
+			  FJArgStack.incrArgIndex();
+		  }
+		  if (FJArgStack.getArgIndex() > maxArgs1 - 1) {
+		      return;
 		  }
 		  FJNamedObj curNamedObj1 = classMemberVars1.get(FJArgStack.getArgIndex());
 		  String curMemberName1 = curNamedObj1.name;

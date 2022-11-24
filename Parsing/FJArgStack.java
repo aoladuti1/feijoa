@@ -85,11 +85,11 @@ public class FJArgStack {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static Integer decrArgIndex() {
+	public static Integer incrArgIndex() {
 		ArrayList<Object> t = top();
 		Integer i = (Integer) t.get(2);
-		Integer decrease = i - 1;
-		t.set(2, decrease);
+		Integer increase = i + 1;
+		t.set(2, increase);
 		return i;
 	}
 
