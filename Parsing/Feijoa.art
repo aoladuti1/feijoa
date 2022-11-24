@@ -160,7 +160,6 @@ structAssign ::= ID
 		  int argi = FJArgStack.getArgIndex();
 	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
 		  int maxArgs = classMemberVars.size();
-		  System.out.println(argi + " + " + maxArgs);
 		  if (argi > maxArgs - 1) {
 				FJ.symbols.remove(FJArgStack.getCurID());
 				return;
