@@ -75,8 +75,10 @@ Python-like argument comments called argNotes were implemented too. After specif
 you can add a colon and then text equivalent to a valid variable name. e.g. z <- Donkey(10: weight_donkey). ArgNotes are purely visual
 and do nothing programmatically.
 
+Virtually all of the above is either used or shown in the demo program structs.fj.
+
 Next steps:
     1 - Add a less than operator
-    2 - Add a walrus operator
-    3:
+    2 - Add a walrus operator and more
+    3 - Document BNF more
 
