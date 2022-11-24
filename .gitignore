@@ -3,7 +3,7 @@
 Parsing/*
 !Parsing/Feijoa.art
 !Parsing/art.jar
-!Parsing/FJ.*
-!Parsing/FJArgStack.*
-!Parsing/FJNamedObj.*
+!Parsing/FJ.java
+!Parsing/FJArgStack.java
+!Parsing/FJNamedObj.java
 
