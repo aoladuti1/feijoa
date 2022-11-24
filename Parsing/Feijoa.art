@@ -226,9 +226,9 @@ structArgs <c:int> ::= arg ','
 		  curIDMembers1.put(curMemberName1, curMemberObj1);
 	 }
 arg <o: Object> ::=  # { arg.o = NO_ARG; } 
-	| typeNote subExprA { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
+	| subExprA argNote { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
 
-typeNote ::= ID ':' | #
+argNote ::= ':' ID | #
 	
 plusEquals <o: Object> ::= AID '+=' subExprC ';'	
 	{ FJ.putSymbol(AID1.v, FJ.plus(FJ.getSymbol(AID1.v), subExprC1.o)); }

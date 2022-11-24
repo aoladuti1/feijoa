@@ -16,7 +16,7 @@ struct Y {
 x <- X(-1000); // note that this made x.a = -1000, x.b = 2, x.c = 3
 x.a = 1; 
 
-y <- Y(LaLaLa: 34); // note the optional type hint in the constructor!
+y <- Y(34: alpha); // note the optional ArgNote in the constructor!
 
 sysline("The following is the result "
 	  +	"of the adding all defined member variables (40): ");
