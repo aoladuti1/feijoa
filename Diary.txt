@@ -1,25 +1,28 @@
-
 [10/10/2022] 
 Since first committing to this project a few days ago, 
 I have managed to set up scripts for generating parsers and parsing/running .fj files.
 Further to this, I have implemented and provided a basis for a duck-typing system,
 and added assignment (-> or <-) and addition (+) operators which are fully functional. Parentheses are supported.
+Assignment can work in two ways:
+   1. Value -> Variable
+   2. Variable <- Value
 
 Next Steps:
    1 - Add all mathematical operations
    2 - Add comparison / extra operators
 
 [31/10/2022]
-Since my last diary entry I have improved my scripts, BNF structure and added exponentiation. 
+Since my last diary entry I have improved my scripts, so parsing Feijoa and running it are split
+into concrete commands. Feijoa.art has an improved BNF structure, and also has exponentiation. 
 
 Next Steps:
    1 - Continue adding operations
-   2 - remove the -> operator for now. Use for function chaining later.
+   2 - remove the -> operator for now. (Use for function chaining later?)
 
 [07/11/2022]
-Since my last diary entry I have implemented a better structure for my BNF that respects operation order.
-I added multiply functionality too, and ensured the not operator would work when applied repeatedly (!!false == false).
-It was tricky to find a good way to make the order of operations not too verbose and fit with duck typing.
+Since my last diary entry, I have implemented a better structure for my BNF that respects operation order.
+I added multiplication functionality too, and ensured the not operator would work when applied repeatedly (!!false == false).
+It was tricky to find a good way to make the order of operations well-defined and fixed with duck typing.
 
 Next steps:
    1 - Finish adding all operations
@@ -29,7 +32,7 @@ Next steps:
 [10/11/2022]
 Since my last diary entry, I added helper functions for duck typing, boolean algebra, 
 tighter BNF formatting and a plus-equals operator '+<-'.
-I had to avoid += due to it looking weird in this language.
+I had to avoid += due to it looking unusual in this language.
 I also had a lot of trouble with the not operator priority as it was meshed with math operators.
 
 Next steps:
@@ -38,7 +41,9 @@ Next steps:
    3 - Start work on branching
 
 [18/11/2022]
-Since my last diary entry, I detoured from adding operators to work on branching.
+Since my last diary entry, I detoured from adding more operators to work on branching.
+Because the order of operations is set up, adding further operators is essentially clerical.
+Added greater than (>) operator.
 I added working if and chainable else if statements. This was done by evaluating the prior if or else if statement
 expression and exploiting the longest-match parse nature of art.
 
@@ -48,9 +53,9 @@ Next steps:
    3 - Finish a good chunk of operators
 
 [21/11/2022]
-Since my last diary entry, I properly implemented my FJ helper class and added
-a 'while' and 'until' loop, with code neatening. Some extra operations were also added
-(minusEquals, negate, equ [equals]...)
+Since my last diary entry, I properly implemented my FJ helper class to handle
+operators, and added a 'while' and 'until' loop, with code neatening. 
+Some extra operations were also added (minusEquals [-=], negate (-), equals [==]...)
 
 Next steps:
    1 - Add a less than operator
@@ -59,7 +64,8 @@ Next steps:
 
 [24/11/2022]
 Since my last diary entry, I implemented structs. Doing so required extreme levels of planning and attention to detail.
-The arrow <- is the struct assignment operator now. Due to misspecification in the BNFmy first solution to struct
+The arrow <- is the struct assignment operator now, and all other assignment uses the equals sign (=).
+Due to misspecification in the BNF my first solution to struct
 implementation involved processing going from the last argument to the first one, in a convoluted way, 
 but I remedied this to be front to back.
 Later, I also implemented an argument context stack (FJArgStack.java) that uses
@@ -81,4 +87,3 @@ Next steps:
     1 - Add a less than operator
     2 - Add a walrus operator and more
     3 - Document BNF more
-
