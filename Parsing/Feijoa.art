@@ -56,12 +56,12 @@ loopStatement ::= whileExpr< compStatements<
             }
 		}
 
-condStatement ::= ifExpr compStatements< 
+condStatement ::= ifExpr compStatements<
 		{	if (FJ.bv(ifExpr1.o) == true) {
 				artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
 		}
-	ifExpr compStatements< elifExpr compStatements<
+	| ifExpr compStatements< elifExpr compStatements<
 		{ if (FJ.bv(ifExpr1.o) == true) {
 			artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
