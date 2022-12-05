@@ -3,7 +3,7 @@
 ## Structure
 
 In the root of the repository is a batch command file **feijoa.bat** which
-is to be called from the terminal in order to regenerate the parser for Feijoa and run Feijoa files.
+is to be called from the terminal in order to regenerate the parser and lexer for Feijoa and run Feijoa files.
 
 All language implementation files are in the folder **Parsing**.
 
@@ -15,9 +15,9 @@ The root also contains an author's diary.
 ## Setup 
 Currently, shell commands are Winows only.
 
-After cloning the repository, the parser for Feijoa will need to be regenerated.
+After cloning / downloading the repository, the parser and lexer for Feijoa will need to be regenerated.
 
-Navigate to the clone folder and run `./feijoa -p` from your favourite terminal.
+Navigate to the local repository folder and run `./feijoa -p` from your favourite terminal.
 
 To call the feijoa command from anywhere on your machine, add the clone folder to the **PATH** environment variable.
 
