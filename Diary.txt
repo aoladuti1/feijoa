@@ -87,3 +87,20 @@ Next steps:
     1 - Add a less than operator
     2 - Add a walrus operator and more
     3 - Document BNF more
+
+[02/12/2022]
+Since my last diary entry, I implemented a less-than operator, improved documentation
+and fixed some bugs.
+
+Next steps:
+    1 - Add a walrus operator
+    2 - Refactor where possible (especially variable names in the helper classes)
+    3 - Try implementing numbers with BigDecimal
+
+[05/12/2022]
+Since my last diary entry, I have written a greatest common factor program in the Projects folder.
+
+Next steps:
+    1 - Same as previous
+    2 - Add a sysin function
+    3 - Move built-in functions to the expression section of Feijoa.art 
