@@ -12,7 +12,6 @@ struct Y {
 
 }
 
-
 x <- X(-1000); // note that this made x.a = -1000, x.b = 2, x.c = 3
 x.a = 1; 
 

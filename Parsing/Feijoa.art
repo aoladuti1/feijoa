@@ -121,6 +121,7 @@ subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
 	| or  { subExprA.o = or1.o;  }
 	| gtr { subExprA.o = gtr1.o; }
+	| lss { subExprA.o = lss1.o; }
 	| equ { subExprA.o = equ1.o; }
 	
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
@@ -129,6 +130,7 @@ subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
 	
 subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
 	| multiply { subExprC.o = multiply1.o; }
+	| divide { subExprC.o = divide1.o; }
 
 subExprD <o: Object> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
@@ -144,6 +146,9 @@ equ <o: Object> ::= subExprB '==' subExprB
 
 gtr <o: Object> ::= subExprB '>' subExprB
 	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
+	
+lss <o: Object> ::= subExprB '<' subExprB
+	{ lss.o = FJ.lss(subExprB1.o, subExprB2.o); }
 		
 assign ::= AID '=' subExprA ';' 
 		{ FJ.putSymbol(AID1.v, subExprA1.o); }
@@ -244,6 +249,9 @@ minus <o: Object> ::= subExprB '-' subExprC
 	
 multiply <o: Object> ::= subExprC '*' subExprD
 	{ multiply.o = FJ.multiply(subExprC1.o, subExprD1.o); }
+	
+divide <o: Object> ::= subExprC '/' subExprD
+	{ divide.o = FJ.divide(subExprC1.o, subExprD1.o); }
 		
 exponentiate <o: Object> ::= subExprE '**' subExprD
 	{ exponentiate.o = FJ.exponentiate(subExprE1.o, subExprD1.o); }

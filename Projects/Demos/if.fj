@@ -1,7 +1,6 @@
 /* Note the flexibility of using / omitting braces and also 
    using / omitting expression parentheses */
    
-
 sysout("The following prints 'wow it works!': ");
 
 x = 5;

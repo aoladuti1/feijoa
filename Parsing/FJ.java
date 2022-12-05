@@ -10,10 +10,6 @@ public class FJ {
 		= new HashMap<String, ArrayList<FJNamedObj>>();
 
 	final static String memberOp = ".";
-	static String curdef = ""; // whatever struct/func is currently being defined
-	static String curID = ""; // whatever  ID is currently being assigned to a struct/func
-	static int argIndex = -1;
-	static int argCount = 0;
 	
 	@SuppressWarnings("unchecked")
 	public static Object getSymbol(String ID) {
@@ -40,6 +36,7 @@ public class FJ {
 		
 	}
 	
+	/* Declare a new struct type */
 	static void declareStruct(String structID) throws Exception {
 		if (structsMValues.containsKey(structID)) {
 			throw new Exception("Struct " + structID + " already defined.");
@@ -48,15 +45,18 @@ public class FJ {
 		}
 	}
 	
+	/* Add a default member variable name to a struct type */
 	static void addMember(
 			String structID, String memberName, Object memberValue) {
 		structsMValues.get(structID).add(new FJNamedObj(memberName, memberValue));
 	}
 	
+	/* Get the default member variable of a struct type */
 	static Object getMember(String structID, int memberIndex) {
 		return structsMValues.get(structID).get(memberIndex).obj;
 	}
 	
+	/* Get the name of a member variable by its member index */
 	static Object getMemberName(String structID, int memberIndex) {
 		return structsMValues.get(structID).get(memberIndex).name;
 	}	
@@ -84,6 +84,14 @@ public class FJ {
 			return (Integer.compare(FJ.iv(a), FJ.iv(b))) > 0;
 		} catch (Exception FjException) {
 			return (Double.compare(FJ.dv(a), FJ.dv(b))) > 0;
+		} 	
+	}
+	
+	static Object lss(Object a, Object b) {
+		try {
+			return (Integer.compare(FJ.iv(a), FJ.iv(b))) < 0;
+		} catch (Exception FjException) {
+			return (Double.compare(FJ.dv(a), FJ.dv(b))) < 0;
 		} 	
 	}
 
@@ -134,6 +142,14 @@ public class FJ {
 			} catch (Exception FJException2) {
 				return (FJ.bv(a) && FJ.bv(b));
 			}
+		}
+	}
+	
+	static Object divide(Object a, Object b) {
+		try {
+			return FJ.iv(a) / FJ.iv(b);
+		} catch (Exception FjException) {
+			return FJ.dv(a) / FJ.dv(b);
 		}
 	}
 	

@@ -4,8 +4,8 @@ public class FJArgStack {
 
 	public static ArrayList<ArrayList<Object>> elements = new ArrayList<>();	
 	
-	public static String defaultCurType = "";
-	public static String defaultCurID = "";
+	public static String defaultCurType = ""; // struct type currently in focus
+	public static String defaultCurID = ""; // current variable being assigned to
 	public static Integer defaultArgIndex = -1;
 	public static Integer defaultArgCount = 0;
 
