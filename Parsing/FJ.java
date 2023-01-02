@@ -3,38 +3,8 @@ import java.util.ArrayList;
 
 public class FJ {
 	
-	static HashMap<String, Object> symbols =
-		new HashMap<String, Object>(); // key, value = identifier, value
-		
 	static HashMap<String, ArrayList<FJNamedObj>> structsMValues
 		= new HashMap<String, ArrayList<FJNamedObj>>();
-
-	final static String memberOp = ".";
-	
-	@SuppressWarnings("unchecked")
-	public static Object getSymbol(String ID) {
-		int dotIndex = ID.indexOf(memberOp);
-			if (dotIndex == -1) {
-				return symbols.get(ID);
-			} else {
-				HashMap<String, Object> subTable = 
-					(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
-				return subTable.get(ID.substring(dotIndex + 1));
-			}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static void putSymbol(String ID, Object value) {
-		int dotIndex = ID.indexOf(memberOp);
-		if (dotIndex == -1) {
-			symbols.put(ID, value);
-		} else {
-			HashMap<String, Object> subTable = 
-				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
-			subTable.put(ID.substring(dotIndex + 1), value);
-		}
-		
-	}
 	
 	/* Declare a new struct type */
 	static void declareStruct(String structID) throws Exception {
