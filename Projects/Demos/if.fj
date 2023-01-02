@@ -1,15 +1,13 @@
 /* Note the flexibility of using / omitting braces and also 
    using / omitting expression parentheses */
    
-
 sysout("The following prints 'wow it works!': ");
 
 x = 5;
-if x > 6 && x > 4 {
+if x > 6 && x > 4 
 	sysout("error");
-} elif x > 3 {
+elif x > 3
 	sysout("wow ");
-}
 
 if x > 5 {
 	sysout("error");

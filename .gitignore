@@ -3,7 +3,11 @@
 Parsing/*
 !Parsing/Feijoa.art
 !Parsing/art.jar
-!Parsing/FJ.*
-!Parsing/FJArgStack.*
-!Parsing/FJNamedObj.*
+!Parsing/*.java
+
+
+.vscode/
+
+Parsing/ARTGeneratedParser.java
+Parsing/ARTGeneratedLexer.java
 

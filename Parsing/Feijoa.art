@@ -9,7 +9,7 @@ prelude {import java.util.HashMap; import java.util.ArrayList;}
 support { 
 	final String NO_ARG = "|__FJNOARG__|";
 	// Helper classes: FJ.java
-	
+	STable symbols = new STable();
 }
 
 whitespace &SIMPLE_WHITESPACE
@@ -17,12 +17,16 @@ whitespace &COMMENT_LINE_C
 whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
-compStatements ::= '{' statements '}' | statement
-statement ::= defStruct | loopStatement | condStatement | mainExpr | sysout | sysline
+compStatements ::= scopeEnter statements scopeLeave | scopeEnter statement scopeLeave
+statement ::= defStruct | loopStatement | condStatement | mainExpr
 
 structDefinition ::= '{' structStatements '}' statements | structStatement statements
 structStatements ::= structStatement | structStatement structStatements
 structStatement ::= memberAssign
+
+scopeEnter ::= '{' { symbols.newScope(); } | # { symbols.newScope(); }
+scopeLeave ::= '}' { symbols.oldScope(); } | # { symbols.oldScope(); } 
+
 
 defStruct ::= 'struct' ID 
 		{	try { 
@@ -56,12 +60,12 @@ loopStatement ::= whileExpr< compStatements<
             }
 		}
 
-condStatement ::= ifExpr compStatements< 
+condStatement ::= ifExpr compStatements<
 		{	if (FJ.bv(ifExpr1.o) == true) {
 				artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
 		}
-	ifExpr compStatements< elifExpr compStatements<
+	| ifExpr compStatements< elifExpr compStatements<
 		{ if (FJ.bv(ifExpr1.o) == true) {
 			artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
@@ -104,11 +108,11 @@ elifExpr <o: Object> ::= 'elif' mainExpr
 	{ elifExpr.o = mainExpr1.o; }
 	
 	
-sysout ::= 'sysout' '(' mainExpr ')'
-	{ System.out.print(mainExpr1.o); } ';'
+sysout ::= 'sysout' '(' subExprA ')'
+	{ System.out.print(subExprA1.o); } ';'
 	
-sysline ::= 'sysline' '(' mainExpr ')'
-	{ System.out.println(mainExpr1.o); } ';'
+sysline ::= 'sysline' '(' subExprA ')'
+	{ System.out.println(subExprA1.o); } ';'
 	
 
 memberAssign ::= ID '=' subExprA ';' 
@@ -116,11 +120,18 @@ memberAssign ::= ID '=' subExprA ';'
 	
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
+	| functionCall
+
+functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
+
+voidFunctions ::= sysout | sysline
+
 
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
 	| or  { subExprA.o = or1.o;  }
 	| gtr { subExprA.o = gtr1.o; }
+	| lss { subExprA.o = lss1.o; }
 	| equ { subExprA.o = equ1.o; }
 	
 subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
@@ -129,6 +140,7 @@ subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
 	
 subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
 	| multiply { subExprC.o = multiply1.o; }
+	| divide { subExprC.o = divide1.o; }
 
 subExprD <o: Object> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
@@ -144,15 +156,18 @@ equ <o: Object> ::= subExprB '==' subExprB
 
 gtr <o: Object> ::= subExprB '>' subExprB
 	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
+	
+lss <o: Object> ::= subExprB '<' subExprB
+	{ lss.o = FJ.lss(subExprB1.o, subExprB2.o); }
 		
 assign ::= AID '=' subExprA ';' 
-		{ FJ.putSymbol(AID1.v, subExprA1.o); }
+		{ symbols.put(AID1.v, subExprA1.o); }
 	| structAssign
 	| plusEquals
 	| minusEquals
 	
 structAssign ::= ID
-		{ FJ.putSymbol(ID1.v, new HashMap<String, Object>()); }
+		{ symbols.put(ID1.v, new HashMap<String, Object>()); }
 	  '<-' ID { FJArgStack.push();
 				FJArgStack.setCurType(ID2.v);
 				FJArgStack.setCurID(ID1.v); }
@@ -161,12 +176,12 @@ structAssign ::= ID
 	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
 		  int maxArgs = classMemberVars.size();
 		  if (argi > maxArgs - 1) {
-				FJ.symbols.remove(FJArgStack.getCurID());
+				symbols.remove(FJArgStack.getCurID());
 				return;
 		  }
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers
-			= (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
+			= (HashMap<String, Object>) symbols.get(FJArgStack.getCurID());
 		  FJNamedObj classMember;
 		  for (int i = argi + 1; i < maxArgs; i++) {
 		      classMember = classMemberVars.get(i);
@@ -188,7 +203,7 @@ structArgs <c:int> ::= arg ','
 		  Object curMemberObj = arg1.o;
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers 
-		      = (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
+		      = (HashMap<String, Object>) symbols.get(FJArgStack.getCurID());
 		  curIDMembers.put(curMemberName, curMemberObj);
 		  // curIDMembers is the memberName, memberObject hashmap of the variable
 	  } structArgs
@@ -222,19 +237,19 @@ structArgs <c:int> ::= arg ','
 		  String curMemberName1 = curNamedObj1.name;
 		  @SuppressWarnings("unchecked")
 		  HashMap<String, Object> curIDMembers1 
-		      = (HashMap<String, Object>) FJ.symbols.get(FJArgStack.getCurID());
+		      = (HashMap<String, Object>) symbols.get(FJArgStack.getCurID());
 		  curIDMembers1.put(curMemberName1, curMemberObj1);
 	 }
 arg <o: Object> ::=  # { arg.o = NO_ARG; } 
-	| typeNote subExprA { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
+	| subExprA argNote { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
 
-typeNote ::= ID ':' | #
+argNote ::= ':' ID | #
 	
 plusEquals <o: Object> ::= AID '+=' subExprC ';'	
-	{ FJ.putSymbol(AID1.v, FJ.plus(FJ.getSymbol(AID1.v), subExprC1.o)); }
+	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprC1.o)); }
 	
 minusEquals <o: Object> ::= AID '-=' subExprC ';'
-	{ FJ.putSymbol(AID1.v, FJ.minus(FJ.getSymbol(AID1.v), subExprC1.o)); }
+	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprC1.o)); }
 		
 plus <o: Object> ::= subExprB '+' subExprC
 	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
@@ -244,6 +259,9 @@ minus <o: Object> ::= subExprB '-' subExprC
 	
 multiply <o: Object> ::= subExprC '*' subExprD
 	{ multiply.o = FJ.multiply(subExprC1.o, subExprD1.o); }
+	
+divide <o: Object> ::= subExprC '/' subExprD
+	{ divide.o = FJ.divide(subExprC1.o, subExprD1.o); }
 		
 exponentiate <o: Object> ::= subExprE '**' subExprD
 	{ exponentiate.o = FJ.exponentiate(subExprE1.o, subExprD1.o); }
@@ -266,7 +284,7 @@ and <o: Object> ::= subExprA '&&' subExprA
 or <o: Object> ::= subExprA '||' subExprA 
 	{ or.o = FJ.bv(subExprA1.o) || FJ.bv(subExprA2.o); }
 	
-operand <o: Object> ::= deref { operand.o = FJ.getSymbol(deref1.v); }
+operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 	| INTEGER
 		{ operand.o = INTEGER1.v; }
 	| REAL

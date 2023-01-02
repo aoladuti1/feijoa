@@ -1,0 +1,15 @@
+a = 214748364;
+b = 3948;
+
+sysline(
+"This program uses Euclid's algorithm to find 
+the greatest common factor of 214743864 and 3948:\n");
+sysout(">> ");
+
+while !(a == b) {
+	if a > b
+		a = a - b;
+	else
+		b = b - a;
+}
+sysline(a);
