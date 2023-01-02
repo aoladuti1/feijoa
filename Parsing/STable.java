@@ -53,6 +53,7 @@ class STable {
         return curLevel;
     }
 
+
 	@SuppressWarnings("unchecked")
     public Object get(String ID) {
         int dotIndex = ID.indexOf(memberOp);
@@ -88,5 +89,23 @@ class STable {
 		}
 		
 	}
+
+    // search and destroy. will look on all levels for the variable
+    @SuppressWarnings("unchecked")
+    public Object remove(String ID) {
+        int dotIndex = ID.indexOf(memberOp);
+        int varLevel = levelOf(ID, dotIndex);
+        if (varLevel < 0) {
+            varLevel = level;
+        }
+        HashMap<String, Object> symbols = getTable(varLevel);
+		if (dotIndex == -1) {
+			return symbols.remove(ID);
+		} else {
+			HashMap<String, Object> subTable = 
+				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
+			return subTable.remove(ID.substring(dotIndex + 1));
+		}
+    }
 
 }

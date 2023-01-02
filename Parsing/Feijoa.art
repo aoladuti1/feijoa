@@ -17,15 +17,15 @@ whitespace &COMMENT_LINE_C
 whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
-compStatements ::= scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
-statement ::= defStruct | loopStatement | condStatement | mainExpr | sysout | sysline
+compStatements ::= scopeEnter statements scopeLeave | scopeEnter statement scopeLeave
+statement ::= defStruct | loopStatement | condStatement | mainExpr
 
 structDefinition ::= '{' structStatements '}' statements | structStatement statements
 structStatements ::= structStatement | structStatement structStatements
 structStatement ::= memberAssign
 
-scopeEnter ::= '{' { symbols.newScope(); }
-scopeLeave ::= '}' { symbols.oldScope(); }
+scopeEnter ::= '{' { symbols.newScope(); } | # { symbols.newScope(); }
+scopeLeave ::= '}' { symbols.oldScope(); } | # { symbols.oldScope(); } 
 
 
 defStruct ::= 'struct' ID 
@@ -108,11 +108,11 @@ elifExpr <o: Object> ::= 'elif' mainExpr
 	{ elifExpr.o = mainExpr1.o; }
 	
 	
-sysout ::= 'sysout' '(' mainExpr ')'
-	{ System.out.print(mainExpr1.o); } ';'
+sysout ::= 'sysout' '(' subExprA ')'
+	{ System.out.print(subExprA1.o); } ';'
 	
-sysline ::= 'sysline' '(' mainExpr ')'
-	{ System.out.println(mainExpr1.o); } ';'
+sysline ::= 'sysline' '(' subExprA ')'
+	{ System.out.println(subExprA1.o); } ';'
 	
 
 memberAssign ::= ID '=' subExprA ';' 
@@ -120,6 +120,12 @@ memberAssign ::= ID '=' subExprA ';'
 	
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
+	| functionCall
+
+functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
+
+voidFunctions ::= sysout | sysline
+
 
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
@@ -170,7 +176,7 @@ structAssign ::= ID
 	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
 		  int maxArgs = classMemberVars.size();
 		  if (argi > maxArgs - 1) {
-				FJ.symbols.remove(FJArgStack.getCurID());
+				symbols.remove(FJArgStack.getCurID());
 				return;
 		  }
 		  @SuppressWarnings("unchecked")

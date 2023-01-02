@@ -7,3 +7,7 @@ Parsing/*
 
 
 .vscode/
+
+Parsing/ARTGeneratedParser.java
+Parsing/ARTGeneratedLexer.java
+
