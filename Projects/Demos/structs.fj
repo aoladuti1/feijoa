@@ -1,26 +1,24 @@
 struct X {
 
 	a = "1"; // to show that structs can hold different types
-	b = 2;
+	b = new X(100);
 	c = 3;
 
 }
 
 struct Y {
 
-	a = 0;
+	a = new X();
 
 }
 
-x <- X(-1000); // note that this made x.a = -1000, x.b = 2, x.c = 3
-x.a = 1; 
+c = new Y();
+e = 6;
+if (c.a.c == 3) {
+	d = 5;
+	e = 7;
+}
 
-y <- Y(34: alpha); // note the optional ArgNote in the constructor!
-
-sysline("The following is the result "
-	  +	"of the adding all defined member variables (40): ");
-sysline(x.a + x.b + x.c + y.a);
-
-sysline("");
-sysline("The following prints an error due to too many arguments:");
-z <- X(4,5,6,7);
+sysline(d);
+sysline(e);
+sysline(c.a.b.a);

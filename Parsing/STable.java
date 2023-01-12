@@ -1,14 +1,20 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class STable {
 
-    private LinkedList<HashMap<String, Object>> tree
-        = new LinkedList<>();
+    private LinkedList<HashMap<String, Object>> tree = new LinkedList<>();
 
-    final static String memberOp = ".";
+    final static String selectOp = "\\.";
 
     private int level = 0;
+    private static AtomicInteger anonCount = new AtomicInteger(-1);
+
+    static String newAnonID() {
+        return "$" + anonCount.incrementAndGet();
+    }
 
     private HashMap<String, Object> currentTable() {
         return getTable(level);
@@ -19,9 +25,9 @@ class STable {
     }
 
     public STable() {
-        tree.add(new HashMap<>());        
+        tree.add(new HashMap<>());
     }
-    
+
     public HashMap<String, Object> newScope() {
         level += 1;
         tree.add(new HashMap<>());
@@ -34,78 +40,110 @@ class STable {
         return currentTable();
     }
 
-    public int levelOf(String ID) {
-        return levelOf(ID, ID.indexOf(memberOp));
-    }
-
-    public int levelOf(String ID, int memOpIndex) {
+    /**
+     * Returns the symbol table of an ID (or the current scope's symbol table if it
+     * cannot be found) and the index of the symbol table in a [ table, index ]
+     * array.
+     * 
+     * @param FirstID the first part of a variable ID
+     *                before the member selection operator, if it exists
+     * @return the symbol table of an ID and the index of the symbol table in a [
+     *         table, index ] array
+     */
+    public Object[] tableAndLevel(String FirstID) {
         boolean found = false;
         int curLevel = level;
-        for (;found != true && curLevel != -1; curLevel -= 1) {
-            HashMap<String, Object> symbols = getTable(curLevel);
-            if (memOpIndex == -1) {
-                found = symbols.containsKey(ID);
-            } else {
-                found = symbols.containsKey(ID.substring(0, memOpIndex));
-            }
+        HashMap<String, Object> lastTable = tree.getLast();
+        HashMap<String, Object> symbols = lastTable;
+        for (; found != true && curLevel != -1; curLevel -= 1) {
+            symbols = getTable(curLevel);
+            found = symbols.containsKey(FirstID);
         }
-        if (found == true) { curLevel++; }
-        return curLevel;
+        if (found == true) {
+            curLevel++;
+        } else {
+            symbols = lastTable;
+        }
+        return new Object[] { symbols, curLevel };
     }
 
+    /***
+     * Returns the fully selected object.
+     * E.g. (if the selection operator is '.') a.b.c returns c, or if
+     * {@code penultimate} is true,
+     * returns b. (The last object with a member selection operator after it.)
+     * Only works when the first object is a struct.
+     * 
+     * @param splits the ID split up by member selection operator
+     * @param table  the resolved variable symbol table
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Object fullSelect(String[] splits, HashMap<String, Object> table, boolean penultimate) {
+        HashMap<String, Object> subTable = table;
+        ArrayList<Object> list = null;
+        boolean lastList = false;
+        int i;
+        for (i = 0; i < splits.length - 1; i++) {
+            try {
+                subTable = (HashMap<String, Object>) subTable.get(splits[i]);
+                lastList = false;
+            } catch (Exception FJ_Excpetion) {
+                list = (ArrayList<Object>) subTable.get(splits[i]);
+                lastList = true;
+            }
+        }
+        if (lastList) {
+            return list; // TODO: Handle lists properly
+        } else {
+            return (penultimate) ? subTable : subTable.get(splits[i]);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public Object get(String ID) {
-        int dotIndex = ID.indexOf(memberOp);
-        int varLevel = levelOf(ID, dotIndex);
-        if (varLevel < 0) {
+        String[] splits = ID.split(selectOp);
+        Object[] tableAndLevel = tableAndLevel(splits[0]);
+        HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
+        if (((int) tableAndLevel[1]) < 0) {
             System.err.println("Cannot find the symbol " + ID);
             return null;
         }
-        HashMap<String, Object> symbols = getTable(varLevel);
-        if (dotIndex == -1) {
-            return symbols.get(ID);
+        if (splits.length == 1) {
+            return table.get(ID);
         } else {
-            HashMap<String, Object> subTable = 
-                (HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
-            return subTable.get(ID.substring(dotIndex + 1));
+            return fullSelect(splits, table, false);
         }
     }
 
-	@SuppressWarnings("unchecked")
-	public void put(String ID, Object value) {
-        int dotIndex = ID.indexOf(memberOp);
-        int varLevel = levelOf(ID, dotIndex);
-        if (varLevel < 0) {
-            varLevel = level;
+    @SuppressWarnings("unchecked")
+    public void put(String ID, Object value) {
+        String[] splits = ID.split(selectOp);
+        Object[] tableAndLevel = tableAndLevel(splits[0]);
+        HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
+        if (splits.length == 1) {
+            table.put(ID, value);
+        } else {
+            HashMap<String, Object> subTable 
+                = (HashMap<String, Object>) fullSelect(splits, table, true);
+            subTable.put(splits[splits.length - 1], value);
         }
-        HashMap<String, Object> symbols = getTable(varLevel);
-		if (dotIndex == -1) {
-			symbols.put(ID, value);
-		} else {
-			HashMap<String, Object> subTable = 
-				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
-			subTable.put(ID.substring(dotIndex + 1), value);
-		}
-		
-	}
+
+    }
 
     // search and destroy. will look on all levels for the variable
     @SuppressWarnings("unchecked")
     public Object remove(String ID) {
-        int dotIndex = ID.indexOf(memberOp);
-        int varLevel = levelOf(ID, dotIndex);
-        if (varLevel < 0) {
-            varLevel = level;
+        String[] splits = ID.split(selectOp);
+        Object[] tableAndLevel = tableAndLevel(splits[0]);
+        HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
+        if (splits.length == 1) {
+            return table.remove(ID);
+        } else {
+            HashMap<String, Object> subTable 
+                = (HashMap<String, Object>) fullSelect(splits, table, true);
+            return subTable.remove(splits[splits.length - 1]);
         }
-        HashMap<String, Object> symbols = getTable(varLevel);
-		if (dotIndex == -1) {
-			return symbols.remove(ID);
-		} else {
-			HashMap<String, Object> subTable = 
-				(HashMap<String, Object>) symbols.get(ID.substring(0, dotIndex));
-			return subTable.remove(ID.substring(dotIndex + 1));
-		}
     }
 
 }

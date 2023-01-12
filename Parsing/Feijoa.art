@@ -6,9 +6,7 @@
 *******************************************************************************)
 prelude {import java.util.HashMap; import java.util.ArrayList;}
 
-support { 
-	final String NO_ARG = "|__FJNOARG__|";
-	// Helper classes: FJ.java
+support {
 	STable symbols = new STable();
 }
 
@@ -30,13 +28,14 @@ scopeLeave ::= '}' { symbols.oldScope(); } | # { symbols.oldScope(); }
 
 defStruct ::= 'struct' ID 
 		{	try { 
-				FJ.declareStruct(ID1.v);
+				FJArgStack.declareStruct(ID1.v);
 			} catch (Exception FJException) {
 				System.err.println(FJException);
+				System.exit(0);
 			} finally {
 				FJArgStack.push();
 			}
-			FJArgStack.setCurType(ID1.v);
+			FJArgStack.setType(ID1.v);
 		} structDefinition { FJArgStack.pop(); }
 
 loopStatement ::= whileExpr< compStatements<
@@ -116,7 +115,7 @@ sysline ::= 'sysline' '(' subExprA ')'
 	
 
 memberAssign ::= ID '=' subExprA ';' 
-		{ FJ.addMember(FJArgStack.getCurType(), ID1.v, subExprA1.o); }
+		{ FJArgStack.addMember(FJArgStack.getType(), ID1.v, subExprA1.o); }
 	
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
@@ -162,85 +161,20 @@ lss <o: Object> ::= subExprB '<' subExprB
 		
 assign ::= AID '=' subExprA ';' 
 		{ symbols.put(AID1.v, subExprA1.o); }
-	| structAssign
 	| plusEquals
 	| minusEquals
 	
-structAssign ::= ID
-		{ symbols.put(ID1.v, new HashMap<String, Object>()); }
-	  '<-' ID { FJArgStack.push();
-				FJArgStack.setCurType(ID2.v);
-				FJArgStack.setCurID(ID1.v); }
-	  '(' structArgs ')' {
-		  int argi = FJArgStack.getArgIndex();
-	      ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
-		  int maxArgs = classMemberVars.size();
-		  if (argi > maxArgs - 1) {
-				symbols.remove(FJArgStack.getCurID());
-				return;
-		  }
-		  @SuppressWarnings("unchecked")
-		  HashMap<String, Object> curIDMembers
-			= (HashMap<String, Object>) symbols.get(FJArgStack.getCurID());
-		  FJNamedObj classMember;
-		  for (int i = argi + 1; i < maxArgs; i++) {
-		      classMember = classMemberVars.get(i);
-			  curIDMembers.put(classMember.name, classMember.obj);
-		  }
-		} ';' { FJArgStack.pop(); }
+
+structConstruct <o: Object> ::= 'new' ID 
+		{	FJArgStack.startStructConstruction(ID1.v); } '(' structArgs ')' 
+		{	structConstruct.o = FJArgStack.endStructConstruction();	}
 	
 structArgs <c:int> ::= arg ','
-		{ ArrayList<FJNamedObj> classMemberVars = FJ.structsMValues.get(FJArgStack.getCurType());
-	      int maxArgs = classMemberVars.size();
-		  FJArgStack.incrArgIndex();
-		  FJNamedObj curNamedObj; 
-		  try {
-			curNamedObj = classMemberVars.get(FJArgStack.getArgIndex());
-		  } catch (Exception FJException) {
-			return;
-		  }
-		  String curMemberName = curNamedObj.name;
-		  Object curMemberObj = arg1.o;
-		  @SuppressWarnings("unchecked")
-		  HashMap<String, Object> curIDMembers 
-		      = (HashMap<String, Object>) symbols.get(FJArgStack.getCurID());
-		  curIDMembers.put(curMemberName, curMemberObj);
-		  // curIDMembers is the memberName, memberObject hashmap of the variable
-	  } structArgs
+		{ FJArgStack.processArg(arg1.o); } structArgs
 	| arg 
-		{ @SuppressWarnings("unchecked")
-		  ArrayList<FJNamedObj> classMemberVars1 
-			= FJ.structsMValues.get(FJArgStack.getCurType());
-		  String curType = FJArgStack.getCurType();
-		  int argc = FJArgStack.getArgCount();
-		  int maxArgs1 = classMemberVars1.size();
-		  if (argc > maxArgs1) {
-			  System.err.println(
-			      "ArgError: [" + FJArgStack.getCurID()
-				+ "] too many arguments for struct type " + curType
-				+ " (got " + argc + "; expected up to " + maxArgs1 + ")");
-			  FJArgStack.setArgCount(-1);
-			  FJArgStack.incrArgIndex();
-			  return;
-		  }
-		  Object curMemberObj1;
-		  if (NO_ARG.equals(arg1.o.toString())) {
-			  return;
-		  } else {
-	          curMemberObj1 = arg1.o;
-			  FJArgStack.incrArgIndex();
-		  }
-		  if (FJArgStack.getArgIndex() > maxArgs1 - 1) {
-		      return;
-		  }
-		  FJNamedObj curNamedObj1 = classMemberVars1.get(FJArgStack.getArgIndex());
-		  String curMemberName1 = curNamedObj1.name;
-		  @SuppressWarnings("unchecked")
-		  HashMap<String, Object> curIDMembers1 
-		      = (HashMap<String, Object>) symbols.get(FJArgStack.getCurID());
-		  curIDMembers1.put(curMemberName1, curMemberObj1);
-	 }
-arg <o: Object> ::=  # { arg.o = NO_ARG; } 
+		{ FJArgStack.processLastArg(arg1.o); }
+
+arg <o: Object> ::=  # { arg.o = FJArgStack.NONE; } 
 	| subExprA argNote { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
 
 argNote ::= ':' ID | #
@@ -295,14 +229,20 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = FJ.bv(false); }
 	| STRING_DQ
 		{ operand.o = STRING_DQ1.v; }
+	| structConstruct
+		{ operand.o = structConstruct1.o; }
+	| structConstruct '.' ID 
+		{ @SuppressWarnings("unchecked")
+		  HashMap<String, Object> hm = (HashMap<String, Object>) structConstruct1.o;
+		  operand.o = hm.get(ID1.v); }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 	| #
 		
 deref <v: String> ::= AID
 	{ deref.v = AID1.v; }
-	
-AID <v:String> ::= ID { AID.v = ID1.v; } | ID '.' ID { AID.v = ID1.v + '.' + ID2.v; }
+
+AID <v:String> ::= ID { AID.v = ID1.v; } | ID '.' AID { AID.v = ID1.v + '.' + AID1.v; }
 
 ID <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
   &ID {ID.lexeme = artLexeme(ID.leftExtent, ID.rightExtent); ID.v = artLexemeAsID(ID.leftExtent, ID.rightExtent); }  
