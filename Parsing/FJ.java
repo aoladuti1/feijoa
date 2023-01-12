@@ -1,35 +1,4 @@
-import java.util.HashMap;
-import java.util.ArrayList;
-
 public class FJ {
-	
-	static HashMap<String, ArrayList<FJNamedObj>> structsMValues
-		= new HashMap<String, ArrayList<FJNamedObj>>();
-	
-	/* Declare a new struct type */
-	static void declareStruct(String structID) throws Exception {
-		if (structsMValues.containsKey(structID)) {
-			throw new Exception("Struct " + structID + " already defined.");
-		} else {
-			structsMValues.put(structID, new ArrayList<FJNamedObj>());
-		}
-	}
-	
-	/* Add a default member variable name to a struct type */
-	static void addMember(
-			String structID, String memberName, Object memberValue) {
-		structsMValues.get(structID).add(new FJNamedObj(memberName, memberValue));
-	}
-	
-	/* Get the default member variable of a struct type */
-	static Object getMember(String structID, int memberIndex) {
-		return structsMValues.get(structID).get(memberIndex).obj;
-	}
-	
-	/* Get the name of a member variable by its member index */
-	static Object getMemberName(String structID, int memberIndex) {
-		return structsMValues.get(structID).get(memberIndex).name;
-	}	
 	
 	static Integer iv(Object obj) {
 		return Integer.valueOf(obj.toString());
