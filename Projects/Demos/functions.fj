@@ -1,0 +1,6 @@
+hi = 10;
+def x(hi=5, penis=5) {
+    hi = hi;
+}
+x();
+sysline(hi);

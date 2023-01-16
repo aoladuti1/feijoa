@@ -7,7 +7,23 @@
 prelude {import java.util.HashMap; import java.util.ArrayList;}
 
 support {
-	STable symbols = new STable();
+	
+	FJCallStack callStack = new FJCallStack();
+	STable symbols = new STable(callStack);
+	FJIDStack ids = new FJIDStack();
+
+	@SuppressWarnings("serial")
+	public class FJSigReturn extends ARTException {
+	private Value value;
+
+	public FJSigReturn(String message) {
+		super(message);
+	}
+
+	public FJSigReturn() {
+		this("");
+	}
+	}
 }
 
 whitespace &SIMPLE_WHITESPACE
@@ -16,16 +32,35 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= scopeEnter statements scopeLeave | scopeEnter statement scopeLeave
-statement ::= defStruct | loopStatement | condStatement | mainExpr
+statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnStatement
 
 structDefinition ::= '{' structStatements '}' statements | structStatement statements
 structStatements ::= structStatement | structStatement structStatements
-structStatement ::= memberAssign
+structStatement ::= memberAssign ';'
+
+fnStatements ::= '{' statements '}'
 
 scopeEnter ::= '{' { symbols.newScope(); } | # { symbols.newScope(); }
 scopeLeave ::= '}' { symbols.oldScope(); } | # { symbols.oldScope(); } 
 
+defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } '(' mainDefFuncArgs ')' fnStatements< 
+	{	FJFunction fn = ids.top();
+		fn.setProcedure(defFunc.fnStatements1);
+		symbols.put(fn.name, fn);
+		ids.pop(); }
 
+mainDefFuncArgs ::= defFuncArgs | #
+
+defFuncArgs <c:int> ::= defFuncArg ',' defFuncArgs
+	| defFuncArg
+
+defFuncArg <o: Object> ::= argID optEquals
+	{ ids.top().addArg(argID1.v, optEquals1.o); }
+
+optEquals <o: Object> ::= # { optEquals.o =  null; }
+	| '=' subExprA { optEquals.o = subExprA1.o; }
+
+argID <v: String> ::= ID ':' AID {argID.v = ID1.v;} | ID { argID.v = ID1.v; }
 defStruct ::= 'struct' ID 
 		{	try { 
 				FJArgStack.declareStruct(ID1.v);
@@ -108,20 +143,49 @@ elifExpr <o: Object> ::= 'elif' mainExpr
 	
 	
 sysout ::= 'sysout' '(' subExprA ')'
-	{ System.out.print(subExprA1.o); } ';'
+	{ System.out.print(subExprA1.o); }
 	
 sysline ::= 'sysline' '(' subExprA ')'
-	{ System.out.println(subExprA1.o); } ';'
+	{ System.out.println(subExprA1.o); }
 	
+returnStatement <o: Object> ::= 'return' subExprA ';' 
+	{  callStack.setLastValue(subExprA1.o);
+		if (true) throw new FJSigReturn(); }
 
-memberAssign ::= ID '=' subExprA ';' 
-		{ FJArgStack.addMember(FJArgStack.getType(), ID1.v, subExprA1.o); }
+memberAssign ::= AID '=' subExprA
+		{ FJArgStack.addMember(FJArgStack.getType(), AID1.v, subExprA1.o); }
 	
 mainExpr <o: Object> ::= assign 
+	| returnStatement
 	| subExprA { mainExpr.o = subExprA1.o; }
-	| functionCall
 
 functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
+	| AID 
+		{
+		  callStack.push((FJFunction) symbols.get(AID1.v));
+		} mainFuncArgs
+	{	
+		try {
+			callStack.nextCall();
+			symbols.newScope();
+			artEvaluate(callStack.topProcedure(), null);
+		} catch (FJSigReturn FJsig) {
+			;
+		} finally {
+			functionCall.o = callStack.getLastValue();
+			callStack.pop();
+			symbols.oldScope();
+		}
+	}
+
+mainFuncArgs ::= '(' ')' { callStack.fillArgs(); } | '(' funcArgs ')'
+
+funcArgs ::= funcArg ','
+		{ callStack.processArg(funcArg1.o); } funcArgs
+	| funcArg 
+		{ callStack.processLastArg(funcArg1.o); }
+
+funcArg <o: Object> ::= subExprA argNote { funcArg.o = subExprA1.o; }
 
 voidFunctions ::= sysout | sysline
 
@@ -159,7 +223,7 @@ gtr <o: Object> ::= subExprB '>' subExprB
 lss <o: Object> ::= subExprB '<' subExprB
 	{ lss.o = FJ.lss(subExprB1.o, subExprB2.o); }
 		
-assign ::= AID '=' subExprA ';' 
+assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
 	| plusEquals
 	| minusEquals
@@ -177,12 +241,12 @@ structArgs <c:int> ::= arg ','
 arg <o: Object> ::=  # { arg.o = FJArgStack.NONE; } 
 	| subExprA argNote { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
 
-argNote ::= ':' ID | #
+argNote ::= ':' AID | #
 	
-plusEquals <o: Object> ::= AID '+=' subExprC ';'	
+plusEquals <o: Object> ::= AID '+=' subExprC	
 	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprC1.o)); }
 	
-minusEquals <o: Object> ::= AID '-=' subExprC ';'
+minusEquals <o: Object> ::= AID '-=' subExprC
 	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprC1.o)); }
 		
 plus <o: Object> ::= subExprB '+' subExprC
@@ -235,6 +299,7 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ @SuppressWarnings("unchecked")
 		  HashMap<String, Object> hm = (HashMap<String, Object>) structConstruct1.o;
 		  operand.o = hm.get(ID1.v); }
+	| functionCall { operand.o = functionCall1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 	| #

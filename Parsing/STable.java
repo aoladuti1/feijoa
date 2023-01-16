@@ -8,6 +8,8 @@ class STable {
     private LinkedList<HashMap<String, Object>> tree = new LinkedList<>();
 
     final static String selectOp = "\\.";
+    ArrayList<String> IDStack = new ArrayList<>();
+    FJCallStack callStack = new FJCallStack();
 
     private int level = 0;
     private static AtomicInteger anonCount = new AtomicInteger(-1);
@@ -24,7 +26,8 @@ class STable {
         return tree.get(level);
     }
 
-    public STable() {
+    public STable(FJCallStack callStack) {
+        this.callStack = callStack;
         tree.add(new HashMap<>());
     }
 
@@ -40,9 +43,17 @@ class STable {
         return currentTable();
     }
 
+    public void shiftIn() {
+        level += 1;
+    }
+
+    public void shiftOut() {
+        level -= 1;
+    }
+
     /**
      * Returns the symbol table of an ID (or the current scope's symbol table if it
-     * cannot be found) and the index of the symbol table in a [ table, index ]
+     * cannot be found) and the index of the symbol table (or -1 if it cannot be found) in a [ table, index ]
      * array.
      * 
      * @param FirstID the first part of a variable ID
@@ -105,7 +116,9 @@ class STable {
         String[] splits = ID.split(selectOp);
         Object[] tableAndLevel = tableAndLevel(splits[0]);
         HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
-        if (((int) tableAndLevel[1]) < 0) {
+        if (!callStack.isEmpty() && callStack.containsID(ID)) {
+            table = callStack.currentTable();
+        } else if (((int) tableAndLevel[1]) < 0) {
             System.err.println("Cannot find the symbol " + ID);
             return null;
         }
@@ -121,6 +134,9 @@ class STable {
         String[] splits = ID.split(selectOp);
         Object[] tableAndLevel = tableAndLevel(splits[0]);
         HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
+        if (!callStack.isEmpty() && callStack.containsID(ID) && (int) tableAndLevel[1] == -1) {
+            table = callStack.topTable();
+        }
         if (splits.length == 1) {
             table.put(ID, value);
         } else {
