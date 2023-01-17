@@ -31,7 +31,7 @@ whitespace &COMMENT_LINE_C
 whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
-compStatements ::= scopeEnter statements scopeLeave | scopeEnter statement scopeLeave
+compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
 statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnStatement
 
 structDefinition ::= '{' structStatements '}' statements | structStatement statements
@@ -40,8 +40,8 @@ structStatement ::= memberAssign ';'
 
 fnStatements ::= '{' statements '}'
 
-scopeEnter ::= '{' { symbols.newScope(); } | # { symbols.newScope(); }
-scopeLeave ::= '}' { symbols.oldScope(); } | # { symbols.oldScope(); } 
+scopeEnter ::= '{' { symbols.newScope(); }
+scopeLeave ::= '}' { symbols.oldScope(); }
 
 defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } '(' mainDefFuncArgs ')' fnStatements< 
 	{	FJFunction fn = ids.top();
@@ -103,7 +103,7 @@ condStatement ::= ifExpr compStatements<
 		{ if (FJ.bv(ifExpr1.o) == true) {
 			artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
-		  else if (FJ.bv(elifExpr1.o)== true){
+		  else if (FJ.bv(elifExpr1.o) == true){
 			artEvaluate(condStatement.compStatements2, compStatements2);  
 		  }
 		}
@@ -129,17 +129,17 @@ condStatement ::= ifExpr compStatements<
 		}
 		
 		
-whileExpr <o: Object> ::= 'while' mainExpr
-	{ whileExpr.o = mainExpr1.o; }
+whileExpr <o: Object> ::= 'while' subExprA
+	{ whileExpr.o = subExprA1.o; }
 
-untilExpr <o: Object> ::= 'until' mainExpr
-	{ untilExpr.o = mainExpr1.o; }
+untilExpr <o: Object> ::= 'until' subExprA
+	{ untilExpr.o = subExprA1.o; }
 	
-ifExpr <o: Object> ::= 'if' mainExpr
-	{ ifExpr.o = mainExpr1.o; }
+ifExpr <o: Object> ::= 'if' subExprA
+	{ ifExpr.o = subExprA1.o; }
 	
-elifExpr <o: Object> ::= 'elif' mainExpr
-	{ elifExpr.o = mainExpr1.o; }
+elifExpr <o: Object> ::= 'elif' subExprA
+	{ elifExpr.o = subExprA1.o; }
 	
 	
 sysout ::= 'sysout' '(' subExprA ')'
@@ -156,7 +156,6 @@ memberAssign ::= AID '=' subExprA
 		{ FJArgStack.addMember(FJArgStack.getType(), AID1.v, subExprA1.o); }
 	
 mainExpr <o: Object> ::= assign 
-	| returnStatement
 	| subExprA { mainExpr.o = subExprA1.o; }
 
 functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
@@ -180,12 +179,11 @@ functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
 
 mainFuncArgs ::= '(' ')' { callStack.fillArgs(); } | '(' funcArgs ')'
 
-funcArgs ::= funcArg ','
-		{ callStack.processArg(funcArg1.o); } funcArgs
-	| funcArg 
-		{ callStack.processLastArg(funcArg1.o); }
-
-funcArg <o: Object> ::= subExprA argNote { funcArg.o = subExprA1.o; }
+funcArgs <o: Object> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
+	| ID argNote '=' subExprA { callStack.processArg(ID1.v, subExprA1.o); } ',' funcArgs
+	| subExprA argNote { callStack.processLastArg(subExprA1.o); }
+	| ID argNote '=' subExprA { callStack.processLastArg(ID1.v, subExprA1.o); }
+	
 
 voidFunctions ::= sysout | sysline
 
