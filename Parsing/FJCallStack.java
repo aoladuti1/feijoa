@@ -37,7 +37,10 @@ public class FJCallStack {
     }
 
     public CSEntry current() {
-        return stack.get(pos);
+        if (pos != -1)
+            return stack.get(pos);
+        else 
+            return null;
     }
 
     public Object getLastValue() {
@@ -53,8 +56,16 @@ public class FJCallStack {
     }
 
     public boolean tooManyArgs() {
-        CSEntry entry = top();
-        return entry.argIndex > entry.maxArgs;
+        CSEntry top = top();
+        int argc = 0;
+        if (top.selectingArgs) {
+            argc = top.argIndex;
+        } else {
+            while (argc < top.visited.length) {
+                argc++;
+            }
+        }
+        return argc > top.maxArgs;
     }
 
     public void putVar(int argc, Object o) {
@@ -71,6 +82,16 @@ public class FJCallStack {
         top().funcVars.put(fvar.name, fvar.obj);
     }
 
+    public void putVar(String ID, Object o) {
+        try {
+            top().visited[topFunction().getArgIndex(ID)] = true;
+        } catch (IndexOutOfBoundsException FJException) {
+            System.err.println(ID + " is not a valid argument name.");
+        }
+        top().selectingArgs = true;
+        top().funcVars.put(ID, o);
+    }
+
     public Object getVar(String ID) {
         return current().funcVars.get(ID);
     }
@@ -84,7 +105,13 @@ public class FJCallStack {
     }
 
     public boolean containsID(String ID) {
-        return current().funcVars.containsKey(ID);
+        CSEntry cur = current();
+        if (cur == null) {
+            return false;
+        }
+        else {
+            return cur.funcVars.containsKey(ID);
+        }
     }
 
     public boolean isEmpty() {
@@ -97,8 +124,15 @@ public class FJCallStack {
 
     public void processArg(Object o) {
         CSEntry top = top();
-        top.visited[top.argIndex] = true;
+        if (top().selectingArgs) {
+            System.err.println(
+                "Selecting arguments to pass with '=' "
+                + "must not be followed by sequential argument assignment (without '=').");
+            return;
+        }
+        top.selectingArgs = false;
         int argc = ++top.argIndex;
+        top.visited[argc] = true;
         if (tooManyArgs()) {
             System.err.println("Too many args");
             return;
@@ -107,16 +141,40 @@ public class FJCallStack {
         }
     }
 
+    public void processArg(String ID, Object o) {
+        CSEntry top = top();
+        top.visited[topFunction().getArgIndex(ID)] = true;
+        top.selectingArgs = true;
+        if (tooManyArgs()) {
+            System.err.println("Too many args");
+            return;
+        } else if (top.maxArgs > 0){
+            putVar(ID, o);
+        }
+    }
+
     public void fillArgs() {
-        if (!top().selectingArgs) {
-            for (int i = top().argIndex + 1; i < topFunction().maxArgs(); i++) {
+        CSEntry top = top();
+        if (!top.selectingArgs) {
+            for (int i = top.argIndex + 1; i < top.maxArgs; i++) {
                 putVar(i);
             }
+        } else {
+            for (int i = 0; i < top.maxArgs; i++) {
+                if (!top.visited[i])
+                    putVar(i);
+            }
+
         }
     }
 
     public void processLastArg(Object o) {
         processArg(o);
+        fillArgs();
+    }
+
+    public void processLastArg(String ID, Object o) {
+        processArg(ID, o);
         fillArgs();
     }
     

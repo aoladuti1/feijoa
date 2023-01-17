@@ -116,7 +116,7 @@ class STable {
         String[] splits = ID.split(selectOp);
         Object[] tableAndLevel = tableAndLevel(splits[0]);
         HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
-        if (!callStack.isEmpty() && callStack.containsID(ID)) {
+        if (callStack.containsID(ID)) {
             table = callStack.currentTable();
         } else if (((int) tableAndLevel[1]) < 0) {
             System.err.println("Cannot find the symbol " + ID);
@@ -134,7 +134,7 @@ class STable {
         String[] splits = ID.split(selectOp);
         Object[] tableAndLevel = tableAndLevel(splits[0]);
         HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
-        if (!callStack.isEmpty() && callStack.containsID(ID) && (int) tableAndLevel[1] == -1) {
+        if (callStack.containsID(ID) && (int) tableAndLevel[1] == -1) {
             table = callStack.topTable();
         }
         if (splits.length == 1) {
