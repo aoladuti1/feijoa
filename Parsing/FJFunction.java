@@ -26,6 +26,21 @@ public class FJFunction {
         return args.get(index);
     }
 
+    /***
+     * Returns the index of the argument name or -1 if it is not found
+     * @param ID argument name to search for
+     * @return index of the argument name or -1 if it is not found
+     */
+    public int getArgIndex(String ID) {
+        for (int i = 0; i < maxArgs(); i++) {
+            if (ID.equals(args.get(i).name)) {
+
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public int maxArgs() {
         return args.size();
     }
