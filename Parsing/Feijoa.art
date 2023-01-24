@@ -4,7 +4,7 @@
 * computer science dept. @ royal holloway, university of london
 *
 *******************************************************************************)
-prelude {import java.util.HashMap; import java.util.ArrayList;}
+prelude {import java.util.HashMap; import java.util.ArrayList; import java.util.Scanner;}
 
 support {
 	
@@ -147,6 +147,9 @@ sysout ::= 'sysout' '(' subExprA ')'
 	
 sysline ::= 'sysline' '(' subExprA ')'
 	{ System.out.println(subExprA1.o); }
+
+sysin <o: Object> ::= 'sysin' '(' ')' 
+	{ sysin.o = new Scanner(System.in).nextLine(); }
 	
 returnStatement <o: Object> ::= 'return' subExprA ';' 
 	{  callStack.setLastValue(subExprA1.o);
@@ -159,6 +162,7 @@ mainExpr <o: Object> ::= assign
 	| subExprA { mainExpr.o = subExprA1.o; }
 
 functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
+	| otherFunctions { functionCall.o = otherFunctions1.o; }
 	| AID 
 		{
 		  callStack.push((FJFunction) symbols.get(AID1.v));
@@ -186,6 +190,7 @@ funcArgs <o: Object> ::= subExprA argNote { callStack.processArg(subExprA1.o); }
 	
 
 voidFunctions ::= sysout | sysline
+otherFunctions <o:Object> ::= sysin { otherFunctions.o = sysin1.o; }
 
 
 subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }

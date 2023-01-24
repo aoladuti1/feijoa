@@ -43,14 +43,6 @@ class STable {
         return currentTable();
     }
 
-    public void shiftIn() {
-        level += 1;
-    }
-
-    public void shiftOut() {
-        level -= 1;
-    }
-
     /**
      * Returns the symbol table of an ID (or the current scope's symbol table if it
      * cannot be found) and the index of the symbol table (or -1 if it cannot be found) in a [ table, index ]
@@ -134,7 +126,7 @@ class STable {
         String[] splits = ID.split(selectOp);
         Object[] tableAndLevel = tableAndLevel(splits[0]);
         HashMap<String, Object> table = (HashMap<String, Object>) tableAndLevel[0];
-        if (callStack.containsID(ID) && (int) tableAndLevel[1] == -1) {
+        if (callStack.containsID(ID)) {
             table = callStack.topTable();
         }
         if (splits.length == 1) {
