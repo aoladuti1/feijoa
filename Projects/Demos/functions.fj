@@ -1,0 +1,9 @@
+foo = 10;
+
+def func(foo: typeHint = 5, bar=2) {
+    sysline(bar);
+    return foo; // it will return 5 - see the way the scope is correct?
+}
+
+sysline(func(bar=700)); // prints 5 and then 700
+
