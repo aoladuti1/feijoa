@@ -104,3 +104,15 @@ Next steps:
     1 - Same as previous
     2 - Add a sysin function
     3 - Move built-in functions to the expression section of Feijoa.art 
+
+[23/01/2023]
+Since my last diary entry, I have implemented functions and greatly improved the symbol table with class STable.
+Similar to Python, it is possible to both specify default arguments and also to specifically define arguments with the
+equals operator. e.g. def x(foo=null, bar) { x(foo=2); }
+Recursion is possible with the new class FJCallStack. Scopes now work correctly.
+The use of BigDecimal is now considered redundant.
+
+Next Steps:
+    1 - Rework structs to be full-on classes
+    2 - Add a sysin function
+    3 - Store type information in variables to speed up duck typing
