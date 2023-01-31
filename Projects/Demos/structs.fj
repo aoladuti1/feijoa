@@ -1,24 +1,16 @@
 struct X {
-
 	a = "1"; // to show that structs can hold different types
-	b = new X(100);
-	c = 3;
 
+	struct Y {
+		b = 6;
+		// err = new X(); --- returns an error - you can't construct the containing struct
+		def c() {
+			sysout("wow");
+		}
+	}
 }
 
-struct Y {
-
-	a = new X();
-
-}
-
-c = new Y();
-e = 6;
-if (c.a.c == 3) {
-	d = 5;
-	e = 7;
-}
-
-sysline(d);
-sysline(e);
-sysline(c.a.b.a);
+a = new X.Y(7).b; // accessing r-values is possible, alongside nested structs
+b = new X.Y(7, c=8); // see functions = first class variables, and arg selection
+callC = new X.Y();
+callC.c();
