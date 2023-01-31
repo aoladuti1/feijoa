@@ -10,7 +10,10 @@ support {
 	
 	FJCallStack callStack = new FJCallStack();
 	STable symbols = new STable(callStack);
+	FJSDStack SDStack = symbols.SDStack();
+	FJSAStack SAStack = new FJSAStack(symbols);
 	FJIDStack ids = new FJIDStack();
+	
 
 	@SuppressWarnings("serial")
 	public class FJSigReturn extends ARTException {
@@ -34,9 +37,9 @@ statements ::= statement | statement statements
 compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
 statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnStatement
 
-structDefinition ::= '{' structStatements '}' statements | structStatement statements
+structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
-structStatement ::= memberAssign ';'
+structStatement ::= mainExpr ';' | defStruct | defFunc
 
 fnStatements ::= '{' statements '}'
 
@@ -62,16 +65,7 @@ optEquals <o: Object> ::= # { optEquals.o =  null; }
 
 argID <v: String> ::= ID ':' AID {argID.v = ID1.v;} | ID { argID.v = ID1.v; }
 defStruct ::= 'struct' ID 
-		{	try { 
-				FJArgStack.declareStruct(ID1.v);
-			} catch (Exception FJException) {
-				System.err.println(FJException);
-				System.exit(0);
-			} finally {
-				FJArgStack.push();
-			}
-			FJArgStack.setType(ID1.v);
-		} structDefinition { FJArgStack.pop(); }
+		{ symbols.startStructDef(ID1.v); } structDefinition { symbols.endStructDef(); }
 
 loopStatement ::= whileExpr< compStatements<
 		{	artEvaluate(
@@ -141,7 +135,6 @@ ifExpr <o: Object> ::= 'if' subExprA
 elifExpr <o: Object> ::= 'elif' subExprA
 	{ elifExpr.o = subExprA1.o; }
 	
-	
 sysout ::= 'sysout' '(' subExprA ')'
 	{ System.out.print(subExprA1.o); }
 	
@@ -156,14 +149,17 @@ returnStatement <o: Object> ::= 'return' subExprA ';'
 		if (true) throw new FJSigReturn(); }
 
 memberAssign ::= AID '=' subExprA
-		{ FJArgStack.addMember(FJArgStack.getType(), AID1.v, subExprA1.o); }
+		{ SDStack.addMember(AID1.v, subExprA1.o); }
+	| defStruct
 	
 mainExpr <o: Object> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
 
+mainFuncArgs ::= '(' ')' { callStack.fillArgs(); } | '(' funcArgs ')'
+
 functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
 	| otherFunctions { functionCall.o = otherFunctions1.o; }
-	| AID 
+	| AID
 		{
 		  callStack.push((FJFunction) symbols.get(AID1.v));
 		} mainFuncArgs
@@ -181,7 +177,8 @@ functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
 		}
 	}
 
-mainFuncArgs ::= '(' ')' { callStack.fillArgs(); } | '(' funcArgs ')'
+
+
 
 funcArgs <o: Object> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
 	| ID argNote '=' subExprA { callStack.processArg(ID1.v, subExprA1.o); } ',' funcArgs
@@ -231,18 +228,16 @@ assign ::= AID '=' subExprA
 	| plusEquals
 	| minusEquals
 	
+structConstruct <o: Object> ::= 'new' AID 
+	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = SAStack.popStruct(); }
 
-structConstruct <o: Object> ::= 'new' ID 
-		{	FJArgStack.startStructConstruction(ID1.v); } '(' structArgs ')' 
-		{	structConstruct.o = FJArgStack.endStructConstruction();	}
-	
-structArgs <c:int> ::= arg ','
-		{ FJArgStack.processArg(arg1.o); } structArgs
-	| arg 
-		{ FJArgStack.processLastArg(arg1.o); }
 
-arg <o: Object> ::=  # { arg.o = FJArgStack.NONE; } 
-	| subExprA argNote { arg.o = subExprA1.o; FJArgStack.incrArgCount(); }
+mainStructArgs ::= '(' ')' { SAStack.fillArgs(); } | '(' structArgs ')'
+
+structArgs <o: Object> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } ',' structArgs
+	| ID argNote '=' subExprA { SAStack.processArg(ID1.v, subExprA1.o); } ',' structArgs
+	| subExprA argNote { SAStack.processLastArg(subExprA1.o); }
+	| ID argNote '=' subExprA { SAStack.processLastArg(ID1.v, subExprA1.o); }
 
 argNote ::= ':' AID | #
 	
@@ -298,10 +293,10 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = STRING_DQ1.v; }
 	| structConstruct
 		{ operand.o = structConstruct1.o; }
-	| structConstruct '.' ID 
+	| structConstruct '.' AID 
 		{ @SuppressWarnings("unchecked")
-		  HashMap<String, Object> hm = (HashMap<String, Object>) structConstruct1.o;
-		  operand.o = hm.get(ID1.v); }
+		 HashMap<String, Object> hm = (HashMap<String, Object>) structConstruct1.o;
+		 operand.o = symbols.fullGet(AID1.v.split(STable.selectOp), hm); }
 	| functionCall { operand.o = functionCall1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
