@@ -121,3 +121,12 @@ Next Steps:
     1 - Rework structs to be full-on classes
     2 - Add a sysin function
     3 - Store type information in variables to speed up duck typing
+
+[02/02/2023]
+Since my last diary entry, I added nested structs, and did a large amount of refactoring.
+I will not be implementing classes in this project, most likely. 
+
+Next steps:
+    1 - Add lambdas
+    2 - Add lists
+    3 - Store type information in variables to speed up duck typing
