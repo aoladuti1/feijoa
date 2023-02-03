@@ -34,7 +34,9 @@ public class FJ {
 		} 	
 	}
 
-	static Object equ(Object a, Object b) {
+	static Boolean equ(Object a, Object b) {
+		if (a == null || b == null) 
+			return a == b;
 		try {
 			return FJ.iv(a).equals(b);
 		} catch (Exception FjException) {
