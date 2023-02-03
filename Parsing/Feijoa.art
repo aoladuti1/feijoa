@@ -34,7 +34,7 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
-statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | mainExpr
+statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';'
 structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
 structStatement ::= mainExpr ';' | defStruct
