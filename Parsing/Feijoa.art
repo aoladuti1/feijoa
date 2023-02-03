@@ -35,13 +35,13 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
-statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnStatement
-
+statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | mainExpr
 structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
-structStatement ::= mainExpr ';' | defStruct | defFunc
+structStatement ::= mainExpr ';' | defStruct
 
 fnStatements ::= '{' statements '}'
+lambdaStatements ::= mainExpr | returnExpr | fnStatements
 
 scopeEnter ::= '{' { symbols.newScope(); }
 scopeLeave ::= '}' { symbols.oldScope(); }
@@ -51,6 +51,11 @@ defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } '(' mainDefFuncArgs ')
 		fn.setProcedure(defFunc.fnStatements1);
 		symbols.put(fn.name, fn);
 		ids.pop(); }
+
+lambdaConstruct <o: Object> ::= { ids.push(new FJFunction("")); } '(' mainDefFuncArgs ')' '->' lambdaStatements< 
+	{ 
+		ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
+		lambdaConstruct.o = ids.pop(); }
 
 mainDefFuncArgs ::= defFuncArgs | #
 
@@ -144,7 +149,7 @@ sysline ::= 'sysline' '(' subExprA ')'
 sysin <o: Object> ::= 'sysin' '(' ')' 
 	{ sysin.o = new Scanner(System.in).nextLine(); }
 	
-returnStatement <o: Object> ::= 'return' subExprA ';' 
+returnExpr <o: Object> ::= 'return' subExprA 
 	{  callStack.setLastValue(subExprA1.o);
 		if (true) throw new FJSigReturn(); }
 
@@ -291,6 +296,8 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = FJ.bv(false); }
 	| STRING_DQ
 		{ operand.o = STRING_DQ1.v; }
+	| lambdaConstruct
+		{ operand.o = lambdaConstruct1.o; }
 	| structConstruct
 		{ operand.o = structConstruct1.o; }
 	| structConstruct '.' AID 

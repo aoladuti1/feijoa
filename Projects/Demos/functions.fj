@@ -7,3 +7,11 @@ def func(foo: typeHint = 5, bar=2) {
 
 sysline(func(bar=700)); // prints 5 and then 700
 
+msgOne = (txt) -> { sysline(txt); }; // longhand lambda syntax
+msgTwo = (txt) -> sysline(txt); // can lambdify a single expression in shorthand
+
+msgOne("i am a lambda");
+msgTwo(txt="i am also a lambda"); // arg selection still present
+
+def callWithLambda(a) { a(); }
+callWithLambda(() -> sysline("i am a function called with a lambda"));
