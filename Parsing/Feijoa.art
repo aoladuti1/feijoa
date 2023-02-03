@@ -51,12 +51,16 @@ defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } mainDefFuncArgs fnStat
 		symbols.put(fn.name, fn);
 		ids.pop(); }
 
-lambdaConstruct <o: Object> ::= { ids.push(new FJFunction("")); } mainDefFuncArgs '->' lambdaStatements< 
-	{ 
-		ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
+lambdaConstruct <o: Object> ::= { ids.push(new FJFunction("")); } javaLambdaArgs '->' lambdaStatements< 
+	{	ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
+		lambdaConstruct.o = ids.pop(); }
+	| { ids.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
+		{	ids.top().setProcedure(lambdaConstruct.lambdaReturn1);
 		lambdaConstruct.o = ids.pop(); }
 
-mainDefFuncArgs ::= '(' ')' | '(' defFuncArgs ')' | defFuncArg
+pythonLambdaArgs ::= mainDefFuncArgs ':' | defFuncArgs ':' | ':'
+javaLambdaArgs ::= mainDefFuncArgs | defFuncArg
+mainDefFuncArgs ::= '(' ')' | '(' defFuncArgs ')'
 
 defFuncArgs <c:int> ::= defFuncArg ',' defFuncArgs
 	| defFuncArg
@@ -149,6 +153,10 @@ sysin <o: Object> ::= 'sysin' '(' ')'
 	{ sysin.o = new Scanner(System.in).nextLine(); }
 	
 returnExpr <o: Object> ::= 'return' subExprA 
+	{  callStack.setLastValue(subExprA1.o);
+		if (true) throw new FJSigReturn(); }
+
+lambdaReturn <o: Object> ::= subExprA 
 	{  callStack.setLastValue(subExprA1.o);
 		if (true) throw new FJSigReturn(); }
 
@@ -279,8 +287,7 @@ and <o: Object> ::= subExprA '&&' subExprA
 or <o: Object> ::= subExprA '||' subExprA 
 	{ or.o = FJ.bv(subExprA1.o) || FJ.bv(subExprA2.o); }
 	
-operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
-
+operand <o: Object> ::= deref { operand.o = deref1.o; }
 	| INTEGER
 		{ operand.o = INTEGER1.v; }
 	| REAL
@@ -304,10 +311,13 @@ operand <o: Object> ::= deref { operand.o = symbols.get(deref1.v); }
 		{ operand.o = mainExpr1.o; }
 	| #
 		
-deref <v: String> ::= AID
-	{ deref.v = AID1.v; }
+deref <o: Object> ::= AID
+	{ if (AID1.v == null) 
+		deref.o = null;
+	  else 
+		deref.o = symbols.get(AID1.v); }
 
-AID <v:String> ::= ID { AID.v = ID1.v; } | ID '.' AID { AID.v = ID1.v + '.' + AID1.v; }
+AID <v:String> ::= 'null' {AID.v = null;} | ID { AID.v = ID1.v; } | ID '.' AID { AID.v = ID1.v + '.' + AID1.v; }
 
 ID <leftExtent:int rightExtent:int lexeme:String v:String> ::= 
   &ID {ID.lexeme = artLexeme(ID.leftExtent, ID.rightExtent); ID.v = artLexemeAsID(ID.leftExtent, ID.rightExtent); }  

@@ -19,5 +19,9 @@ msgTwo = txt -> sysline(txt);
 msgOne("i am a lambda");
 msgTwo(txt="i am also a lambda"); // arg selection still present
 
-def callWithLambda(a) { a(); }
-callWithLambda(() -> sysline("i am a function called with a lambda"));
+def lambdaCaller(a) { a(); }
+lambdaCaller(() -> sysline("i am a function called with a lambda"));
+
+// See Python-style lambdas:
+pyDouble = lambda (x) : x * 2;
+sysline("The double of 10 is " + pyDouble(10));

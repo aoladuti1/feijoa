@@ -36,9 +36,19 @@ public class FJ {
 
 	static Object equ(Object a, Object b) {
 		try {
-			return (Integer.compare(FJ.iv(a), FJ.iv(b))) == 0;
+			return FJ.iv(a).equals(b);
 		} catch (Exception FjException) {
-			return (Double.compare(FJ.dv(a), FJ.dv(b))) == 0;
+			try {
+				return FJ.dv(a).equals(b);
+			}
+			catch (Exception fJException2) {
+				try {
+					return bv(a).equals(b);
+				} 	catch (Exception fjException3) {
+					return false;
+				}
+			}
+
 		} 
 	}
 	
