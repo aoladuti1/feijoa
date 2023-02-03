@@ -7,8 +7,12 @@ def func(foo: typeHint = 5, bar=2) {
 
 sysline(func(bar=700)); // prints 5 and then 700
 
-msgOne = (txt) -> { sysline(txt); }; // longhand lambda syntax
-msgTwo = (txt) -> sysline(txt); // can lambdify a single expression in shorthand
+// standard lambda syntax (see default args possible)
+msgOne = (txt="default") -> { txt += ""; sysline(txt);  }; 
+
+// parentheses are optional for a single argument
+// curly braces are optional for a single function expression
+msgTwo = txt -> sysline(txt);
 
 msgOne("i am a lambda");
 msgTwo(txt="i am also a lambda"); // arg selection still present
