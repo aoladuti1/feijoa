@@ -29,8 +29,8 @@ public class FJCallStack {
 
     public void push(FJFunction func) {
         stack.add(new CSEntry(func, null));
-        
     }
+    
 
     public void setLastValue(Object o) {
         current().output = o;
