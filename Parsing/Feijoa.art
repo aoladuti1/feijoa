@@ -52,7 +52,10 @@ defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } mainDefFuncArgs fnStat
 		ids.pop(); }
 
 lambdaConstruct <o: Object> ::= { ids.push(new FJFunction("")); } javaLambdaArgs '->' lambdaStatements< 
-	{	ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
+	{   if (callStack.current() != null) {
+			ids.top().setOuterTables(callStack.current().funcVars);
+		};
+		ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
 		lambdaConstruct.o = ids.pop(); }
 	| { ids.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
 		{	ids.top().setProcedure(lambdaConstruct.lambdaReturn1);
@@ -179,6 +182,9 @@ functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
 		try {
 			callStack.nextCall();
 			symbols.newScope();
+			if (callStack.topFunction().outerTables != null) {
+				callStack.top().funcVars.addAll(callStack.topFunction().outerTables);
+			}
 			artEvaluate(callStack.topProcedure(), null);
 		} catch (FJSigReturn FJsig) {
 			;

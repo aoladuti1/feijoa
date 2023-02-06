@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class FJIDStack {
+public class FJFuncStack {
 
     ArrayList<FJFunction> stack = new ArrayList<>();
 
@@ -15,6 +15,10 @@ public class FJIDStack {
 
     public FJFunction top() {
         return stack.get(stack.size() - 1);
+    }
+
+    public int nestLevel() {
+        return stack.size();
     }
 
 

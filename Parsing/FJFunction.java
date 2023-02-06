@@ -1,4 +1,7 @@
 import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 
@@ -10,6 +13,7 @@ public class FJFunction {
     }
 
     ARTGLLRDTHandle procedure = null;
+    ArrayList<HashMap<String, Object>> outerTables = null;
     String name;
 
     LinkedList<FJNamedObj> args = new LinkedList<>();
@@ -25,6 +29,12 @@ public class FJFunction {
     public FJNamedObj getArg(int index) {
         return args.get(index);
     }
+
+    public void setOuterTables(ArrayList<HashMap<String,Object>> tList) {
+        this.outerTables = tList;
+    }
+
+
 
     /***
      * Returns the index of the argument name or -1 if it is not found
@@ -52,8 +62,6 @@ public class FJFunction {
     public ARTGLLRDTHandle getProcedure() {
         return this.procedure;
     }
-
-
 
 }
 

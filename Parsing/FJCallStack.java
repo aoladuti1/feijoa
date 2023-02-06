@@ -11,13 +11,14 @@ class CSEntry {
     int maxArgs = 0;
     boolean[] visited;
     boolean selectingArgs;
-    HashMap<String, Object> funcVars;
+    ArrayList<HashMap<String, Object>> funcVars;
 
     public CSEntry(FJFunction function, Object output) {
         this.function = function;
         this.output = output;
         this.maxArgs = function.maxArgs();
-        this.funcVars = new HashMap<String, Object>();
+        this.funcVars = new ArrayList<HashMap<String, Object>>();
+        this.funcVars.add(new HashMap<>());
         this.selectingArgs = false;
         this.visited = new boolean[maxArgs];
     }
@@ -70,7 +71,7 @@ public class FJCallStack {
 
     public void putVar(int argc, Object o) {
         FJNamedObj fvar = topFunction().getArg(argc);
-        top().funcVars.put(fvar.name, o);
+        topTable().put(fvar.name, o);
     }
 
     /**
@@ -79,7 +80,7 @@ public class FJCallStack {
      */
     public void putVar(int argc) {
         FJNamedObj fvar = topFunction().getArg(argc);
-        top().funcVars.put(fvar.name, fvar.obj);
+        topTable().put(fvar.name, fvar.obj);
     }
 
     public void putVar(String ID, Object o) {
@@ -89,19 +90,19 @@ public class FJCallStack {
             System.err.println(ID + " is not a valid argument name.");
         }
         top().selectingArgs = true;
-        top().funcVars.put(ID, o);
+        topTable().put(ID, o);
     }
 
     public Object getVar(String ID) {
-        return current().funcVars.get(ID);
+        return currentTable().get(ID);
     }
 
     public HashMap<String, Object> topTable() {
-        return top().funcVars;
+        return top().funcVars.get(0);
     }
 
     public HashMap<String, Object> currentTable() {
-        return current().funcVars;
+        return current().funcVars.get(0);
     }
 
     public boolean containsID(String ID) {
@@ -109,10 +110,32 @@ public class FJCallStack {
         if (cur == null) {
             return false;
         }
-        else {
-            return cur.funcVars.containsKey(ID);
+        for (HashMap<String, Object> h : cur.funcVars) {
+            if (h.containsKey(ID)) return true;
         }
+        return false;
     }
+
+    public HashMap<String, Object> findCurTable(String firstID) {
+        if (stack.isEmpty()) {
+            return null;
+        }
+        for (HashMap<String, Object> h : current().funcVars) {
+            if (h.containsKey(firstID)) return h;
+        }
+        return null;
+    }
+
+    public HashMap<String, Object> findTopTable(String firstID) {
+        if (stack.isEmpty()) {
+            return null;
+        }
+        for (HashMap<String, Object> h : top().funcVars) {
+            if (h.containsKey(firstID)) return h;
+        }
+        return null;
+    }
+
 
     public boolean isEmpty() {
         return stack.isEmpty();
@@ -179,7 +202,7 @@ public class FJCallStack {
     }
     
 
-    private CSEntry top() {
+    public CSEntry top() {
         return stack.get(stack.size() - 1);
     }
 
