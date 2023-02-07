@@ -147,8 +147,8 @@ class STable {
         String[] splits = ID.split(selectOp);
         splits = SDstack.qualify(splits);
         HashMap<String, Object> table = findTable(splits[0]);
-        if (callStack.containsID(ID)) {
-            table = callStack.currentTable();
+        if (callStack.containsID(splits[0])) {
+            table = callStack.findCurTable(splits[0]);
         }
         if (table == null) {
             System.err.println("Cannot find the symbol " + ID);
@@ -161,8 +161,8 @@ class STable {
         String[] splits = ID.split(selectOp);
         splits = SDstack.qualify(splits);
         HashMap<String, Object> table = findTable(splits[0]);
-        if (callStack.containsID(ID)) {
-            table = callStack.topTable();
+        if (callStack.containsID(splits[0])) {
+            table = callStack.findTopTable(splits[0]);
         }
         if (table == null) { table = currentTable(); }
         fullPut(splits, o, table);

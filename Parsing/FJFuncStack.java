@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class FJIDStack {
+public class FJFuncStack {
 
     ArrayList<FJFunction> stack = new ArrayList<>();
 
