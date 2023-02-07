@@ -1,0 +1,14 @@
+def recur_fibo(n) {
+   if n < 1 || n == 1
+       return n;
+   else
+       return (recur_fibo(n-1) + recur_fibo(n-2));
+}
+
+i = 1;
+sysline("Enter the number of fibonacci terms you want to see:");
+n = sysin(); 
+while (i < n + 1) {
+    sysline(recur_fibo(i));
+    i = i + 1;
+}
