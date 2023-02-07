@@ -130,3 +130,13 @@ Next steps:
     1 - Add lambdas
     2 - Add lists
     3 - Store type information in variables to speed up duck typing
+
+[07/02/2023]
+Since my last diary entry, I added nested functions, closures, Java-style lambdas, Python-style lambdas
+and tightened up syntax. Adding closures was extremely difficult as I had to essentially make all function objects
+hold a list of potential outer function symbol tables, and implementing this change was not easy.
+
+Next steps:
+    1 - Add lists
+    2 - Store type information in variables to speed up duck typing
+    3 - Finish adding operations
