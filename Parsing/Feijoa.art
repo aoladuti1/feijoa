@@ -322,7 +322,6 @@ operand <o: Object> ::= deref { operand.o = deref1.o; }
 	| functionCall { operand.o = functionCall1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
-	| #
 		
 deref <o: Object> ::= AID
 	{ if (AID1.v == null) 
