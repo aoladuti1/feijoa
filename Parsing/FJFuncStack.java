@@ -17,9 +17,5 @@ public class FJFuncStack {
         return stack.get(stack.size() - 1);
     }
 
-    public int nestLevel() {
-        return stack.size();
-    }
-
 
 }

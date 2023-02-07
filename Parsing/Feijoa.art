@@ -47,6 +47,9 @@ scopeLeave ::= '}' { symbols.oldScope(); }
 
 defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } mainDefFuncArgs fnStatements< 
 	{	FJFunction fn = ids.top();
+		if (callStack.current() != null) {
+			fn.setOuterTables(callStack.current().funcVars);
+		};
 		fn.setProcedure(defFunc.fnStatements1);
 		symbols.put(fn.name, fn);
 		ids.pop(); }
@@ -58,7 +61,11 @@ lambdaConstruct <o: Object> ::= { ids.push(new FJFunction("")); } javaLambdaArgs
 		ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
 		lambdaConstruct.o = ids.pop(); }
 	| { ids.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
-		{	ids.top().setProcedure(lambdaConstruct.lambdaReturn1);
+		{	
+			if (callStack.current() != null) {
+			ids.top().setOuterTables(callStack.current().funcVars);
+			};
+			ids.top().setProcedure(lambdaConstruct.lambdaReturn1);
 		lambdaConstruct.o = ids.pop(); }
 
 pythonLambdaArgs ::= mainDefFuncArgs ':' | defFuncArgs ':' | ':'
@@ -174,9 +181,9 @@ mainFuncArgs ::= '(' ')' { callStack.fillArgs(); } | '(' funcArgs ')'
 
 functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
 	| otherFunctions { functionCall.o = otherFunctions1.o; }
-	| AID
+	| operand
 		{
-		  callStack.push((FJFunction) symbols.get(AID1.v));
+		  callStack.push((FJFunction) operand1.o);
 		} mainFuncArgs
 	{	
 		try {

@@ -147,7 +147,7 @@ class STable {
         String[] splits = ID.split(selectOp);
         splits = SDstack.qualify(splits);
         HashMap<String, Object> table = findTable(splits[0]);
-        if (table == null) {
+        if (callStack.containsID(splits[0])) {
             table = callStack.findCurTable(splits[0]);
         }
         if (table == null) {
@@ -161,7 +161,7 @@ class STable {
         String[] splits = ID.split(selectOp);
         splits = SDstack.qualify(splits);
         HashMap<String, Object> table = findTable(splits[0]);
-        if (table == null) {
+        if (callStack.containsID(splits[0])) {
             table = callStack.findTopTable(splits[0]);
         }
         if (table == null) { table = currentTable(); }
