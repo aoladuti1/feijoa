@@ -29,4 +29,18 @@ pyAdd = lambda x, y :  x + y;
 sysline("The double of 10 is " + pyDouble(10));
 sysline(5 + " add " + 5 + " is " + pyAdd(5, 5));
 
+// See nested functions and closures
+def printNested() {
+    def x() {
+        msg = "i was called from a nested function";
+        def y() {
+            sysline(msg);
+        }
+        y();
+    }
+    return x;
+}
+
+printNested()();
+
 // Note: ALL arguments without a default specified are defaulted to null
