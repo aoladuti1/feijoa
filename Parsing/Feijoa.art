@@ -167,10 +167,6 @@ returnExpr <o: FJTO> ::= 'return' subExprA
 lambdaReturn <o: FJTO> ::= subExprA 
 	{  callStack.setLastValue(subExprA1.o);
 		if (true) throw new FJSigReturn(); }
-
-memberAssign ::= AID '=' subExprA
-		{ SDStack.addMember(AID1.v, subExprA1.o); }
-	| defStruct
 	
 mainExpr <o: FJTO> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
