@@ -31,6 +31,28 @@ public class FJ {
 		return new FJTO(null, FJTypes.NULL);
 	}
 
+	static FJTO type(FJTO a) {
+		switch (a.type) {
+			case BOOLEAN:
+				return newString("boolean");
+			case DOUBLE:
+				return newString("double");
+			case FUNCTION:
+				return newString("function");
+			case INT:
+				return newString("int");
+			case NULL:
+				return newString("null");
+			case STRING:
+				return newString("string");
+			case STRUCT:
+				return newString("struct");
+			case STRUCT_DEF:
+				return newString("struct_definition");
+		}
+		return newString("????");
+	}
+
 	static FJTO toInt(FJTO a) {
 		return newInt(Integer.parseInt(a.obj.toString()));
 	}

@@ -139,7 +139,6 @@ condStatement ::= ifExpr compStatements<
 			}
 		}
 		
-		
 whileExpr <o: FJTO> ::= 'while' subExprA
 	{ whileExpr.o = subExprA1.o; }
 
@@ -209,16 +208,18 @@ funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } '
 voidFunctions ::= sysout | sysline
 
 otherFunctions <o: FJTO> ::= sysin { otherFunctions.o = sysin1.o; }
+	| type { otherFunctions.o = type1.o; }
 	| toInt { otherFunctions.o = toInt1.o; }
 	| toDouble { otherFunctions.o = toDouble1.o; }
 	| toBoolean { otherFunctions.o = toBoolean1.o; }
 	| toString { otherFunctions.o = toString1.o; }
 
+type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.type(subExprA1.o); }
+
 toInt <o: FJTO> ::= integerOrInt '(' subExprA ')' { toInt.o = FJ.toInt(subExprA1.o); }
 toDouble <o: FJTO> ::= doubleOrFloat '(' subExprA ')' { toDouble.o = FJ.toDouble(subExprA1.o); }
 toBoolean <o: FJTO> ::= booleanOrBool '(' subExprA ')' { toBoolean.o = FJ.toBoolean(subExprA1.o); }
 toString <o: FJTO> ::= stringOrStr '(' subExprA ')' { toString.o = FJ.toString(subExprA1.o); }
-
 integerOrInt ::= 'integer' | 'int'
 doubleOrFloat ::= 'double' | 'float'
 booleanOrBool ::= 'boolean' | 'bool'
