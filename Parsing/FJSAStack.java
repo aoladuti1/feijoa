@@ -4,7 +4,7 @@ import java.util.HashMap;
 class SAEntry {
 
     FJStructDef structDef;
-    HashMap<String, Object> struct = new HashMap<String, Object>();
+    HashMap<String, FJTO> struct = new HashMap<String, FJTO>();
     Object output;
     int argIndex = -1;
     int argCount = 0;
@@ -30,7 +30,7 @@ public class FJSAStack {
     }
 
     public void push(String ID) {
-        stack.add(new SAEntry((FJStructDef) this.symbols.get(ID)));
+        stack.add(new SAEntry((FJStructDef) this.symbols.get(ID).obj));
         pos++;
     }
 
@@ -45,7 +45,7 @@ public class FJSAStack {
         return top().structDef;
     }
 
-    public HashMap<String, Object> topStruct() {
+    public HashMap<String, FJTO> topStruct() {
         return top().struct;
     }
 
@@ -53,7 +53,7 @@ public class FJSAStack {
         return top().argCount > top().maxArgs;
     }
 
-    public void putVar(int argc, Object o) {
+    public void putVar(int argc, FJTO o) {
         String argName = topDef().getArgName(argc - 1);
         topStruct().put(argName, o);
     }
@@ -63,7 +63,7 @@ public class FJSAStack {
         topStruct().put(name, topDef().getDefault(name));
     }
 
-    public void putVar(String ID, Object o) {
+    public void putVar(String ID, FJTO o) {
         try {
             top().visited[topDef().getArgIndex(ID)] = true;
         } catch (IndexOutOfBoundsException FJException) {
@@ -92,7 +92,7 @@ public class FJSAStack {
         return stack.isEmpty();
     }
 
-    public void processArg(Object o) {
+    public void processArg(FJTO o) {
         SAEntry top = top();
         if (top.selectingArgs) {
             System.err.println(
@@ -111,7 +111,7 @@ public class FJSAStack {
         }
     }
 
-    public void processArg(String ID, Object o) {
+    public void processArg(String ID, FJTO o) {
         SAEntry top = top();
         top.visited[topDef().getArgIndex(ID)] = true;
         top.selectingArgs = true;
@@ -138,12 +138,12 @@ public class FJSAStack {
         }
     }
 
-    public void processLastArg(Object o) {
+    public void processLastArg(FJTO o) {
         processArg(o);
         fillArgs();
     }
 
-    public void processLastArg(String ID, Object o) {
+    public void processLastArg(String ID, FJTO o) {
         processArg(ID, o);
         fillArgs();
     }
@@ -159,7 +159,7 @@ public class FJSAStack {
         return stack.remove(stack.size() - 1);
     }
 
-    public HashMap<String, Object> popStruct() {
+    public HashMap<String, FJTO> popStruct() {
         pos--;
         return stack.remove(stack.size() - 1).struct;
     }

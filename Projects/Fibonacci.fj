@@ -7,7 +7,8 @@ def recur_fibo(n) {
 
 i = 1;
 sysline("Enter the number of fibonacci terms you want to see:");
-n = sysin(); 
+n = int(sysin()); 
+
 while (i < n + 1) {
     sysline(recur_fibo(i));
     i = i + 1;

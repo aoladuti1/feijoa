@@ -1,0 +1,13 @@
+x = "true";
+if (bool(x)) {
+    sysline("x (a string) was typecast to a boolean.");
+}
+
+typeOfx = type(x);
+sysline("the result of type() on x is: " + typeOfx);
+sysline("see: typecasts make new variables instead of changing data.");
+
+// bool(x) == boolean(x)
+// float(x) == double(x)
+// str(x) == string(x)
+// int(x) == integer(x)

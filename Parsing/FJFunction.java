@@ -13,16 +13,16 @@ public class FJFunction {
     } 
  
     ARTGLLRDTHandle procedure = null; 
-    ArrayList<HashMap<String, Object>> outerTables = null; 
+    ArrayList<HashMap<String, FJTO>> outerTables = null; 
     String name; 
  
     LinkedList<FJNamedObj> args = new LinkedList<>(); 
  
     public void addArg(String ID) { 
-        this.args.add(new FJNamedObj(ID, null)); 
+        this.args.add(new FJNamedObj(ID, FJ.newNull())); 
     } 
  
-    public void addArg(String ID, Object def) { 
+    public void addArg(String ID, FJTO def) { 
         this.args.add(new FJNamedObj(ID, def)); 
     } 
  
@@ -30,7 +30,7 @@ public class FJFunction {
         return args.get(index); 
     } 
  
-    public void setOuterTables(ArrayList<HashMap<String,Object>> tList) { 
+    public void setOuterTables(ArrayList<HashMap<String, FJTO>> tList) { 
         this.outerTables = tList; 
     } 
  
