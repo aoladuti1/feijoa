@@ -51,22 +51,21 @@ defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } mainDefFuncArgs fnStat
 			fn.setOuterTables(callStack.current().funcVars);
 		};
 		fn.setProcedure(defFunc.fnStatements1);
-		symbols.put(fn.name, fn);
+		symbols.put(fn.name, FJ.newFunction(fn));
 		ids.pop(); }
 
-lambdaConstruct <o: Object> ::= { ids.push(new FJFunction("")); } javaLambdaArgs '->' lambdaStatements< 
+lambdaConstruct <o: FJTO> ::= { ids.push(new FJFunction("")); } javaLambdaArgs '->' lambdaStatements< 
 	{   if (callStack.current() != null) {
 			ids.top().setOuterTables(callStack.current().funcVars);
 		};
 		ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
-		lambdaConstruct.o = ids.pop(); }
-	| { ids.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
-		{	
-			if (callStack.current() != null) {
-			ids.top().setOuterTables(callStack.current().funcVars);
+		lambdaConstruct.o = FJ.newFunction(ids.pop()); }
+	|   { ids.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
+		{	if (callStack.current() != null) {
+				ids.top().setOuterTables(callStack.current().funcVars);
 			};
 			ids.top().setProcedure(lambdaConstruct.lambdaReturn1);
-		lambdaConstruct.o = ids.pop(); }
+		lambdaConstruct.o = FJ.newFunction(ids.pop()); }
 
 pythonLambdaArgs ::= mainDefFuncArgs ':' | defFuncArgs ':' | ':'
 javaLambdaArgs ::= mainDefFuncArgs | defFuncArg
@@ -75,10 +74,10 @@ mainDefFuncArgs ::= '(' ')' | '(' defFuncArgs ')'
 defFuncArgs <c:int> ::= defFuncArg ',' defFuncArgs
 	| defFuncArg
 
-defFuncArg <o: Object> ::= argID optEquals
+defFuncArg <o: FJTO> ::= argID optEquals
 	{ ids.top().addArg(argID1.v, optEquals1.o); }
 
-optEquals <o: Object> ::= # { optEquals.o =  null; }
+optEquals <o: FJTO> ::= # { optEquals.o =  null; }
 	| '=' subExprA { optEquals.o = subExprA1.o; }
 
 argID <v: String> ::= ID ':' AID {argID.v = ID1.v;} | ID { argID.v = ID1.v; }
@@ -88,7 +87,7 @@ defStruct ::= 'struct' ID
 loopStatement ::= whileExpr< compStatements<
 		{	artEvaluate(
 					loopStatement.whileExpr1, whileExpr1);
-			while (FJ.bv(whileExpr1.o) == true) { 
+			while (((boolean) whileExpr1.o.obj) == true) { 
 				artEvaluate(
 					loopStatement.compStatements1, compStatements1); 
                 artEvaluate(
@@ -98,7 +97,7 @@ loopStatement ::= whileExpr< compStatements<
 	| untilExpr< compStatements<
 		{	artEvaluate(
 					loopStatement.untilExpr1, untilExpr1);
-			while (FJ.bv(untilExpr1.o) == false) { 
+			while (((boolean) untilExpr1.o.obj) == false) { 
 				artEvaluate(
 					loopStatement.compStatements1, compStatements1); 
                 artEvaluate(
@@ -107,27 +106,27 @@ loopStatement ::= whileExpr< compStatements<
 		}
 
 condStatement ::= ifExpr compStatements<
-		{	if (FJ.bv(ifExpr1.o) == true) {
+		{	if (((boolean) ifExpr1.o.obj) == true) {
 				artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
 		}
 	| ifExpr compStatements< elifExpr compStatements<
-		{ if (FJ.bv(ifExpr1.o) == true) {
+		{ if (((boolean) ifExpr1.o.obj) == true) {
 			artEvaluate(condStatement.compStatements1, compStatements1); 
 			}
-		  else if (FJ.bv(elifExpr1.o) == true){
+		  else if (((boolean) elifExpr1.o.obj) == true) {
 			artEvaluate(condStatement.compStatements2, compStatements2);  
 		  }
 		}
 	| elifExpr compStatements< elifExpr compStatements<
 		{	
-			if (FJ.bv(elifExpr1.o) == false && FJ.bv(elifExpr2.o) == true) {
+			if (((boolean) elifExpr1.o.obj) == false && ((boolean) elifExpr2.o.obj) == true) {
 				artEvaluate(condStatement.compStatements2, compStatements2); 
 			}
 		}
 	| ifExpr compStatements< 'else' compStatements<
 		{
-			if (FJ.bv(ifExpr1.o) == false) {
+			if ((boolean) ifExpr1.o.obj == false) {
 				artEvaluate(condStatement.compStatements2, compStatements2);
 			} else {
 				artEvaluate(condStatement.compStatements1, compStatements1);
@@ -135,38 +134,38 @@ condStatement ::= ifExpr compStatements<
 		}
 	| elifExpr compStatements< 'else' compStatements<
 		{
-			if (FJ.bv(elifExpr1.o) == false) {
+			if ((boolean) elifExpr1.o.obj == false) {
 				artEvaluate(condStatement.compStatements2, compStatements2);
 			}
 		}
 		
 		
-whileExpr <o: Object> ::= 'while' subExprA
+whileExpr <o: FJTO> ::= 'while' subExprA
 	{ whileExpr.o = subExprA1.o; }
 
-untilExpr <o: Object> ::= 'until' subExprA
+untilExpr <o: FJTO> ::= 'until' subExprA
 	{ untilExpr.o = subExprA1.o; }
 	
-ifExpr <o: Object> ::= 'if' subExprA
+ifExpr <o: FJTO> ::= 'if' subExprA
 	{ ifExpr.o = subExprA1.o; }
 	
-elifExpr <o: Object> ::= 'elif' subExprA
+elifExpr <o: FJTO> ::= 'elif' subExprA
 	{ elifExpr.o = subExprA1.o; }
 	
 sysout ::= 'sysout' '(' subExprA ')'
-	{ System.out.print(subExprA1.o); }
+	{ System.out.print(subExprA1.o.obj); }
 	
 sysline ::= 'sysline' '(' subExprA ')'
-	{ System.out.println(subExprA1.o); }
+	{ System.out.println(subExprA1.o.obj); }
 
-sysin <o: Object> ::= 'sysin' '(' ')' 
-	{ sysin.o = new Scanner(System.in).nextLine(); }
+sysin <o: FJTO> ::= 'sysin' '(' ')' 
+	{ sysin.o = FJ.newString(new Scanner(System.in).nextLine());}
 	
-returnExpr <o: Object> ::= 'return' subExprA 
+returnExpr <o: FJTO> ::= 'return' subExprA 
 	{  callStack.setLastValue(subExprA1.o);
 		if (true) throw new FJSigReturn(); }
 
-lambdaReturn <o: Object> ::= subExprA 
+lambdaReturn <o: FJTO> ::= subExprA 
 	{  callStack.setLastValue(subExprA1.o);
 		if (true) throw new FJSigReturn(); }
 
@@ -174,16 +173,16 @@ memberAssign ::= AID '=' subExprA
 		{ SDStack.addMember(AID1.v, subExprA1.o); }
 	| defStruct
 	
-mainExpr <o: Object> ::= assign 
+mainExpr <o: FJTO> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
 
 mainFuncArgs ::= '(' ')' { callStack.fillArgs(); } | '(' funcArgs ')'
 
-functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
+functionCall <o: FJTO> ::= voidFunctions { functionCall.o = FJ.newNull(); }
 	| otherFunctions { functionCall.o = otherFunctions1.o; }
 	| operand
 		{
-		  callStack.push((FJFunction) operand1.o);
+		  callStack.push((FJFunction) operand1.o.obj);
 		} mainFuncArgs
 	{	
 		try {
@@ -202,45 +201,56 @@ functionCall <o: Object> ::= voidFunctions { functionCall.o = null; }
 		}
 	}
 
-funcArgs <o: Object> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
+funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
 	| ID argNote '=' subExprA { callStack.processArg(ID1.v, subExprA1.o); } ',' funcArgs
 	| subExprA argNote { callStack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { callStack.processLastArg(ID1.v, subExprA1.o); }
 
 voidFunctions ::= sysout | sysline
-otherFunctions <o:Object> ::= sysin { otherFunctions.o = sysin1.o; }
 
-subExprA <o: Object> ::= subExprB { subExprA.o = subExprB1.o; }
+otherFunctions <o: FJTO> ::= sysin { otherFunctions.o = sysin1.o; }
+	| toInt { otherFunctions.o = toInt1.o; }
+
+toInt <o: FJTO> ::= 'int' '(' subExprA ')' { toInt.o = FJ.toInt(subExprA1.o); }
+toDouble <o: FJTO> ::= doubleOrFloat '(' subExprA ')' { toDouble.o = FJ.toDouble(subExprA1.o); }
+toBoolean <o: FJTO> ::= booleanOrBool '(' subExprA ')' { toBoolean.o = FJ.toBoolean(subExprA1.o); }
+toString <o: FJTO> ::= stringOrStr '(' subExprA ')' { toString.o = FJ.toString(subExprA1.o); }
+
+doubleOrFloat ::= 'double' | 'float'
+booleanOrBool ::= 'boolean' | 'bool'
+stringOrStr ::= 'string' | 'str'
+
+subExprA <o: FJTO> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
 	| or  { subExprA.o = or1.o;  }
 	| gtr { subExprA.o = gtr1.o; }
 	| lss { subExprA.o = lss1.o; }
 	| equ { subExprA.o = equ1.o; }
 	
-subExprB <o: Object> ::= subExprC { subExprB.o = subExprC1.o; }
+subExprB <o: FJTO> ::= subExprC { subExprB.o = subExprC1.o; }
 	| plus { subExprB.o = plus1.o; }
 	| minus { subExprB.o = minus1.o; }
 	
-subExprC <o: Object> ::= subExprD { subExprC.o = subExprD1.o; }
+subExprC <o: FJTO> ::= subExprD { subExprC.o = subExprD1.o; }
 	| multiply { subExprC.o = multiply1.o; }
 	| divide { subExprC.o = divide1.o; }
 
-subExprD <o: Object> ::= subExprE { subExprD.o = subExprE1.o; }
+subExprD <o: FJTO> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
 	
-subExprE <o: Object> ::= subExprF { subExprE.o = subExprF1.o; }
+subExprE <o: FJTO> ::= subExprF { subExprE.o = subExprF1.o; }
 	| not { subExprE.o = not1.o; }
 	| negate { subExprE.o = negate1.o; }
 	
-subExprF <o: Object> ::= operand { subExprF.o = operand1.o; }
+subExprF <o: FJTO> ::= operand { subExprF.o = operand1.o; }
 
-equ <o: Object> ::= subExprB '==' subExprB
+equ <o: FJTO> ::= subExprB '==' subExprB
 	{ equ.o = FJ.equ(subExprB1.o, subExprB2.o); }
 
-gtr <o: Object> ::= subExprB '>' subExprB
+gtr <o: FJTO> ::= subExprB '>' subExprB
 	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
 	
-lss <o: Object> ::= subExprB '<' subExprB
+lss <o: FJTO> ::= subExprB '<' subExprB
 	{ lss.o = FJ.lss(subExprB1.o, subExprB2.o); }
 		
 assign ::= AID '=' subExprA
@@ -248,84 +258,77 @@ assign ::= AID '=' subExprA
 	| plusEquals
 	| minusEquals
 	
-structConstruct <o: Object> ::= 'new' AID 
-	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = SAStack.popStruct(); }
-
+structConstruct <o: FJTO> ::= 'new' AID 
+	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct()); }
 
 mainStructArgs ::= '(' ')' { SAStack.fillArgs(); } | '(' structArgs ')'
 
-structArgs <o: Object> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } ',' structArgs
+structArgs <o: FJTO> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } ',' structArgs
 	| ID argNote '=' subExprA { SAStack.processArg(ID1.v, subExprA1.o); } ',' structArgs
 	| subExprA argNote { SAStack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { SAStack.processLastArg(ID1.v, subExprA1.o); }
 
 argNote ::= ':' AID | #
 	
-plusEquals <o: Object> ::= AID '+=' subExprC	
+plusEquals <o: FJTO> ::= AID '+=' subExprC	
 	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprC1.o)); }
 	
-minusEquals <o: Object> ::= AID '-=' subExprC
+minusEquals <o: FJTO> ::= AID '-=' subExprC
 	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprC1.o)); }
 		
-plus <o: Object> ::= subExprB '+' subExprC
+plus <o: FJTO> ::= subExprB '+' subExprC
 	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
 					
-minus <o: Object> ::= subExprB '-' subExprC
+minus <o: FJTO> ::= subExprB '-' subExprC
 	{ minus.o = FJ.minus(subExprB1.o, subExprC1.o); }
 	
-multiply <o: Object> ::= subExprC '*' subExprD
+multiply <o: FJTO> ::= subExprC '*' subExprD
 	{ multiply.o = FJ.multiply(subExprC1.o, subExprD1.o); }
 	
-divide <o: Object> ::= subExprC '/' subExprD
+divide <o: FJTO> ::= subExprC '/' subExprD
 	{ divide.o = FJ.divide(subExprC1.o, subExprD1.o); }
 		
-exponentiate <o: Object> ::= subExprE '**' subExprD
+exponentiate <o: FJTO> ::= subExprE '**' subExprD
 	{ exponentiate.o = FJ.exponentiate(subExprE1.o, subExprD1.o); }
 		
-not <o: Object> ::= '!' subExprE
-	{ not.o = !(FJ.bv(subExprE1.o)); }
+not <o: FJTO> ::= '!' subExprE
+	{ not.o = FJ.not(subExprE1.o); }
 	
-negate <o: Object> ::= '-' subExprE
-	{	try {
-			negate.o = FJ.iv(subExprE1.o) * -1; 
-		} catch (Exception FJException) {
-			negate.o = FJ.dv(subExprE1.o) * -1;
-		}
-	}
+negate <o: FJTO> ::= '-' subExprE
+	{	negate.o = FJ.negate(subExprE1.o); }
 	
-and <o: Object> ::= subExprA '&&' subExprA 
-	{ and.o = (FJ.bv(subExprA1.o)
-			&& FJ.bv(subExprA2.o)); }
+and <o: FJTO> ::= subExprA '&&' subExprA 
+	{ and.o = FJ.and(subExprA1.o, subExprA2.o); }
 
-or <o: Object> ::= subExprA '||' subExprA 
-	{ or.o = FJ.bv(subExprA1.o) || FJ.bv(subExprA2.o); }
+or <o: FJTO> ::= subExprA '||' subExprA 
+	{ or.o = FJ.or(subExprA1.o, subExprA2.o); }
 	
-operand <o: Object> ::= deref { operand.o = deref1.o; }
+operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| INTEGER
-		{ operand.o = INTEGER1.v; }
+		{ operand.o = FJ.newInt(INTEGER1.v); }
 	| REAL
-		{ operand.o = REAL1.v; }
+		{ operand.o = FJ.newDouble(REAL1.v); }
 	| 'true'
-		{ operand.o = FJ.bv(true); }
+		{ operand.o = FJ.newBoolean(true); }
 	| 'false'
-		{ operand.o = FJ.bv(false); }
+		{ operand.o = FJ.newBoolean(false); }
 	| STRING_DQ
-		{ operand.o = STRING_DQ1.v; }
+		{ operand.o = FJ.newString(STRING_DQ1.v); }
 	| lambdaConstruct
 		{ operand.o = lambdaConstruct1.o; }
 	| structConstruct
 		{ operand.o = structConstruct1.o; }
 	| structConstruct '.' AID 
 		{ @SuppressWarnings("unchecked")
-		 HashMap<String, Object> hm = (HashMap<String, Object>) structConstruct1.o;
+		 HashMap<String, FJTO> hm = (HashMap<String, FJTO>) structConstruct1.o.obj;
 		 operand.o = symbols.fullGet(AID1.v.split(STable.selectOp), hm); }
 	| functionCall { operand.o = functionCall1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 		
-deref <o: Object> ::= AID
+deref <o: FJTO> ::= AID
 	{ if (AID1.v == null) 
-		deref.o = null;
+		deref.o = FJ.newNull();
 	  else 
 		deref.o = symbols.get(AID1.v); }
 
@@ -337,7 +340,7 @@ ID <leftExtent:int rightExtent:int lexeme:String v:String> ::=
 INTEGER <leftExtent:int rightExtent:int lexeme:String v:int> ::= 
   &INTEGER {INTEGER.lexeme = artLexeme(INTEGER.leftExtent, INTEGER.rightExtent); INTEGER.v = artLexemeAsInteger(INTEGER.leftExtent, INTEGER.rightExtent); }  
 
-REAL <leftExtent:int rightExtent:int lexeme:String v:Double> ::= 
+REAL <leftExtent:int rightExtent:int lexeme:String v:double> ::= 
   &REAL {REAL.lexeme = artLexeme(REAL.leftExtent, REAL.rightExtent); REAL.v = artLexemeAsReal(REAL.leftExtent, REAL.rightExtent); }
   
 STRING_DQ <leftExtent:int rightExtent:int lexeme:String v:String> ::= 

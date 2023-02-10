@@ -3,37 +3,36 @@ import java.util.HashMap;
  
 import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.ARTGLLRDTHandle; 
  
-class CSEntry { 
- 
+class CSEntry {
+
     FJFunction function; 
-    Object output; 
+    FJTO output; 
     int argIndex = -1; 
     int maxArgs = 0; 
     boolean[] visited; 
     boolean selectingArgs; 
-    ArrayList<HashMap<String, Object>> funcVars; 
+    ArrayList<HashMap<String, FJTO>> funcVars; 
  
-    public CSEntry(FJFunction function, Object output) { 
+    public CSEntry(FJFunction function, FJTO output) { 
         this.function = function; 
         this.output = output; 
         this.maxArgs = function.maxArgs(); 
-        this.funcVars = new ArrayList<HashMap<String, Object>>(); 
+        this.funcVars = new ArrayList<HashMap<String, FJTO>>(); 
         this.funcVars.add(new HashMap<>()); 
         this.selectingArgs = false; 
         this.visited = new boolean[maxArgs]; 
-    } 
- 
-} 
+    }
+}
+
 public class FJCallStack { 
     ArrayList<CSEntry> stack = new ArrayList<>(); 
     int pos = -1; 
  
     public void push(FJFunction func) { 
         stack.add(new CSEntry(func, null)); 
-    } 
-     
- 
-    public void setLastValue(Object o) { 
+    }
+    
+    public void setLastValue(FJTO o) { 
         current().output = o; 
     } 
  
@@ -44,7 +43,7 @@ public class FJCallStack {
             return null; 
     } 
  
-    public Object getLastValue() { 
+    public FJTO getLastValue() { 
         return current().output; 
     } 
  
@@ -69,7 +68,7 @@ public class FJCallStack {
         return argc > top.maxArgs; 
     } 
  
-    public void putVar(int argc, Object o) { 
+    public void putVar(int argc, FJTO o) { 
         FJNamedObj fvar = topFunction().getArg(argc); 
         topTable().put(fvar.name, o); 
     } 
@@ -80,10 +79,10 @@ public class FJCallStack {
      */ 
     public void putVar(int argc) { 
         FJNamedObj fvar = topFunction().getArg(argc); 
-        topTable().put(fvar.name, fvar.obj); 
+        topTable().put(fvar.name, fvar.ftjo); 
     } 
  
-    public void putVar(String ID, Object o) { 
+    public void putVar(String ID, FJTO o) { 
         try { 
             top().visited[topFunction().getArgIndex(ID)] = true; 
         } catch (IndexOutOfBoundsException FJException) { 
@@ -97,11 +96,11 @@ public class FJCallStack {
         return currentTable().get(ID); 
     } 
  
-    public HashMap<String, Object> topTable() { 
+    public HashMap<String, FJTO> topTable() { 
         return top().funcVars.get(0); 
     } 
  
-    public HashMap<String, Object> currentTable() { 
+    public HashMap<String, FJTO> currentTable() { 
         return current().funcVars.get(0); 
     } 
  
@@ -110,33 +109,32 @@ public class FJCallStack {
         if (cur == null) { 
             return false; 
         } 
-        for (HashMap<String, Object> h : cur.funcVars) { 
+        for (HashMap<String, FJTO> h : cur.funcVars) { 
             if (h.containsKey(ID)) return true; 
         } 
         return false; 
     } 
  
-    public HashMap<String, Object> findCurTable(String firstID) { 
+    public HashMap<String, FJTO> findCurTable(String firstID) { 
         if (stack.isEmpty()) { 
             return null; 
         } 
-        for (HashMap<String, Object> h : current().funcVars) { 
+        for (HashMap<String, FJTO> h : current().funcVars) { 
             if (h.containsKey(firstID)) return h; 
         } 
         return null; 
     } 
  
-    public HashMap<String, Object> findTopTable(String firstID) { 
+    public HashMap<String, FJTO> findTopTable(String firstID) { 
         if (stack.isEmpty()) { 
             return null; 
         } 
-        for (HashMap<String, Object> h : top().funcVars) { 
+        for (HashMap<String, FJTO> h : top().funcVars) { 
             if (h.containsKey(firstID)) return h; 
         } 
         return null; 
-    } 
- 
- 
+    }
+
     public boolean isEmpty() { 
         return stack.isEmpty(); 
     } 
@@ -145,7 +143,7 @@ public class FJCallStack {
         pos++; 
     } 
  
-    public void processArg(Object o) { 
+    public void processArg(FJTO o) { 
         CSEntry top = top(); 
         if (top().selectingArgs) { 
             System.err.println( 
@@ -164,7 +162,7 @@ public class FJCallStack {
         } 
     } 
  
-    public void processArg(String ID, Object o) { 
+    public void processArg(String ID, FJTO o) { 
         CSEntry top = top(); 
         top.visited[topFunction().getArgIndex(ID)] = true; 
         top.selectingArgs = true; 
@@ -191,12 +189,12 @@ public class FJCallStack {
         } 
     } 
  
-    public void processLastArg(Object o) { 
+    public void processLastArg(FJTO o) { 
         processArg(o); 
         fillArgs(); 
     } 
  
-    public void processLastArg(String ID, Object o) { 
+    public void processLastArg(String ID, FJTO o) { 
         processArg(ID, o); 
         fillArgs(); 
     } 

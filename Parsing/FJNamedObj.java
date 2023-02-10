@@ -1,15 +1,15 @@
 public class FJNamedObj { 
   public final String name; 
-  public final Object obj;
+  public final FJTO ftjo;
   
-  public FJNamedObj(String name, Object obj) { 
+  public FJNamedObj(String name, FJTO ftjo) { 
     this.name = name;
-    this.obj = obj;
+    this.ftjo = ftjo;
   } 
 
   @Override
   public String toString() {
-      return name + "=" + obj;
+      return name + "=" + ftjo;
   }
   
 } 
