@@ -166,7 +166,8 @@ public class FJ {
 			return newInt((int) a.obj + (int) b.obj);
 		} else if ((a.type == FJTypes.DOUBLE && b.isNumeric())
 				|| (b.type == FJTypes.DOUBLE && a.isNumeric())) {
-			return newDouble((double) a.obj + (double) b.obj);
+			return newDouble(Double.valueOf(a.obj.toString()) 
+						  +  Double.valueOf(b.obj.toString()));
 		} else if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean((boolean) a.obj || (boolean) b.obj);
 		} else if (a.type == FJTypes.STRING) {
@@ -183,7 +184,8 @@ public class FJ {
 			return newInt((int) a.obj - (int) b.obj);
 		} else if ((a.type == FJTypes.DOUBLE && b.isNumeric())
 				|| (b.type == FJTypes.DOUBLE && a.isNumeric())) {
-			return newDouble((double) a.obj - (double) b.obj);
+			return newDouble(Double.valueOf(a.obj.toString()) 
+						  -  Double.valueOf(b.obj.toString()));
 		} else if (a.type == FJTypes.STRING && b.type == FJTypes.STRING) {
 			return newString(((String) a.obj).replace((String) b.obj, ""));
 		} else {
@@ -203,7 +205,8 @@ public class FJ {
 	
 	static FJTO multiply(FJTO a, FJTO b) {
 		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
-			return newDouble((double) a.obj * (double) b.obj);
+			return newDouble(Double.valueOf(a.obj.toString()) 
+						   * Double.valueOf(b.obj.toString()));
 		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
 			return newInt((int) a.obj * (int) b.obj);
 		} else if (a.isBoolean() && b.isBoolean()) {
@@ -215,7 +218,8 @@ public class FJ {
 	
 	static FJTO divide(FJTO a, FJTO b) {
 		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
-			return newDouble((double) a.obj / (double) b.obj);
+			return newDouble(Double.valueOf(a.obj.toString()) 
+						   / Double.valueOf(b.obj.toString()));
 		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
 			return newInt((int) a.obj / (int) b.obj);
 		} else {

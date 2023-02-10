@@ -6,7 +6,6 @@ sysline(x ** 2);
 sysout("The following prints 5.0: ");
 sysline(25 ** 0.5);
 
-
 // minus 
 x = 10;
 sysout("The following prints 5: ");
