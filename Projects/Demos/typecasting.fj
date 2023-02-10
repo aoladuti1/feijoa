@@ -1,0 +1,9 @@
+x = "true";
+if (bool(x)) {
+    sysline("x was typecast to a boolean");
+}
+
+// bool(x) == boolean(x)
+// float(x) == double(x)
+// str(x) == string(x)
+// int(x) == integer(x)
