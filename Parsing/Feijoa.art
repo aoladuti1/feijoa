@@ -13,6 +13,7 @@ support {
 	FJSDStack SDStack = symbols.SDStack();
 	FJSAStack SAStack = new FJSAStack(symbols);
 	FJIDStack ids = new FJIDStack();
+	FJLStack Lstack = new FJLStack();
 
 	@SuppressWarnings("serial")
 	public class FJSigReturn extends ARTException {
@@ -196,6 +197,9 @@ functionCall <o: FJTO> ::= voidFunctions { functionCall.o = FJ.newNull(); }
 		}
 	}
 
+indexAccess <o: FJTO> ::= operand '[' subExprA ']' 
+	{ indexAccess.o = ((FJList) operand1.o.obj).get((int) subExprA1.o.obj); }
+
 funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
 	| ID argNote '=' subExprA { callStack.processArg(ID1.v, subExprA1.o); } ',' funcArgs
 	| subExprA argNote { callStack.processLastArg(subExprA1.o); }
@@ -262,6 +266,13 @@ assign ::= AID '=' subExprA
 structConstruct <o: FJTO> ::= 'new' AID 
 	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct()); }
 
+listConstruct <o: FJTO> ::= { Lstack.push(); } mainListArgs { listConstruct.o = FJ.newList(Lstack.pop()); }
+
+mainListArgs ::= '[' ']' | '[' listArgs ']' | (* TODO: subExprA '..' subExprA *)
+
+listArgs ::= subExprA { Lstack.processArg(subExprA1.o); } ',' listArgs
+	| subExprA { Lstack.processLastArg(subExprA1.o); }
+
 mainStructArgs ::= '(' ')' { SAStack.fillArgs(); } | '(' structArgs ')'
 
 structArgs <o: FJTO> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } ',' structArgs
@@ -323,7 +334,10 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 		{ @SuppressWarnings("unchecked")
 		 HashMap<String, FJTO> hm = (HashMap<String, FJTO>) structConstruct1.o.obj;
 		 operand.o = symbols.fullGet(AID1.v.split(STable.selectOp), hm); }
+	| listConstruct
+		{ operand.o = listConstruct1.o; }
 	| functionCall { operand.o = functionCall1.o; }
+	| indexAccess { operand.o = indexAccess1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 		

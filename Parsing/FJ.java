@@ -31,6 +31,24 @@ public class FJ {
 		return new FJTO(null, FJTypes.NULL);
 	}
 
+	static FJTO newList() {
+		return new FJTO(new FJList(), FJTypes.LIST);
+	}
+
+	static FJTO newList(FJList value) {
+		return new FJTO(value, FJTypes.LIST);
+	}
+	
+	static FJTO newList(FJTO a, FJTO b) {
+		int start = (int) a.obj;
+		int end = (int) b.obj;
+		FJList list = new FJList();
+		for (int i = start; i < end; i++) {
+			list.add(newInt(i));
+		}
+		return newList(list);
+	}
+
 	static FJTO type(FJTO a) {
 		switch (a.type) {
 			case BOOLEAN:
@@ -49,6 +67,8 @@ public class FJ {
 				return newString("struct");
 			case STRUCT_DEF:
 				return newString("struct_definition");
+			case LIST:
+				return newString("list");
 		}
 		return newString("????");
 	}
