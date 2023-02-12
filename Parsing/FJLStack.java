@@ -28,4 +28,13 @@ public class FJLStack {
         processArg(o);
     }
 
+    void makeRange(FJTO a, FJTO b) {
+        int start = (int) a.obj;
+		int end = (int) b.obj;
+		FJList list = top();
+		for (int i = start; i < end; i++) {
+			list.add(FJ.newInt(i));
+		}
+    }
+
 }

@@ -9,7 +9,7 @@ public class FJList extends ArrayList<FJTO> {
     public String toString() {
         String ret = "";
         for (int i = 0; i < this.size() - 1; i++) {
-            ret = get(i).obj.toString() + ", ";
+            ret += get(i).obj.toString() + ", ";
         }
         if (this.size() > 1) {
             ret += get(size() - 1).obj.toString();

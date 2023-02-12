@@ -38,16 +38,6 @@ public class FJ {
 	static FJTO newList(FJList value) {
 		return new FJTO(value, FJTypes.LIST);
 	}
-	
-	static FJTO newList(FJTO a, FJTO b) {
-		int start = (int) a.obj;
-		int end = (int) b.obj;
-		FJList list = new FJList();
-		for (int i = start; i < end; i++) {
-			list.add(newInt(i));
-		}
-		return newList(list);
-	}
 
 	static FJTO type(FJTO a) {
 		switch (a.type) {

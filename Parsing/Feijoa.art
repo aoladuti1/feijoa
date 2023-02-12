@@ -268,7 +268,10 @@ structConstruct <o: FJTO> ::= 'new' AID
 
 listConstruct <o: FJTO> ::= { Lstack.push(); } mainListArgs { listConstruct.o = FJ.newList(Lstack.pop()); }
 
-mainListArgs ::= '[' ']' | '[' listArgs ']' | (* TODO: subExprA '..' subExprA *)
+mainListArgs ::= '[' ']'
+	| '[' listArgs ']'
+	| subExprA '..' subExprA
+		{ Lstack.makeRange(subExprA1.o, subExprA2.o); }
 
 listArgs ::= subExprA { Lstack.processArg(subExprA1.o); } ',' listArgs
 	| subExprA { Lstack.processLastArg(subExprA1.o); }
