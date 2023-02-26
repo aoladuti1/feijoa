@@ -110,6 +110,10 @@ public class FJ {
 		else
 			return numericCompare(a, b);
 	}
+
+	static void append(FJTO a, FJTO b) {
+		((FJList) a.obj).add(b);
+	} 
 	
 	static Boolean bv(Object obj) {
 		String s = obj.toString();
@@ -184,6 +188,13 @@ public class FJ {
 			return newString(a.obj.toString() + b.obj.toString());
 		} else if (b.type == FJTypes.STRING) {
 			return newString(a.obj.toString() + b.obj.toString());
+		} else if (a.isList() && b.isList()) {
+			FJList al = (FJList) a.obj;
+			FJList bl = (FJList) b.obj;
+			FJList ret = new FJList(al.size() + bl.size());
+			ret.addAll(al);
+			ret.addAll(bl);
+			return newList(ret);
 		} else {
 			return null; //error
 		}

@@ -27,4 +27,8 @@ public class FJTO {
     public boolean isBoolean() {
         return this.type == FJTypes.BOOLEAN;
     }
+
+    public boolean isList() {
+        return this.type == FJTypes.LIST;
+    }
 }

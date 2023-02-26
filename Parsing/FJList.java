@@ -5,6 +5,18 @@ public class FJList extends ArrayList<FJTO> {
     @java.io.Serial
     private static final long serialVersionUID = 8683452581122892190L;
 
+    public FJList(int num) {
+        super(num);
+    }
+
+    public FJList(FJList c) {
+        super(c);
+    }
+
+    public FJList() {
+        super();
+    }
+
     @Override
     public String toString() {
         String ret = "";
