@@ -6,11 +6,13 @@ sysline(x[0][0]); // prints 1
 sysline(1..5); // prints [1, 2, 3, 4]
 
 // concat [[1, 2], 3, 4] with the plus operator to [5, 6]
+// concat adds elements from the list, not the list itself
+// use append! to add the list itself
 y = x + [5, 6];
 sysline(y); // prints [[1, 2], 3, 4, 5, 6]
 
 // append 4 to [1, 2, 3]
 one_two_three = [1, 2, 3];
-append!(one_two_three, [4,5]);
+append!(one_two_three, 4);
 
 sysline(one_two_three);
