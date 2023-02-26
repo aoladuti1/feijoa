@@ -114,6 +114,10 @@ public class FJ {
 	static void append(FJTO a, FJTO b) {
 		((FJList) a.obj).add(b);
 	} 
+
+	static FJTO remove(FJTO a, FJTO b) {
+		return ((FJList) a.obj).remove((int) b.obj);
+	} 
 	
 	static Boolean bv(Object obj) {
 		String s = obj.toString();
