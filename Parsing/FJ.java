@@ -23,8 +23,8 @@ public class FJ {
 		return new FJTO(value, FJTypes.STRING);
 	}
 
-	static FJTO newStruct(HashMap<String, FJTO> value) {
-		return new FJTO(value, FJTypes.STRUCT);
+	static FJTO newStruct(HashMap<String, FJTO> value, String name) {
+		return new FJTO(value, FJTypes.STRUCT, name);
 	}
 
 	static FJTO newNull() {
@@ -39,28 +39,32 @@ public class FJ {
 		return new FJTO(value, FJTypes.LIST);
 	}
 
-	static FJTO type(FJTO a) {
-		switch (a.type) {
+	static String type(FJTO a) {
+		return typeEnumToString(a.type);
+	}
+
+	public static String typeEnumToString(FJTypes t) {
+		switch (t) {
 			case BOOLEAN:
-				return newString("boolean");
+				return "boolean";
 			case DOUBLE:
-				return newString("double");
+				return "double";
 			case FUNCTION:
-				return newString("function");
+				return "function";
 			case INT:
-				return newString("int");
+				return "int";
 			case NULL:
-				return newString("null");
+				return "null";
 			case STRING:
-				return newString("string");
+				return "string";
 			case STRUCT:
-				return newString("struct");
+				return "struct";
 			case STRUCT_DEF:
-				return newString("struct_definition");
+				return "struct_definition";
 			case LIST:
-				return newString("list");
+				return "list";
 		}
-		return newString("????");
+		return "??????";
 	}
 
 	static FJTO toInt(FJTO a) {
@@ -113,6 +117,10 @@ public class FJ {
 
 	static void append(FJTO a, FJTO b) {
 		((FJList) a.obj).add(b);
+	} 
+
+	static void add(FJTO a, FJTO b, FJTO c) {
+		((FJList) a.obj).add((int) b.obj, c);
 	} 
 
 	static FJTO remove(FJTO a, FJTO b) {

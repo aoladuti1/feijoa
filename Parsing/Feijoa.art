@@ -205,10 +205,13 @@ funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } '
 	| subExprA argNote { callStack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { callStack.processLastArg(ID1.v, subExprA1.o); }
 
-voidFunctions ::= sysout | sysline | append | remove
+voidFunctions ::= sysout | sysline | append | add
 
 append ::= 'append!' '(' subExprA ',' subExprA ')'
 	{ FJ.append(subExprA1.o, subExprA2.o); }
+
+add ::= 'add!' '(' subExprA ',' subExprA ',' subExprA ')'
+	{ FJ.add(subExprA1.o, subExprA2.o, subExprA3.o); }
 
 otherFunctions <o: FJTO> ::= 
 	  sysin { otherFunctions.o = sysin1.o; }
@@ -222,7 +225,7 @@ otherFunctions <o: FJTO> ::=
 remove <o: FJTO> ::= 'remove!' '(' subExprA ',' subExprA ')'
 	{ remove.o = FJ.remove(subExprA1.o, subExprA2.o); }
 
-type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.type(subExprA1.o); }
+type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.newString(FJ.type(subExprA1.o)); }
 
 toInt <o: FJTO> ::= integerOrInt '(' subExprA ')' { toInt.o = FJ.toInt(subExprA1.o); }
 toDouble <o: FJTO> ::= doubleOrFloat '(' subExprA ')' { toDouble.o = FJ.toDouble(subExprA1.o); }
@@ -272,7 +275,7 @@ assign ::= AID '=' subExprA
 	| minusEquals
 	
 structConstruct <o: FJTO> ::= 'new' AID 
-	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct()); }
+	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct(), AID1.v); }
 
 listConstruct <o: FJTO> ::= { Lstack.push(); } mainListArgs { listConstruct.o = FJ.newList(Lstack.pop()); }
 

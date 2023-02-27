@@ -1,23 +1,23 @@
 public class FJTO {
-    public String structName; 
+    public String typeString; 
     public Object obj;
     public FJTypes type; 
 
     public FJTO(Object obj) { 
-        this.structName = "";
+        this.typeString = "";
         this.obj = obj;
       }
 
-    public FJTO(String structName, Object obj, FJTypes type) { 
-        this.structName = structName;
-        this.obj = obj;
+    public FJTO(Object obj, FJTypes type, String typeString) { 
         this.type = type;
+        this.typeString = typeString;
+        this.obj = obj;
     }
 
     public FJTO(Object obj, FJTypes type) { 
-        this.structName = "";
         this.obj = obj;
         this.type = type;
+        this.typeString = FJ.typeEnumToString(type);
     }
 
     public boolean isNumeric() {
