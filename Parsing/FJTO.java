@@ -8,9 +8,9 @@ public class FJTO {
         this.obj = obj;
       }
 
-    public FJTO(Object obj, FJTypes type, String typeString) { 
+    public FJTO(Object obj, FJTypes type, String structType) { 
         this.type = type;
-        this.typeString = typeString;
+        this.typeString = structType;
         this.obj = obj;
     }
 
