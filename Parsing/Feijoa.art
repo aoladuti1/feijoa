@@ -13,6 +13,7 @@ support {
 	FJSDStack SDStack = symbols.SDStack();
 	FJSAStack SAStack = new FJSAStack(symbols);
 	FJIDStack ids = new FJIDStack();
+	FJLStack Lstack = new FJLStack();
 
 	@SuppressWarnings("serial")
 	public class FJSigReturn extends ARTException {
@@ -196,21 +197,35 @@ functionCall <o: FJTO> ::= voidFunctions { functionCall.o = FJ.newNull(); }
 		}
 	}
 
+indexAccess <o: FJTO> ::= operand '[' subExprA ']' 
+	{ indexAccess.o = ((FJList) operand1.o.obj).get((int) subExprA1.o.obj); }
+
 funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
 	| ID argNote '=' subExprA { callStack.processArg(ID1.v, subExprA1.o); } ',' funcArgs
 	| subExprA argNote { callStack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { callStack.processLastArg(ID1.v, subExprA1.o); }
 
-voidFunctions ::= sysout | sysline
+voidFunctions ::= sysout | sysline | append | add
 
-otherFunctions <o: FJTO> ::= sysin { otherFunctions.o = sysin1.o; }
+append ::= 'append!' '(' subExprA ',' subExprA ')'
+	{ FJ.append(subExprA1.o, subExprA2.o); }
+
+add ::= 'add!' '(' subExprA ',' subExprA ',' subExprA ')'
+	{ FJ.add(subExprA1.o, subExprA2.o, subExprA3.o); }
+
+otherFunctions <o: FJTO> ::= 
+	  sysin { otherFunctions.o = sysin1.o; }
+	| remove { otherFunctions.o = remove1.o; }
 	| type { otherFunctions.o = type1.o; }
 	| toInt { otherFunctions.o = toInt1.o; }
 	| toDouble { otherFunctions.o = toDouble1.o; }
 	| toBoolean { otherFunctions.o = toBoolean1.o; }
 	| toString { otherFunctions.o = toString1.o; }
 
-type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.type(subExprA1.o); }
+remove <o: FJTO> ::= 'remove!' '(' subExprA ',' subExprA ')'
+	{ remove.o = FJ.remove(subExprA1.o, subExprA2.o); }
+
+type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.newString(FJ.type(subExprA1.o)); }
 
 toInt <o: FJTO> ::= integerOrInt '(' subExprA ')' { toInt.o = FJ.toInt(subExprA1.o); }
 toDouble <o: FJTO> ::= doubleOrFloat '(' subExprA ')' { toDouble.o = FJ.toDouble(subExprA1.o); }
@@ -260,7 +275,17 @@ assign ::= AID '=' subExprA
 	| minusEquals
 	
 structConstruct <o: FJTO> ::= 'new' AID 
-	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct()); }
+	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct(), AID1.v); }
+
+listConstruct <o: FJTO> ::= { Lstack.push(); } mainListArgs { listConstruct.o = FJ.newList(Lstack.pop()); }
+
+mainListArgs ::= '[' ']'
+	| '[' listArgs ']'
+	| subExprA '..' subExprA
+		{ Lstack.makeRange(subExprA1.o, subExprA2.o); }
+
+listArgs ::= subExprA { Lstack.processArg(subExprA1.o); } ',' listArgs
+	| subExprA { Lstack.processLastArg(subExprA1.o); }
 
 mainStructArgs ::= '(' ')' { SAStack.fillArgs(); } | '(' structArgs ')'
 
@@ -323,7 +348,10 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 		{ @SuppressWarnings("unchecked")
 		 HashMap<String, FJTO> hm = (HashMap<String, FJTO>) structConstruct1.o.obj;
 		 operand.o = symbols.fullGet(AID1.v.split(STable.selectOp), hm); }
+	| listConstruct
+		{ operand.o = listConstruct1.o; }
 	| functionCall { operand.o = functionCall1.o; }
+	| indexAccess { operand.o = indexAccess1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 		

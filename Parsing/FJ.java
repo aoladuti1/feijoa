@@ -23,34 +23,48 @@ public class FJ {
 		return new FJTO(value, FJTypes.STRING);
 	}
 
-	static FJTO newStruct(HashMap<String, FJTO> value) {
-		return new FJTO(value, FJTypes.STRUCT);
+	static FJTO newStruct(HashMap<String, FJTO> value, String name) {
+		return new FJTO(value, FJTypes.STRUCT, name);
 	}
 
 	static FJTO newNull() {
 		return new FJTO(null, FJTypes.NULL);
 	}
 
-	static FJTO type(FJTO a) {
-		switch (a.type) {
+	static FJTO newList() {
+		return new FJTO(new FJList(), FJTypes.LIST);
+	}
+
+	static FJTO newList(FJList value) {
+		return new FJTO(value, FJTypes.LIST);
+	}
+
+	static String type(FJTO a) {
+		return typeEnumToString(a.type);
+	}
+
+	public static String typeEnumToString(FJTypes t) {
+		switch (t) {
 			case BOOLEAN:
-				return newString("boolean");
+				return "boolean";
 			case DOUBLE:
-				return newString("double");
+				return "double";
 			case FUNCTION:
-				return newString("function");
+				return "function";
 			case INT:
-				return newString("int");
+				return "int";
 			case NULL:
-				return newString("null");
+				return "null";
 			case STRING:
-				return newString("string");
+				return "string";
 			case STRUCT:
-				return newString("struct");
+				return "struct";
 			case STRUCT_DEF:
-				return newString("struct_definition");
+				return "struct_definition";
+			case LIST:
+				return "list";
 		}
-		return newString("????");
+		return "??????";
 	}
 
 	static FJTO toInt(FJTO a) {
@@ -100,6 +114,18 @@ public class FJ {
 		else
 			return numericCompare(a, b);
 	}
+
+	static void append(FJTO a, FJTO b) {
+		((FJList) a.obj).add(b);
+	} 
+
+	static void add(FJTO a, FJTO b, FJTO c) {
+		((FJList) a.obj).add((int) b.obj, c);
+	} 
+
+	static FJTO remove(FJTO a, FJTO b) {
+		return ((FJList) a.obj).remove((int) b.obj);
+	} 
 	
 	static Boolean bv(Object obj) {
 		String s = obj.toString();
@@ -174,6 +200,13 @@ public class FJ {
 			return newString(a.obj.toString() + b.obj.toString());
 		} else if (b.type == FJTypes.STRING) {
 			return newString(a.obj.toString() + b.obj.toString());
+		} else if (a.isList() && b.isList()) {
+			FJList al = (FJList) a.obj;
+			FJList bl = (FJList) b.obj;
+			FJList ret = new FJList(al.size() + bl.size());
+			ret.addAll(al);
+			ret.addAll(bl);
+			return newList(ret);
 		} else {
 			return null; //error
 		}

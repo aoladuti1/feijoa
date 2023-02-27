@@ -1,7 +1,10 @@
+sysline("x was set to the string 'true'.");
 x = "true";
 if (bool(x)) {
-    sysline("x (a string) was typecast to a boolean.");
+    sysline("x (a string) was typecast to a boolean, and if it is true you can see this.");
 }
+
+sysline(type(d));
 
 typeOfx = type(x);
 sysline("the result of type() on x is: " + typeOfx);

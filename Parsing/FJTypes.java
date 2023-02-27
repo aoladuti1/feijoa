@@ -5,6 +5,7 @@ public enum FJTypes {
     BOOLEAN,
     STRING,
     FUNCTION,
+    LIST,
     STRUCT,
     STRUCT_DEF;
 }
