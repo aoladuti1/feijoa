@@ -1,10 +1,9 @@
 public class FJTO {
-    public String typeString; 
+    public String typeString; // for structs etc. 
     public Object obj;
     public FJTypes type; 
 
     public FJTO(Object obj) { 
-        this.typeString = "";
         this.obj = obj;
       }
 
@@ -17,7 +16,6 @@ public class FJTO {
     public FJTO(Object obj, FJTypes type) { 
         this.obj = obj;
         this.type = type;
-        this.typeString = FJ.typeEnumToString(type);
     }
 
     public boolean isNumeric() {
