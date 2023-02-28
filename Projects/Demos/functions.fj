@@ -1,0 +1,46 @@
+foo = 10;
+
+def func(foo: typeHint = 5, bar=2) {
+    sysline(bar);
+    return foo; // it will return 5 - see the way the scope is correct?
+}
+
+sysline(func(bar=700)); // prints 5 and then 700
+
+    /* standard java-style lambda syntax */ 
+// ...but see that default args are possible
+msgOne = (txt="default") -> { txt += ""; sysline(txt);  };
+
+// parentheses are optional for a single argument
+// curly braces are optional for a single function expression in the body
+msgTwo = txt -> sysline(txt);
+
+msgOne("i am a lambda");
+msgTwo(txt="i am also a lambda"); // arg selection still possible
+
+def lambdaCaller(a) { a(); }
+lambdaCaller(() -> sysline("i am a function called with a lambda"));
+
+    /* See Python-style lambdas -- right side is returned, left side is for args */
+pyDouble = lambda x : x * 2;
+// parentheses optional for any number of args in python-style
+pyAdd = lambda x, y :  x + y; 
+
+sysline("The double of 10 is " + pyDouble(10));
+sysline(5 + " add " + 5 + " is " + pyAdd(5, 5));
+
+// See nested functions and closures
+def printNested() {
+    def x() {
+        msg = "i was called from a nested function";
+        def y() {
+            sysline(msg);
+        }
+        y();
+    }
+    return x;
+}
+
+printNested()();
+
+// Note: ALL arguments without a default specified are defaulted to null

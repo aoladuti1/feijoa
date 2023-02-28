@@ -1,19 +1,18 @@
 // exponentiation
-x <- 7;
+x = 7;
 sysout("The following prints 49.0: ");
 sysline(x ** 2);
 
 sysout("The following prints 5.0: ");
 sysline(25 ** 0.5);
 
-
 // minus 
-x <- 10;
+x = 10;
 sysout("The following prints 5: ");
 sysline(15 - x);
 
-lie <- "i don't like computer science. i really don't like it.";
-truth_sometimes <- lie - " don't";
+lie = "i don't like computer science. i really don't like it.";
+truth_sometimes = lie - " don't";
 sysout("The following is prints a line about me liking comp sci: ");
 sysline(truth_sometimes);
 
@@ -34,8 +33,8 @@ sysline(!((x > 2) && (x > 1)));
 
 
 // boolean algebra
-T <- true;
-F <- false;
+T = true;
+F = false;
 sysout("Prints true: ");
 sysline(T * F + T);
 

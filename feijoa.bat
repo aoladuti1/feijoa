@@ -7,7 +7,7 @@ set "project=%cd%\%2"
 if /I "%project:~-3%" neq ".fj" (
 	set "project=%project%.fj"
 )
-cd Parsing
+cd %~dp0\Parsing
 if '%1'=='-p' (
 java -classpath .;%arthome%/art.jar uk.ac.rhul.cs.csle.art.v3.ARTV3 %arthome%\%fei%.art
 javac -Xlint -classpath .;%arthome%/art.jar ARTGeneratedParser.java ARTGeneratedLexer.java

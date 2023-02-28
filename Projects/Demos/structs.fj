@@ -1,0 +1,15 @@
+struct X {
+	a = "1"; // to show that structs can hold different types
+
+	struct Y {
+		b = 6;
+		// err = new X(); --- returns an error - you can't construct the containing struct
+		c = () -> sysout("max");
+		// def d() { sysout("max"); } --- returns an error - no formal function definitions in structs
+	}
+}
+
+a = new X.Y(7).b; // accessing r-values is possible, alongside nested structs
+b = new X.Y(7, c=8); // see functions = first class variables, and arg selection
+callC = new X.Y();
+callC.c(); // prints "max"
