@@ -14,3 +14,6 @@ while (x > 0) {
 	sysline(x);
 	x -= 1;
 }
+
+// continue -- keyword works same as python/java
+// break --- keyword works same as python/java

@@ -27,6 +27,30 @@ support {
 		this("");
 	}
 	}
+
+	@SuppressWarnings("serial")
+	public class FJSigBreak extends ARTException {
+
+		public FJSigBreak(String message) {
+			super(message);
+		}
+
+		public FJSigBreak() {
+			this("");
+		}
+	}
+
+		@SuppressWarnings("serial")
+	public class FJSigContinue extends ARTException {
+
+		public FJSigContinue(String message) {
+			super(message);
+		}
+
+		public FJSigContinue() {
+			this("");
+		}
+	}
 }
 
 whitespace &SIMPLE_WHITESPACE
@@ -35,7 +59,7 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
-statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';'
+statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | break | continue
 structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
 structStatement ::= mainExpr ';' | defStruct
@@ -88,9 +112,17 @@ defStruct ::= 'struct' ID
 loopStatement ::= whileExpr< compStatements<
 		{	artEvaluate(
 					loopStatement.whileExpr1, whileExpr1);
-			while (((boolean) whileExpr1.o.obj) == true) { 
-				artEvaluate(
-					loopStatement.compStatements1, compStatements1); 
+			while (((boolean) whileExpr1.o.obj) == true) {
+				try { 
+					artEvaluate(
+						loopStatement.compStatements1, compStatements1); 
+				} catch (FJSigBreak FJBreak) {
+					break;
+				} catch (FJSigContinue FJContinue) {
+					artEvaluate(
+					loopStatement.whileExpr1, whileExpr1);
+					continue;
+				}
                 artEvaluate(
 					loopStatement.whileExpr1, whileExpr1); 
             }
@@ -98,9 +130,17 @@ loopStatement ::= whileExpr< compStatements<
 	| untilExpr< compStatements<
 		{	artEvaluate(
 					loopStatement.untilExpr1, untilExpr1);
-			while (((boolean) untilExpr1.o.obj) == false) { 
-				artEvaluate(
-					loopStatement.compStatements1, compStatements1); 
+			while (((boolean) untilExpr1.o.obj) == false) {
+				try {
+					artEvaluate(
+						loopStatement.compStatements1, compStatements1); 
+				} catch (FJSigBreak FJBreak) {
+					break;
+				} catch (FJSigContinue FJContinue) {
+					artEvaluate(
+						loopStatement.untilExpr1, untilExpr1);
+					continue;
+				}
                 artEvaluate(
 					loopStatement.untilExpr1, untilExpr1); 
             }
@@ -164,6 +204,12 @@ sysin <o: FJTO> ::= 'sysin' '(' ')'
 returnExpr <o: FJTO> ::= 'return' subExprA 
 	{  callStack.setLastValue(subExprA1.o);
 		if (true) throw new FJSigReturn(); }
+
+break ::= 'break' ';'
+	{ if (true) throw new FJSigBreak(); }
+
+continue ::= 'continue' ';'
+	{ if (true) throw new FJSigContinue(); }
 
 lambdaReturn <o: FJTO> ::= subExprA 
 	{  callStack.setLastValue(subExprA1.o);
