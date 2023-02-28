@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class FJ {
 	
@@ -40,6 +39,7 @@ public class FJ {
 	}
 
 	static String type(FJTO a) {
+		if (a.type == FJTypes.STRUCT) { return a.typeString; }
 		return typeEnumToString(a.type);
 	}
 
