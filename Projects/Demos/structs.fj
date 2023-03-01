@@ -4,8 +4,8 @@ struct X {
 	struct Y {
 		b = 6;
 		// err = new X(); --- returns an error - you can't construct the containing struct
-		c = () -> sysout("max");
-		// def d() { sysout("max"); } --- returns an error - no formal function definitions in structs
+		c = () -> sysout!("max");
+		// def d() { sysout!("max"); } --- returns an error - no formal function definitions in structs
 	}
 }
 

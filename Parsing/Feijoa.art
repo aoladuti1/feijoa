@@ -192,13 +192,13 @@ ifExpr <o: FJTO> ::= 'if' subExprA
 elifExpr <o: FJTO> ::= 'elif' subExprA
 	{ elifExpr.o = subExprA1.o; }
 	
-sysout ::= 'sysout' '(' subExprA ')'
+sysout ::= 'sysout!' '(' subExprA ')'
 	{ System.out.print(subExprA1.o.obj); }
 	
-sysline ::= 'sysline' '(' subExprA ')'
+sysln ::= 'sysln!' '(' subExprA ')'
 	{ System.out.println(subExprA1.o.obj); }
 
-sysin <o: FJTO> ::= 'sysin' '(' ')' 
+sysin <o: FJTO> ::= 'sysin!' '(' ')' 
 	{ sysin.o = FJ.newString(new Scanner(System.in).nextLine());}
 	
 returnExpr <o: FJTO> ::= 'return' subExprA 
@@ -251,7 +251,7 @@ funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } '
 	| subExprA argNote { callStack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { callStack.processLastArg(ID1.v, subExprA1.o); }
 
-voidFunctions ::= sysout | sysline | append | add
+voidFunctions ::= sysout | sysln | append | add
 
 append ::= 'append!' '(' subExprA ',' subExprA ')'
 	{ FJ.append(subExprA1.o, subExprA2.o); }
@@ -275,7 +275,7 @@ remove <o: FJTO> ::= 'remove!' '(' subExprA ',' subExprA ')'
 len <o: FJTO> ::= 'len!' '(' subExprA ')'
 	{ len.o = FJ.len(subExprA1.o); }
 
-type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.newString(FJ.type(subExprA1.o)); }
+type <o: FJTO> ::= 'type!' '(' subExprA ')' { type.o = FJ.newString(FJ.type(subExprA1.o)); }
 
 toInt <o: FJTO> ::= integerOrInt '(' subExprA ')' { toInt.o = FJ.toInt(subExprA1.o); }
 toDouble <o: FJTO> ::= doubleOrFloat '(' subExprA ')' { toDouble.o = FJ.toDouble(subExprA1.o); }
