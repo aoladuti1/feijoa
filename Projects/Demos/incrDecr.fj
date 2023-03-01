@@ -1,0 +1,14 @@
+x = 0;
+sysline("> x = 0");
+sysout("> sysline(x++)"); sysline(" // outputs " + x++); // postfix incr.
+sysout("> sysline(x)"); sysline(" // outputs " + x);
+
+sysline("-----------------");
+
+y = 0;
+sysline("> y = 0");
+sysout("> sysline(++y)"); sysline(" // outputs " + ++y); // prefix incr.
+
+sysline("-----------------");
+
+sysline("Equivalent decrement operations exist (e.g. x--)");

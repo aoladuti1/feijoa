@@ -83,21 +83,13 @@ public class FJ {
 		return newBoolean(Boolean.parseBoolean(a.obj.toString()));
 	}
 
-	static Integer iv(FJTO o) {
-		return Integer.valueOf(o.obj.toString());
-	}
-	
-	static Double dv(FJTO o) {
-		return Double.valueOf(o.obj.toString());
-	}
-
 	static int numericCompare(FJTO a, FJTO b) {
 		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
-			double ao = (double) a.obj;
-			double bo = (double) b.obj;
-			if (ao > bo) return 1;
-			if (ao == bo) return 0;
-			if (ao < bo) return -1;
+			Double ao = Double.valueOf(a.obj.toString());
+			Double bo = Double.valueOf(b.obj.toString());
+			int ret = ao.compareTo(bo);
+			if (ret < 0) ret = -1;
+			return ret;
 		} else {
 			int ao = (int) a.obj;
 			int bo = (int) b.obj;
@@ -144,14 +136,37 @@ public class FJ {
 			return false;
 		throw new IllegalArgumentException();
 	}
-
 	
 	static FJTO gtr(FJTO a, FJTO b) {
-		return newBoolean(safeNumericCompare(a, b) == 1);
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // err
+		else
+			return newBoolean(safeNumericCompare(a, b) == 1);
+	}
+
+	static FJTO geq(FJTO a, FJTO b) {
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // err
+		else
+			return newBoolean(comp == 1 || comp == 0);
 	}
 	
 	static FJTO lss(FJTO a, FJTO b) {
-		return newBoolean(safeNumericCompare(a, b) == -1);
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // err
+		else
+			return newBoolean(safeNumericCompare(a, b) == -1);
+	}
+
+	static FJTO leq(FJTO a, FJTO b) {
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // err
+		else
+			return newBoolean(comp == -1 || comp == 0);
 	}
 
 	static FJTO not(FJTO a) {
@@ -253,6 +268,17 @@ public class FJ {
 			return newInt((int) a.obj * (int) b.obj);
 		} else if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean(((boolean) a.obj) && ((boolean) b.obj));
+		} else {
+			return null; // error
+		}
+	}
+
+	static FJTO mod(FJTO a, FJTO b) {
+		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
+			return newDouble(Double.valueOf(a.obj.toString()) 
+						   % Double.valueOf(b.obj.toString()));
+		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
+			return newInt((int) a.obj % (int) b.obj);
 		} else {
 			return null; // error
 		}
