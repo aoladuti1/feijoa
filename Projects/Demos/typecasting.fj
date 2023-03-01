@@ -1,0 +1,19 @@
+sysln!("x was set to the string 'true'.");
+x = "true";
+if (bool(x)) {
+    sysln!("x was typecast to a boolean, and if x == true you can see this text.");
+}
+
+typeOfx = type!(x);
+sysln!("the result of type() on x is: " + typeOfx);
+sysln!("see: typecasts make new variables instead of changing data.");
+
+struct Dummy { _ = null; }
+dummy = new Dummy();
+sysln!("\ntype(_) called on structs gives their type. 
+    For a Dummy construct variabled named dummy, type!(dummy) is " + type!(dummy));
+    
+// bool(x) == boolean(x)
+// float(x) == double(x)
+// str(x) == string(x)
+// int(x) == integer(x)

@@ -3,32 +3,27 @@ import java.util.HashMap;
 
 public class FJStructDef {
     String name;
-    HashMap<String, Object> members = new HashMap<>();
+    HashMap<String, FJTO> members = new HashMap<>();
     ArrayList<String> memberOrder = new ArrayList<>();
     
     public FJStructDef(String typeName) {
         this.name = typeName;
     }
 
-    public void addMember(String ID, Object o) {
+    public void addMember(String ID, FJTO o) {
         if (!members.containsKey(ID)) {
-            try {
-                FJStructDef _fjsd = (FJStructDef) o;
-            } catch (Exception FJ_Exception) {
+            if (o.type != FJTypes.STRUCT_DEF) {
                 this.memberOrder.add(ID);
-            } finally {
-                this.members.put(ID, o); 
             }
-        } else {
-            this.members.put(ID, o);    
         }
+        this.members.put(ID, o);    
     }
 
-    public void addStructDef(String ID, Object o) {
+    public void addStructDef(String ID, FJTO o) {
         this.members.put(ID, o);
     }
 
-    public Object getMember(String ID) {
+    public FJTO getMember(String ID) {
         return this.members.get(ID);
     }
 
@@ -45,11 +40,11 @@ public class FJStructDef {
         return -1;
     }
 
-    public Object getDefault(int index) {
+    public FJTO getDefault(int index) {
         return members.get(getArgName(index));
     }
 
-    public Object getDefault(String ID) {
+    public FJTO getDefault(String ID) {
         return members.get(ID);
     }
 

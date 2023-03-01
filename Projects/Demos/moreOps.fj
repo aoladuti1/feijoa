@@ -1,50 +1,53 @@
 // exponentiation
 x = 7;
-sysout("The following prints 49.0: ");
-sysline(x ** 2);
+sysout!("The following prints 49.0: ");
+sysln!(x ** 2);
 
-sysout("The following prints 5.0: ");
-sysline(25 ** 0.5);
-
+sysout!("The following prints 5.0: ");
+sysln!(25 ** 0.5);
 
 // minus 
 x = 10;
-sysout("The following prints 5: ");
-sysline(15 - x);
+sysout!("The following prints 5: ");
+sysln!(15 - x);
 
 lie = "i don't like computer science. i really don't like it.";
 truth_sometimes = lie - " don't";
-sysout("The following is prints a line about me liking comp sci: ");
-sysline(truth_sometimes);
+sysout!("The following is prints a line about me liking comp sci: ");
+sysln!(truth_sometimes);
+
+// mod
+sysout!("The following prints 0.5: ");
+sysln!(1.5 % 1.0);
 
 
 // not
-sysout("Prints true: ");
-sysline(!false);
+sysout!("Prints true: ");
+sysln!(!false);
 
-sysout("Prints false: ");
-sysline(!(x > 2));
+sysout!("Prints false: ");
+sysln!(not (x > 2));
 
 // and
-sysout("Prints true: ");
-sysline(!((x > 2) && (x > 100)));
+sysout!("Prints true: ");
+sysln!(!((x > 2) && (x > 100)));
 
-sysout("Prints false: ");
-sysline(!((x > 2) && (x > 1)));
+sysout!("Prints false: ");
+sysln!(!((x > 2) and (x > 1)));
 
 
 // boolean algebra
 T = true;
 F = false;
-sysout("Prints true: ");
-sysline(T * F + T);
+sysout!("Prints true: ");
+sysln!(T * F + T);
 
 
 // or 	
-sysout("Prints false: ");
-sysline(true || false && false);
+sysout!("Prints false: ");
+sysln!(true || false && false);
 
 
 // equals
-sysout("Prints true if x == x: ");
-sysline(x == x);
+sysout!("Prints true if \"hi\" == \"hi\": "); //notice the java char esacpes
+sysln!("hi" == "hi");

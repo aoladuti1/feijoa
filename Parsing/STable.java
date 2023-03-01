@@ -1,11 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class STable {
 
-    private ArrayList<HashMap<String, Object>> tree = new ArrayList<>();
+    private ArrayList<HashMap<String, FJTO>> tree = new ArrayList<>();
 
     final static String selectOp = "\\.";
     ArrayList<String> IDStack = new ArrayList<>();
@@ -25,11 +24,11 @@ class STable {
         return SDstack;
     }
 
-    private HashMap<String, Object> currentTable() {
+    private HashMap<String, FJTO> currentTable() {
         return getTable(level);
     }
 
-    private HashMap<String, Object> getTable(int level) {
+    private HashMap<String, FJTO> getTable(int level) {
         return tree.get(level);
     }
 
@@ -38,13 +37,13 @@ class STable {
         tree.add(new HashMap<>());
     }
 
-    public HashMap<String, Object> newScope() {
+    public HashMap<String, FJTO> newScope() {
         level += 1;
         tree.add(new HashMap<>());
         return currentTable();
     }
 
-    public HashMap<String, Object> oldScope() {
+    public HashMap<String, FJTO> oldScope() {
         tree.remove(tree.size() - 1);
         level -= 1;
         return currentTable();
@@ -52,7 +51,7 @@ class STable {
 
     public void startStructDef(String typeName) {
         FJStructDef add = new FJStructDef(typeName);
-        put(typeName, add);
+        put(typeName, new FJTO(add, FJTypes.STRUCT_DEF));
         SDstack.declare(add);
     }
 
@@ -70,11 +69,11 @@ class STable {
      * @return the symbol table of an ID and the index of the symbol table in a [
      *         table, index ] array
      */
-    public HashMap<String, Object> findTable(String FirstID) {
+    public HashMap<String, FJTO> findTable(String FirstID) {
         boolean found = false;
         int curLevel = level;
-        HashMap<String, Object> lastTable = tree.get(tree.size() - 1);
-        HashMap<String, Object> symbols = lastTable;
+        HashMap<String, FJTO> lastTable = tree.get(tree.size() - 1);
+        HashMap<String, FJTO> symbols = lastTable;
         for (; found != true && curLevel != -1; curLevel -= 1) {
             symbols = getTable(curLevel);
             found = symbols.containsKey(FirstID);
@@ -84,71 +83,67 @@ class STable {
 
     @SuppressWarnings("unchecked")
     private void fullPut(
-        String[] splits, Object o, HashMap<String, Object> table) {
-            Object holder;
+        String[] splits, FJTO o, HashMap<String, FJTO> table) {
+            FJTO holder;
             if (splits.length == 1) {
-                holder = table;
+                holder = new FJTO(table, FJTypes.STRUCT);
             } else {
                 holder = resolve(splits, table);
+                if (holder == null) return;
             }
-            try {
-                ((HashMap<String, Object>) holder).put(splits[splits.length - 1], o);
-            } catch (Exception isAStructDef) {
-                ((FJStructDef) holder).addMember(splits[splits.length - 1], o);
+            if (holder.type == FJTypes.STRUCT) {
+                ((HashMap<String, FJTO>) holder.obj).put(splits[splits.length - 1], o);
+            } else if (holder.type == FJTypes.STRUCT_DEF) {
+                ((FJStructDef) holder.obj).addMember(splits[splits.length - 1], o);
             }
         
     }
 
     @SuppressWarnings("unchecked")
-    public Object fullGet(
-        String[] splits, HashMap<String, Object> table) {
-            Object holder;
+    public FJTO fullGet(
+        String[] splits, HashMap<String, FJTO> table) {
+            FJTO holder;
             if (splits.length == 1) {
-                holder = table;
-                
+                holder = new FJTO(table, FJTypes.STRUCT);
             } else {
                 holder = resolve(splits, table);
+                if (holder == null) return null;
             }
-            try {
-                return ((HashMap<String, Object>) holder).get(splits[splits.length - 1]);
-            } catch (Exception isAStructDef) {
-                return ((FJStructDef) holder).getMember(splits[splits.length - 1]);
+            if (holder.type == FJTypes.STRUCT) {
+                return ((HashMap<String, FJTO>) holder.obj).get(splits[splits.length - 1]);
+            } else if (holder.type == FJTypes.STRUCT_DEF) {
+                return ((FJStructDef) holder.obj).getMember(splits[splits.length - 1]);
             }
-            
-        
+            return null;
     }
 
     @SuppressWarnings("unchecked")
-    private Object resolve(String[] splits, HashMap<String, Object> table) {
-        HashMap<String, Object> subTable = table;
-        FJStructDef sdef = null;
-        boolean lastDef = false;
+    private FJTO resolve(String[] splits, HashMap<String, FJTO> table) {
+        HashMap<String, FJTO> subTable = table;
+        FJTO fetch = null;
         int i;
         for (i = 0; i < splits.length - 1; i++) {
-            try {
-                subTable = (HashMap<String, Object>) subTable.get(splits[i]);
-                lastDef = false;
-            } catch (Exception FJ_Excpetion) {
-                sdef = ((FJStructDef) subTable.get(splits[i]));
-                subTable = sdef.members;
-                lastDef = true;
+            fetch = subTable.get(splits[i]);
+            if (fetch == null) {
+                System.err.println("Cannot find symbol " + splits[i]);
+                return null;
+            }
+            if (fetch.type == FJTypes.STRUCT) {
+                subTable = (HashMap<String, FJTO>) fetch.obj;
+            } else if (fetch.type == FJTypes.STRUCT_DEF) {
+                subTable = ((FJStructDef) fetch.obj).members;
             }
         }
-        if (lastDef) {
-            return sdef;
-        } else {
-            return subTable;
-        }
+        return fetch;
 
     }
 
-    @SuppressWarnings("unchecked")
-    public Object get(String ID) {
+    public FJTO get(String ID) {
         String[] splits = ID.split(selectOp);
         splits = SDstack.qualify(splits);
-        HashMap<String, Object> table = findTable(splits[0]);
-        if (callStack.containsID(ID)) {
-            table = callStack.currentTable();
+        HashMap<String, FJTO> table = findTable(splits[0]);
+        if (callStack.containsID(splits[0])) {
+            table = callStack.findCurTable(splits[0]);
         }
         if (table == null) {
             System.err.println("Cannot find the symbol " + ID);
@@ -157,12 +152,12 @@ class STable {
         return fullGet(splits, table);
     }
 
-    public void put(String ID, Object o) {
+    public void put(String ID, FJTO o) {
         String[] splits = ID.split(selectOp);
         splits = SDstack.qualify(splits);
-        HashMap<String, Object> table = findTable(splits[0]);
-        if (callStack.containsID(ID)) {
-            table = callStack.topTable();
+        HashMap<String, FJTO> table = findTable(splits[0]);
+        if (callStack.containsID(splits[0])) {
+            table = callStack.findTopTable(splits[0]);
         }
         if (table == null) { table = currentTable(); }
         fullPut(splits, o, table);
@@ -172,7 +167,7 @@ class STable {
         return getTable(0).containsKey(ID);
     }
 
-    public HashMap<String, Object> globalTable() {
+    public HashMap<String, FJTO> globalTable() {
         return getTable(0);
     }
 
@@ -180,12 +175,12 @@ class STable {
     @SuppressWarnings("unchecked")
     public Object remove(String ID) {
         String[] splits = ID.split(selectOp);
-        HashMap<String, Object> table = findTable(ID);
+        HashMap<String, FJTO> table = findTable(ID);
         if (splits.length == 1) {
             return table.remove(ID);
         } else if (table != null) {
-            HashMap<String, Object> subTable 
-                = (HashMap<String, Object>) resolve(splits, table);
+            HashMap<String, FJTO> subTable 
+                = ((HashMap<String, FJTO>) resolve(splits, table).obj);
             return subTable.remove(splits[splits.length - 1]);
         }
         return null;

@@ -40,7 +40,7 @@ public class FJSDStack {
 		return top().name;
 	}
 
-	public HashMap<String, Object> topTable() {
+	public HashMap<String, FJTO> topTable() {
 		if (!stack.isEmpty()) {
 			return top().members; 
 		} else {
@@ -49,7 +49,7 @@ public class FJSDStack {
 		
 	}
 
-	public HashMap<String, Object> bottomTable() {
+	public HashMap<String, FJTO> bottomTable() {
 		if (!stack.isEmpty()) {
 			return stack.get(0).members; 
 		} else {
@@ -59,12 +59,12 @@ public class FJSDStack {
 	}
 
 	@SuppressWarnings("unchecked")
-	public HashMap<String, Object> findTable(String[] IDSplits) {
-		HashMap<String, Object> ret = bottomTable();
-		HashMap<String, Object> last = null;
+	public HashMap<String, FJTO> findTable(String[] IDSplits) {
+		HashMap<String, FJTO> ret = bottomTable();
+		HashMap<String, FJTO> last = null;
 		for (int i = 0; i < IDSplits.length; i++) {
 			last = ret;
-			ret = (HashMap<String, Object>) ret.get(IDSplits[i]);
+			ret = (HashMap<String, FJTO>) ret.get(IDSplits[i]).obj;
 			if (ret == null) {
 				return last;
 			}
@@ -91,7 +91,7 @@ public class FJSDStack {
 	}
 
 	/* Add a default member variable to a struct type */
-	public void addMember(String ID, Object o) {
+	public void addMember(String ID, FJTO o) {
 		top().addMember(ID, o);
 	}
 
