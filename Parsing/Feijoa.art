@@ -332,6 +332,10 @@ assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
 	| plusEquals 
 	| minusEquals
+	| multiplyEquals
+	| divideEquals
+	| modEquals
+	| exponentiateEquals
 
 
 
@@ -363,7 +367,19 @@ plusEquals ::= AID '+=' subExprB
 	
 minusEquals ::= AID '-=' subExprB
 	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprB1.o)); }
+
+multiplyEquals ::= AID '*=' subExprB	
+	{ symbols.put(AID1.v, FJ.multiply(symbols.get(AID1.v), subExprB1.o)); }
+	
+divideEquals ::= AID '/=' subExprB
+	{ symbols.put(AID1.v, FJ.divide(symbols.get(AID1.v), subExprB1.o)); }
 		
+modEquals ::= AID '%=' subExprB
+	{ symbols.put(AID1.v, FJ.mod(symbols.get(AID1.v), subExprB1.o)); }
+
+exponentiateEquals ::= AID '**=' subExprB
+	{ symbols.put(AID1.v, FJ.exponentiate(symbols.get(AID1.v), subExprB1.o)); }
+
 plus <o: FJTO> ::= subExprB '+' subExprC
 	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
 					
@@ -373,11 +389,11 @@ minus <o: FJTO> ::= subExprB '-' subExprC
 multiply <o: FJTO> ::= subExprC '*' subExprD
 	{ multiply.o = FJ.multiply(subExprC1.o, subExprD1.o); }
 
-mod <o: FJTO> ::= subExprC '%' subExprD
-	{ mod.o = FJ.mod(subExprC1.o, subExprD1.o); }
-	
 divide <o: FJTO> ::= subExprC '/' subExprD
 	{ divide.o = FJ.divide(subExprC1.o, subExprD1.o); }
+
+mod <o: FJTO> ::= subExprC '%' subExprD
+	{ mod.o = FJ.mod(subExprC1.o, subExprD1.o); }
 		
 exponentiate <o: FJTO> ::= subExprE '**' subExprD
 	{ exponentiate.o = FJ.exponentiate(subExprE1.o, subExprD1.o); }
