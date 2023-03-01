@@ -125,22 +125,13 @@ public class FJ {
 		if (a.isString())
 			return newInt(((String) a.obj).length());
 		else
-			return null; //err
-	}
-	
-	static Boolean bv(Object obj) {
-		String s = obj.toString();
-		if (s.equalsIgnoreCase("true"))
-			return true;
-		if (s.equalsIgnoreCase("false"))
-			return false;
-		throw new IllegalArgumentException();
+			return null; // error
 	}
 	
 	static FJTO gtr(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
-			return null; // err
+			return null; // error
 		else
 			return newBoolean(safeNumericCompare(a, b) == 1);
 	}
@@ -148,7 +139,7 @@ public class FJ {
 	static FJTO geq(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
-			return null; // err
+			return null; // error
 		else
 			return newBoolean(comp == 1 || comp == 0);
 	}
@@ -156,7 +147,7 @@ public class FJ {
 	static FJTO lss(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
-			return null; // err
+			return null; // error
 		else
 			return newBoolean(safeNumericCompare(a, b) == -1);
 	}
@@ -164,7 +155,7 @@ public class FJ {
 	static FJTO leq(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
-			return null; // err
+			return null; // error
 		else
 			return newBoolean(comp == -1 || comp == 0);
 	}
@@ -173,7 +164,7 @@ public class FJ {
 		if (a.isBoolean()) {
 			return newBoolean(!((boolean) a.obj));
 		} else {
-			return null; //err
+			return null; // error
 		}
 	}
 
@@ -181,7 +172,7 @@ public class FJ {
 		if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean(((boolean) a.obj) && ((boolean) b.obj));
 		} else {
-			return newBoolean(false);
+			return null; // error
 		}
 	}
 
@@ -193,7 +184,7 @@ public class FJ {
 		} else if (b.isBoolean()) {
 			return newBoolean((boolean) b.obj);
 		} else {
-			return newBoolean(false);
+			return null; // error
 		}
 	}
 
@@ -207,7 +198,7 @@ public class FJ {
 		} else if (a.type == FJTypes.STRING) {
 			return newBoolean(((String) a.obj).equals((String) b.obj));
 		} else {
-			return newBoolean(false);
+			return null; // error
 		}
 	}
 	
@@ -232,7 +223,7 @@ public class FJ {
 			ret.addAll(bl);
 			return newList(ret);
 		} else {
-			return null; //error
+			return null; // error
 		}
 	}
 
@@ -246,7 +237,7 @@ public class FJ {
 		} else if (a.type == FJTypes.STRING && b.type == FJTypes.STRING) {
 			return newString(((String) a.obj).replace((String) b.obj, ""));
 		} else {
-			return null; //err
+			return null; // error
 		}
 	}
 
@@ -256,7 +247,7 @@ public class FJ {
 		} else if (a.type == FJTypes.DOUBLE) {
 			return newDouble(-1 * (double) a.obj);
 		} else {
-			return null; //err
+			return null; // error
 		}
 	}
 	
@@ -295,11 +286,25 @@ public class FJ {
 		}
 	}
 	
+	// returns a double 
+	// unless two integers are the operands AND the exponent is nonnegative
 	static FJTO exponentiate(FJTO a, FJTO b) {
-		if (a.isNumeric() && b.isNumeric()) {
+		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
 			return newDouble(
 				Math.pow(Double.valueOf(a.obj.toString()), 
 						 Double.valueOf(b.obj.toString())));
+		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
+			int bInt = (int) b.obj;
+			if (bInt > 0)
+				return newInt(
+						(int) Math.pow(Double.valueOf(a.obj.toString()), 
+							Double.valueOf(b.obj.toString())));
+			else if (bInt == 0)
+				return newInt(1);
+			else 
+				return newDouble(
+					Math.pow(Double.valueOf(a.obj.toString()), 
+							Double.valueOf(b.obj.toString())));
 		} else {
 			return null; // error
 		}
