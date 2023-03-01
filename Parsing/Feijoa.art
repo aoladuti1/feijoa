@@ -62,7 +62,7 @@ compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newSco
 statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | break | continue
 structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
-structStatement ::= mainExpr ';' | defStruct
+structStatement ::= mainExpr ';' | defStruct | defFunc
 
 fnStatements ::= '{' statements '}'
 lambdaStatements ::= mainExpr | returnExpr | fnStatements
