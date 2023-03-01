@@ -16,20 +16,24 @@ truth_sometimes = lie - " don't";
 sysout("The following is prints a line about me liking comp sci: ");
 sysline(truth_sometimes);
 
+// mod
+sysout("The following prints 0.5: ");
+sysline(1.5 % 1.0);
+
 
 // not
 sysout("Prints true: ");
 sysline(!false);
 
 sysout("Prints false: ");
-sysline(!(x > 2));
+sysline(not (x > 2));
 
 // and
 sysout("Prints true: ");
 sysline(!((x > 2) && (x > 100)));
 
 sysout("Prints false: ");
-sysline(!((x > 2) && (x > 1)));
+sysline(!((x > 2) and (x > 1)));
 
 
 // boolean algebra
@@ -45,5 +49,5 @@ sysline(true || false && false);
 
 
 // equals
-sysout("Prints true if x == x: ");
-sysline(x == x);
+sysout("Prints true if \"hi\" == \"hi\": "); //notice the java char esacpes
+sysline("hi" == "hi");

@@ -290,7 +290,9 @@ subExprA <o: FJTO> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
 	| or  { subExprA.o = or1.o;  }
 	| gtr { subExprA.o = gtr1.o; }
+	| geq { subExprA.o = geq1.o; }
 	| lss { subExprA.o = lss1.o; }
+	| leq { subExprA.o = leq1.o; }
 	| equ { subExprA.o = equ1.o; }
 	
 subExprB <o: FJTO> ::= subExprC { subExprB.o = subExprC1.o; }
@@ -300,6 +302,7 @@ subExprB <o: FJTO> ::= subExprC { subExprB.o = subExprC1.o; }
 subExprC <o: FJTO> ::= subExprD { subExprC.o = subExprD1.o; }
 	| multiply { subExprC.o = multiply1.o; }
 	| divide { subExprC.o = divide1.o; }
+	| mod { subExprC.o = mod1.o; }
 
 subExprD <o: FJTO> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
@@ -315,14 +318,23 @@ equ <o: FJTO> ::= subExprB '==' subExprB
 
 gtr <o: FJTO> ::= subExprB '>' subExprB
 	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
+
+geq <o: FJTO> ::= subExprB '>=' subExprB
+	{ geq.o = FJ.geq(subExprB1.o, subExprB2.o); }
 	
 lss <o: FJTO> ::= subExprB '<' subExprB
 	{ lss.o = FJ.lss(subExprB1.o, subExprB2.o); }
+
+leq <o: FJTO> ::= subExprB '<=' subExprB
+	{ leq.o = FJ.leq(subExprB1.o, subExprB2.o); }
 		
 assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
-	| plusEquals
+	| plusEquals 
 	| minusEquals
+
+
+
 	
 structConstruct <o: FJTO> ::= 'new' AID 
 	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct(), AID1.v); }
@@ -346,11 +358,11 @@ structArgs <o: FJTO> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } '
 
 argNote ::= ':' AID | #
 	
-plusEquals <o: FJTO> ::= AID '+=' subExprC	
-	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprC1.o)); }
+plusEquals ::= AID '+=' subExprB	
+	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprB1.o)); }
 	
-minusEquals <o: FJTO> ::= AID '-=' subExprC
-	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprC1.o)); }
+minusEquals ::= AID '-=' subExprB
+	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprB1.o)); }
 		
 plus <o: FJTO> ::= subExprB '+' subExprC
 	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
@@ -360,6 +372,9 @@ minus <o: FJTO> ::= subExprB '-' subExprC
 	
 multiply <o: FJTO> ::= subExprC '*' subExprD
 	{ multiply.o = FJ.multiply(subExprC1.o, subExprD1.o); }
+
+mod <o: FJTO> ::= subExprC '%' subExprD
+	{ mod.o = FJ.mod(subExprC1.o, subExprD1.o); }
 	
 divide <o: FJTO> ::= subExprC '/' subExprD
 	{ divide.o = FJ.divide(subExprC1.o, subExprD1.o); }
@@ -367,19 +382,45 @@ divide <o: FJTO> ::= subExprC '/' subExprD
 exponentiate <o: FJTO> ::= subExprE '**' subExprD
 	{ exponentiate.o = FJ.exponentiate(subExprE1.o, subExprD1.o); }
 		
-not <o: FJTO> ::= '!' subExprE
+not <o: FJTO> ::= notSym subExprE
 	{ not.o = FJ.not(subExprE1.o); }
+notSym ::= '!' | 'not'
 	
 negate <o: FJTO> ::= '-' subExprE
 	{	negate.o = FJ.negate(subExprE1.o); }
 	
-and <o: FJTO> ::= subExprA '&&' subExprA 
+and <o: FJTO> ::= subExprA andSym subExprA 
 	{ and.o = FJ.and(subExprA1.o, subExprA2.o); }
+andSym ::= '&&' | 'and'
 
-or <o: FJTO> ::= subExprA '||' subExprA 
+or <o: FJTO> ::= subExprA orSym subExprA 
 	{ or.o = FJ.or(subExprA1.o, subExprA2.o); }
+orSym ::= '||' | 'or'
 	
+walruses <o: FJTO> ::= preIncr { walruses.o = preIncr1.o; }
+	| postIncr { walruses.o = postIncr1.o; }
+	| preDecr { walruses.o = preDecr1.o; }
+	| postDecr { walruses.o = postDecr1.o; }
+
+preIncr <o: FJTO> ::= '++' AID	
+	{ preIncr.o = FJ.plus(symbols.get(AID1.v), FJ.newInt(1));
+	  symbols.put(AID1.v, preIncr.o); }
+
+postIncr <o: FJTO> ::= AID '++'
+	{ postIncr.o = symbols.get(AID1.v);
+	  symbols.put(AID1.v, FJ.plus(postIncr.o, FJ.newInt(1))); }
+
+preDecr <o: FJTO> ::= '--' AID	
+	{ preDecr.o = FJ.minus(symbols.get(AID1.v), FJ.newInt(1));
+	  symbols.put(AID1.v, preDecr.o); }
+
+postDecr <o: FJTO> ::= AID '--'
+	{ postDecr.o = symbols.get(AID1.v);
+	  symbols.put(AID1.v, FJ.minus(postDecr.o, FJ.newInt(1))); }
+
+
 operand <o: FJTO> ::= deref { operand.o = deref1.o; }
+	| walruses { operand.o = walruses1.o; }
 	| INTEGER
 		{ operand.o = FJ.newInt(INTEGER1.v); }
 	| REAL
