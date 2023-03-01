@@ -262,6 +262,7 @@ add ::= 'add!' '(' subExprA ',' subExprA ',' subExprA ')'
 otherFunctions <o: FJTO> ::= 
 	  sysin { otherFunctions.o = sysin1.o; }
 	| remove { otherFunctions.o = remove1.o; }
+	| len { otherFunctions.o = len1.o; }
 	| type { otherFunctions.o = type1.o; }
 	| toInt { otherFunctions.o = toInt1.o; }
 	| toDouble { otherFunctions.o = toDouble1.o; }
@@ -270,6 +271,9 @@ otherFunctions <o: FJTO> ::=
 
 remove <o: FJTO> ::= 'remove!' '(' subExprA ',' subExprA ')'
 	{ remove.o = FJ.remove(subExprA1.o, subExprA2.o); }
+
+len <o: FJTO> ::= 'len!' '(' subExprA ')'
+	{ len.o = FJ.len(subExprA1.o); }
 
 type <o: FJTO> ::= 'type' '(' subExprA ')' { type.o = FJ.newString(FJ.type(subExprA1.o)); }
 

@@ -29,4 +29,8 @@ public class FJTO {
     public boolean isList() {
         return this.type == FJTypes.LIST;
     }
+
+    public boolean isString() {
+        return this.type == FJTypes.STRING;
+    }
 }
