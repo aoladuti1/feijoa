@@ -41,12 +41,17 @@ def printNested() {
     return x;
 }
 
+def c (x, y) -> int {
+
+}
 printNested()();
 
 // New and improved type-hinting!
-def ditto1() -> [str] { return ["ditto"]; }
+def ditto1() -> [str] {
+    return ["ditto"]; 
+}
 ditto2 = () -> [str] { return ["ditto"]; }; // ALT.: ditto2 = () -> [str] return ["ditto"];
-ditto3 = lambda () -> [RANDOM.TEXT[YO]] : ["ditto"]; // ALT.: lambda -> [str] : ["ditto"];
+ditto3 = lambda () -> [RANDOM.TEXT[YO]] : ["ditto"]; // ALT.: lambda -> [RANDOM.TEXT[YO]] : ["ditto"];
 
 sysln!(ditto1() + ditto2() + ditto3());
 

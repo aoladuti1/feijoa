@@ -11,4 +11,4 @@ sysout!("> sysln!(++y)"); sysln!(" // outputs " + ++y); // prefix incr.
 
 sysln!("-----------------");
 
-sysln!("Equivalent decrement operations exist (e.g. x--)");
+sysln!("Equivalent decrement operations exist (e.g. x-- or --x)");
