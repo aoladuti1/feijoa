@@ -125,7 +125,16 @@ public class FJ {
 
 	static FJTO remove(FJTO a, FJTO b) {
 		return ((FJList) a.obj).remove((int) b.obj);
-	} 
+	}
+
+	static FJTO len(FJTO a) {
+		if (a.isList())
+			return newInt(((FJList) a.obj).size());
+		if (a.isString())
+			return newInt(((String) a.obj).length());
+		else
+			return null; //err
+	}
 	
 	static Boolean bv(Object obj) {
 		String s = obj.toString();
