@@ -24,7 +24,7 @@ lambdaCaller(() -> sysln!("i am a function called with a lambda"));
     /* See Python-style lambdas -- right side is returned, left side is for args */
 pyDouble = lambda x : x * 2;
 // parentheses optional for any number of args in python-style
-pyAdd = lambda x, y :  x + y; 
+pyAdd = lambda x, y -> : x + y; 
 
 sysln!("The double of 10 is " + pyDouble(10));
 sysln!(5 + " add " + 5 + " is " + pyAdd(5, 5));
@@ -42,5 +42,13 @@ def printNested() {
 }
 
 printNested()();
+
+// New and improved type-hinting!
+def ditto1() -> [str] { return ["ditto"]; }
+ditto2 = () -> [str] { return ["ditto"]; }; // ALT.: ditto2 = () -> [str] return ["ditto"];
+ditto3 = lambda () -> [RANDOM.TEXT[YO]] : ["ditto"]; // ALT.: lambda -> [str] : ["ditto"];
+
+sysln!(ditto1() + ditto2() + ditto3());
+
 
 // Note: ALL arguments without a default specified are defaulted to null

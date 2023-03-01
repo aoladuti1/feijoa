@@ -12,7 +12,7 @@ support {
 	STable symbols = new STable(callStack);
 	FJSDStack SDStack = symbols.SDStack();
 	FJSAStack SAStack = new FJSAStack(symbols);
-	FJIDStack ids = new FJIDStack();
+	FJFuncStack funcStack = new FJFuncStack();
 	FJLStack Lstack = new FJLStack();
 
 	@SuppressWarnings("serial")
@@ -70,29 +70,34 @@ lambdaStatements ::= mainExpr | returnExpr | fnStatements
 scopeEnter ::= '{' { symbols.newScope(); }
 scopeLeave ::= '}' { symbols.oldScope(); }
 
-defFunc ::= 'def' ID { ids.push(new FJFunction(ID1.v)); } mainDefFuncArgs fnStatements< 
-	{	FJFunction fn = ids.top();
+defFunc ::= 'def' ID { funcStack.push(new FJFunction(ID1.v)); } mainDefFuncArgs functionArrow fnStatements< 
+	{	FJFunction fn = funcStack.top();
 		if (callStack.current() != null) {
 			fn.setOuterTables(callStack.current().funcVars);
 		};
 		fn.setProcedure(defFunc.fnStatements1);
 		symbols.put(fn.name, FJ.newFunction(fn));
-		ids.pop(); }
+		funcStack.pop(); }
 
-lambdaConstruct <o: FJTO> ::= { ids.push(new FJFunction("")); } javaLambdaArgs '->' lambdaStatements< 
+lambdaConstruct <o: FJTO> ::= { funcStack.push(new FJFunction("")); } javaLambdaArgs javaLambdaArrow lambdaStatements< 
 	{   if (callStack.current() != null) {
-			ids.top().setOuterTables(callStack.current().funcVars);
+			funcStack.top().setOuterTables(callStack.current().funcVars);
 		};
-		ids.top().setProcedure(lambdaConstruct.lambdaStatements1);
-		lambdaConstruct.o = FJ.newFunction(ids.pop()); }
-	|   { ids.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
+		funcStack.top().setProcedure(lambdaConstruct.lambdaStatements1);
+		lambdaConstruct.o = FJ.newFunction(funcStack.pop()); }
+	|   { funcStack.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
 		{	if (callStack.current() != null) {
-				ids.top().setOuterTables(callStack.current().funcVars);
+				funcStack.top().setOuterTables(callStack.current().funcVars);
 			};
-			ids.top().setProcedure(lambdaConstruct.lambdaReturn1);
-		lambdaConstruct.o = FJ.newFunction(ids.pop()); }
+			funcStack.top().setProcedure(lambdaConstruct.lambdaReturn1);
+		lambdaConstruct.o = FJ.newFunction(funcStack.pop()); }
 
-pythonLambdaArgs ::= mainDefFuncArgs ':' | defFuncArgs ':' | ':'
+javaLambdaArrow ::= '->' | noteArrow
+pythonLambdaArrow ::= noteArrow | #
+functionArrow ::= noteArrow | #
+noteArrow ::= '->' note | '->'
+
+pythonLambdaArgs ::= mainDefFuncArgs pythonLambdaArrow ':' | defFuncArgs pythonLambdaArrow ':' | pythonLambdaArrow ':'
 javaLambdaArgs ::= mainDefFuncArgs | defFuncArg
 mainDefFuncArgs ::= '(' ')' | '(' defFuncArgs ')'
 
@@ -100,12 +105,24 @@ defFuncArgs <c:int> ::= defFuncArg ',' defFuncArgs
 	| defFuncArg
 
 defFuncArg <o: FJTO> ::= argID optEquals
-	{ ids.top().addArg(argID1.v, optEquals1.o); }
+	{ funcStack.top().addArg(argID1.v, optEquals1.o); }
 
 optEquals <o: FJTO> ::= # { optEquals.o =  null; }
 	| '=' subExprA { optEquals.o = subExprA1.o; }
 
 argID <v: String> ::= ID ':' AID {argID.v = ID1.v;} | ID { argID.v = ID1.v; }
+optionalAID ::= AID | #
+
+note ::= optionalAID '[' ']'
+	| AID
+	| primitives
+	| optionalAID '[' compNoteArgs ']'
+	| optionalAID '(' compNoteArgs ')'
+	| #
+
+compNoteArgs ::= AID ',' compNoteArgs
+		| primitives ',' compNoteArgs | note
+
 defStruct ::= 'struct' ID 
 		{ symbols.startStructDef(ID1.v); } structDefinition { symbols.endStructDef(); }
 
@@ -286,6 +303,8 @@ doubleOrFloat ::= 'double' | 'float'
 booleanOrBool ::= 'boolean' | 'bool'
 stringOrStr ::= 'string' | 'str'
 
+primitives ::= integerOrInt | doubleOrFloat | booleanOrBool | stringOrStr | 'list'
+
 subExprA <o: FJTO> ::= subExprB { subExprA.o = subExprB1.o; }
 	| and { subExprA.o = and1.o; }
 	| or  { subExprA.o = or1.o;  }
@@ -360,7 +379,7 @@ structArgs <o: FJTO> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } '
 	| subExprA argNote { SAStack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { SAStack.processLastArg(ID1.v, subExprA1.o); }
 
-argNote ::= ':' AID | #
+argNote ::= ':' note | # 
 	
 plusEquals ::= AID '+=' subExprB	
 	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprB1.o)); }

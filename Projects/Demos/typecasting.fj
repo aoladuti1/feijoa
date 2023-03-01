@@ -5,7 +5,7 @@ if (bool(x)) {
 }
 
 typeOfx = type!(x);
-sysln!("the result of type() on x is: " + typeOfx);
+sysln!("the result of type!() on x is: " + typeOfx);
 sysln!("see: typecasts make new variables instead of changing data.");
 
 struct Dummy { _ = null; }
