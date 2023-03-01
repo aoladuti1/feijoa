@@ -1,10 +1,10 @@
 a = 214748364;
 b = 3948;
 
-sysline(
+sysln!(
 "This program uses Euclid's algorithm to find 
 the greatest common factor of 214743864 and 3948:\n");
-sysout(">> ");
+sysout!(">> ");
 
 while !(a == b) {
 	if a > b
@@ -12,4 +12,4 @@ while !(a == b) {
 	else
 		b = b - a;
 }
-sysline(a);
+sysln!(a);

@@ -1,40 +1,40 @@
 /* Note the flexibility of using / omitting braces and also 
    using / omitting expression parentheses */
    
-sysout("The following prints 'wow it works!': ");
+sysout!("The following prints 'wow it works!': ");
 
 x = 5;
 if x > 6 && x > 4 
-	sysout("error");
+	sysout!("error");
 elif x > 3
-	sysout("wow ");
+	sysout!("wow ");
 
 if x > 5 {
-	sysout("error");
+	sysout!("error");
 }
 elif x > 5 {
-    sysout("error"); 
+    sysout!("error"); 
 }
 elif x > 4 {
-	sysout("it ");
+	sysout!("it ");
 }
 elif x > 4 {
-	sysout("error");
+	sysout!("error");
 }
 elif x > 4 {
-	sysout("error");
+	sysout!("error");
 }
 
-if (x > 4) sysline("works!");
+if (x > 4) sysln!("works!");
 
-sysout("The following prints 'yo adrian!': ");
+sysout!("The following prints 'yo adrian!': ");
 
 if (x > 0) {
-	sysout("yo ");
+	sysout!("yo ");
 } else {
-	sysout("error");
+	sysout!("error");
 }
 
 if x > 10 {} 
 	elif x > 10 {}
-	else { sysout("adrian!"); }
+	else { sysout!("adrian!"); }
