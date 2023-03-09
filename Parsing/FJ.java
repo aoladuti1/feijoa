@@ -310,4 +310,54 @@ public class FJ {
 		}
 	}
 
-}
+	static FJTO subscript(FJTO a, FJTO b) {
+		if (a.isList() && b.isInt()) {
+			return ((FJList) a.obj).get((Integer) b.obj); 
+		} else if (a.isString() && b.isInt()) {
+			return newString(((String) a.obj).charAt((Integer) b.obj) + "");
+		} else {
+			return null; // error
+		}
+	}
+
+	static void listEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		((FJList) a.obj).set(index, b);
+	}
+
+	static void listPlusEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.plus(list.get(index), b));
+	}
+
+	static void listMinusEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.minus(list.get(index), b));
+	}
+
+	static void listMultiplyEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.multiply(list.get(index), b));
+	}
+
+	static void listDivideEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.divide(list.get(index), b));
+	}
+
+	static void listModEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.mod(list.get(index), b));
+	}
+
+	static void listExponentiateEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.exponentiate(list.get(index), b));
+	}
+}	
