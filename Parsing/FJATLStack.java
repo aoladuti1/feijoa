@@ -1,4 +1,4 @@
-public class FJLAStack {
+public class FJATLStack {
     
     FJTO top;
     FJTO index;

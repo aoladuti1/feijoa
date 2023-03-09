@@ -41,9 +41,6 @@ def printNested() {
     return x;
 }
 
-def c (x, y) -> int {
-
-}
 printNested()();
 
 // New and improved type-hinting!
@@ -54,6 +51,4 @@ ditto2 = () -> [str] { return ["ditto"]; }; // ALT.: ditto2 = () -> [str] return
 ditto3 = lambda () -> [RANDOM.TEXT[YO]] : ["ditto"]; // ALT.: lambda -> [RANDOM.TEXT[YO]] : ["ditto"];
 
 sysln!(ditto1() + ditto2() + ditto3());
-
-
 // Note: ALL arguments without a default specified are defaulted to null

@@ -14,7 +14,7 @@ support {
 	FJSAStack SAStack = new FJSAStack(symbols);
 	FJFuncStack funcStack = new FJFuncStack();
 	FJLStack Lstack = new FJLStack();
-	FJLAStack LAstack = new FJLAStack();
+	FJATLStack ATLstack = new FJATLStack();
 	FJMAStack MAstack = new FJMAStack(symbols);
 
 	@SuppressWarnings("serial")
@@ -351,8 +351,8 @@ leq <o: FJTO> ::= subExprB '<=' subExprB
 		
 assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
-	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes '=' subExprA
-		{ FJ.listEquals(LAstack.top, LAstack.index, subExprA1.o); }
+	| AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes '=' subExprA
+		{ FJ.listEquals(ATLstack.top, ATLstack.index, subExprA1.o); }
 	| multiAssign 
 	| plusEquals
 	| minusEquals
@@ -364,17 +364,15 @@ assign ::= AID '=' subExprA
 multiAssign ::= multiAssignArgs '=' operand
 	{ MAstack.popAssign(operand1.o); }
 
-multiAssignArgs ::= AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes ',' multiAssignArgs 
-	{ MAstack.push(LAstack.top, LAstack.index, AID1.v); }
-	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes
-	{ MAstack.push(LAstack.top, LAstack.index, AID1.v); }
+multiAssignArgs ::= AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes ',' multiAssignArgs 
+	{ MAstack.push(ATLstack.top, ATLstack.index, AID1.v); }
+	| AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes
+	{ MAstack.push(ATLstack.top, ATLstack.index, AID1.v); }
 	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); } ',' multiAssignArgs
 	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); }
 	
-
-
-listAssignRes <o: FJTO> ::= '[' subExprB ']' { LAstack.index = subExprB1.o; }
-	| '[' subExprB ']' listAssignRes { LAstack.nextList(subExprB1.o); }
+assignToListRes <o: FJTO> ::= '[' subExprB ']' { ATLstack.index = subExprB1.o; }
+	| '[' subExprB ']' assignToListRes { ATLstack.nextList(subExprB1.o); }
 	
 structConstruct <o: FJTO> ::= 'new' AID 
 	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct(), AID1.v); }
@@ -470,31 +468,31 @@ walruses <o: FJTO> ::= preIncr { walruses.o = preIncr1.o; }
 preIncr <o: FJTO> ::= '++' AID	
 	{ preIncr.o = FJ.plus(symbols.get(AID1.v), FJ.newInt(1));
 	  symbols.put(AID1.v, preIncr.o); }
-	| '++' AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes
-		{  preIncr.o = FJ.plus(FJ.subscript(LAstack.top, LAstack.index), FJ.newInt(1));
-		   FJ.listEquals(LAstack.top, LAstack.index, preIncr.o); }
+	| '++' AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes
+		{  preIncr.o = FJ.plus(FJ.subscript(ATLstack.top, ATLstack.index), FJ.newInt(1));
+		   FJ.listEquals(ATLstack.top, ATLstack.index, preIncr.o); }
 	
 
 postIncr <o: FJTO> ::= AID '++'
 	{ postIncr.o = symbols.get(AID1.v);
 	  symbols.put(AID1.v, FJ.plus(postIncr.o, FJ.newInt(1))); }
-	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes '++'
-		{  postIncr.o = FJ.subscript(LAstack.top, LAstack.index);
-		   FJ.listEquals(LAstack.top, LAstack.index, FJ.plus(postIncr.o, FJ.newInt(1))); }
+	| AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes '++'
+		{  postIncr.o = FJ.subscript(ATLstack.top, ATLstack.index);
+		   FJ.listEquals(ATLstack.top, ATLstack.index, FJ.plus(postIncr.o, FJ.newInt(1))); }
 
 preDecr <o: FJTO> ::= '--' AID	
 	{ preDecr.o = FJ.minus(symbols.get(AID1.v), FJ.newInt(1));
 	  symbols.put(AID1.v, preDecr.o); }
-	| '--' AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes
-		{  preDecr.o = FJ.minus(FJ.subscript(LAstack.top, LAstack.index), FJ.newInt(1));
-		   FJ.listEquals(LAstack.top, LAstack.index, preDecr.o); }
+	| '--' AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes
+		{  preDecr.o = FJ.minus(FJ.subscript(ATLstack.top, ATLstack.index), FJ.newInt(1));
+		   FJ.listEquals(ATLstack.top, ATLstack.index, preDecr.o); }
 
 postDecr <o: FJTO> ::= AID '--'
 	{ postDecr.o = symbols.get(AID1.v);
 	  symbols.put(AID1.v, FJ.minus(postDecr.o, FJ.newInt(1))); }
-	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes '--'
-		{  postDecr.o = FJ.subscript(LAstack.top, LAstack.index);
-		   FJ.listEquals(LAstack.top, LAstack.index, FJ.minus(postDecr.o, FJ.newInt(1))); }
+	| AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes '--'
+		{  postDecr.o = FJ.subscript(ATLstack.top, ATLstack.index);
+		   FJ.listEquals(ATLstack.top, ATLstack.index, FJ.minus(postDecr.o, FJ.newInt(1))); }
 
 operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| walruses { operand.o = walruses1.o; }
