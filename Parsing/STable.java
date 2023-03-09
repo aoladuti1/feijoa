@@ -80,7 +80,7 @@ class STable {
         }
         return found ? symbols : null;
     }
-
+    
     @SuppressWarnings("unchecked")
     private void fullPut(
         String[] splits, FJTO o, HashMap<String, FJTO> table) {

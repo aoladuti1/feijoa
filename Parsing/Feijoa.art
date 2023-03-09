@@ -73,26 +73,12 @@ scopeEnter ::= '{' { symbols.newScope(); }
 scopeLeave ::= '}' { symbols.oldScope(); }
 
 defFunc ::= 'def' ID { funcStack.push(new FJFunction(ID1.v)); } mainDefFuncArgs functionArrow fnStatements< 
-	{	FJFunction fn = funcStack.top();
-		if (callStack.current() != null) {
-			fn.setOuterTables(callStack.current().funcVars);
-		};
-		fn.setProcedure(defFunc.fnStatements1);
-		symbols.put(fn.name, FJ.newFunction(fn));
-		funcStack.pop(); }
+	{ FJ.defFunc(defFunc.fnStatements1, funcStack, callStack, symbols); }
 
 lambdaConstruct <o: FJTO> ::= { funcStack.push(new FJFunction("")); } javaLambdaArgs javaLambdaArrow lambdaStatements< 
-	{   if (callStack.current() != null) {
-			funcStack.top().setOuterTables(callStack.current().funcVars);
-		};
-		funcStack.top().setProcedure(lambdaConstruct.lambdaStatements1);
-		lambdaConstruct.o = FJ.newFunction(funcStack.pop()); }
+	{ lambdaConstruct.o = FJ.constructLambda(lambdaConstruct.lambdaStatements1, funcStack, callStack); }
 	|   { funcStack.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
-		{	if (callStack.current() != null) {
-				funcStack.top().setOuterTables(callStack.current().funcVars);
-			};
-			funcStack.top().setProcedure(lambdaConstruct.lambdaReturn1);
-		lambdaConstruct.o = FJ.newFunction(funcStack.pop()); }
+	{ lambdaConstruct.o = FJ.constructLambda(lambdaConstruct.lambdaReturn1, funcStack, callStack); }
 
 javaLambdaArrow ::= '->' | noteArrow
 pythonLambdaArrow ::= noteArrow | #
@@ -108,6 +94,10 @@ defFuncArgs <c:int> ::= defFuncArg ',' defFuncArgs
 
 defFuncArg <o: FJTO> ::= argID optEquals
 	{ funcStack.top().addArg(argID1.v, optEquals1.o); }
+
+lambdaReturn <o: FJTO> ::= subExprA 
+	{  callStack.setLastValue(subExprA1.o);
+		if (true) throw new FJSigReturn(); }
 
 optEquals <o: FJTO> ::= # { optEquals.o =  null; }
 	| '=' subExprA { optEquals.o = subExprA1.o; }
@@ -229,10 +219,6 @@ break ::= 'break' ';'
 
 continue ::= 'continue' ';'
 	{ if (true) throw new FJSigContinue(); }
-
-lambdaReturn <o: FJTO> ::= subExprA 
-	{  callStack.setLastValue(subExprA1.o);
-		if (true) throw new FJSigReturn(); }
 	
 mainExpr <o: FJTO> ::= assign 
 	| subExprA { mainExpr.o = subExprA1.o; }
