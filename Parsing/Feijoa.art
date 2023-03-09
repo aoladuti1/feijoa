@@ -14,6 +14,8 @@ support {
 	FJSAStack SAStack = new FJSAStack(symbols);
 	FJFuncStack funcStack = new FJFuncStack();
 	FJLStack Lstack = new FJLStack();
+	FJLAStack LAstack = new FJLAStack();
+	FJMAStack MAstack = new FJMAStack(symbols);
 
 	@SuppressWarnings("serial")
 	public class FJSigReturn extends ARTException {
@@ -260,8 +262,8 @@ functionCall <o: FJTO> ::= voidFunctions { functionCall.o = FJ.newNull(); }
 		}
 	}
 
-indexAccess <o: FJTO> ::= operand '[' subExprA ']' 
-	{ indexAccess.o = ((FJList) operand1.o.obj).get((int) subExprA1.o.obj); }
+subscript <o: FJTO> ::= operand '[' subExprB ']' 
+	{ subscript.o = FJ.subscript(operand1.o, subExprB1.o); }
 
 funcArgs <o: FJTO> ::= subExprA argNote { callStack.processArg(subExprA1.o); } ',' funcArgs
 	| ID argNote '=' subExprA { callStack.processArg(ID1.v, subExprA1.o); } ',' funcArgs
@@ -349,15 +351,30 @@ leq <o: FJTO> ::= subExprB '<=' subExprB
 		
 assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
-	| plusEquals 
+	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes '=' subExprA
+		{ FJ.listEquals(LAstack.top, LAstack.index, subExprA1.o); }
+	| multiAssign 
+	| plusEquals
 	| minusEquals
 	| multiplyEquals
 	| divideEquals
 	| modEquals
 	| exponentiateEquals
 
+multiAssign ::= multiAssignArgs '=' operand
+	{ MAstack.popAssign(operand1.o); }
+
+multiAssignArgs ::= AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes ',' multiAssignArgs 
+	{ MAstack.push(LAstack.top, LAstack.index, AID1.v); }
+	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes
+	{ MAstack.push(LAstack.top, LAstack.index, AID1.v); }
+	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); } ',' multiAssignArgs
+	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); }
+	
 
 
+listAssignRes <o: FJTO> ::= '[' subExprB ']' { LAstack.index = subExprB1.o; }
+	| '[' subExprB ']' listAssignRes { LAstack.nextList(subExprB1.o); }
 	
 structConstruct <o: FJTO> ::= 'new' AID 
 	{	SAStack.push(AID1.v); } mainStructArgs { structConstruct.o = FJ.newStruct(SAStack.popStruct(), AID1.v); }
@@ -380,24 +397,36 @@ structArgs <o: FJTO> ::= subExprA argNote { SAStack.processArg(subExprA1.o); } '
 	| ID argNote '=' subExprA { SAStack.processLastArg(ID1.v, subExprA1.o); }
 
 argNote ::= ':' note | # 
-	
+
 plusEquals ::= AID '+=' subExprB	
 	{ symbols.put(AID1.v, FJ.plus(symbols.get(AID1.v), subExprB1.o)); }
+	| operand '[' subExprB ']' '+=' subExprB
+		{ FJ.listPlusEquals(operand1.o, subExprB1.o, subExprB2.o); }	
 	
 minusEquals ::= AID '-=' subExprB
 	{ symbols.put(AID1.v, FJ.minus(symbols.get(AID1.v), subExprB1.o)); }
+	| operand '[' subExprB ']' '-=' subExprB
+		{ FJ.listMinusEquals(operand1.o, subExprB1.o, subExprB2.o); }
 
 multiplyEquals ::= AID '*=' subExprB	
 	{ symbols.put(AID1.v, FJ.multiply(symbols.get(AID1.v), subExprB1.o)); }
+	| operand '[' subExprB ']' '*=' subExprB
+		{ FJ.listMultiplyEquals(operand1.o, subExprB1.o, subExprB2.o); }
 	
 divideEquals ::= AID '/=' subExprB
 	{ symbols.put(AID1.v, FJ.divide(symbols.get(AID1.v), subExprB1.o)); }
-		
+	| operand '[' subExprB ']' '/=' subExprB
+		{ FJ.listDivideEquals(operand1.o, subExprB1.o, subExprB2.o); }
+
 modEquals ::= AID '%=' subExprB
 	{ symbols.put(AID1.v, FJ.mod(symbols.get(AID1.v), subExprB1.o)); }
+	| operand '[' subExprB ']' '%=' subExprB
+		{ FJ.listModEquals(operand1.o, subExprB1.o, subExprB2.o); }
 
 exponentiateEquals ::= AID '**=' subExprB
 	{ symbols.put(AID1.v, FJ.exponentiate(symbols.get(AID1.v), subExprB1.o)); }
+	| operand '[' subExprB ']' '**=' subExprB
+		{ FJ.listExponentiateEquals(operand1.o, subExprB1.o, subExprB2.o); }
 
 plus <o: FJTO> ::= subExprB '+' subExprC
 	{ plus.o = FJ.plus(subExprB1.o, subExprC1.o); }	
@@ -437,22 +466,35 @@ walruses <o: FJTO> ::= preIncr { walruses.o = preIncr1.o; }
 	| preDecr { walruses.o = preDecr1.o; }
 	| postDecr { walruses.o = postDecr1.o; }
 
+
 preIncr <o: FJTO> ::= '++' AID	
 	{ preIncr.o = FJ.plus(symbols.get(AID1.v), FJ.newInt(1));
 	  symbols.put(AID1.v, preIncr.o); }
+	| '++' AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes
+		{  preIncr.o = FJ.plus(FJ.subscript(LAstack.top, LAstack.index), FJ.newInt(1));
+		   FJ.listEquals(LAstack.top, LAstack.index, preIncr.o); }
+	
 
 postIncr <o: FJTO> ::= AID '++'
 	{ postIncr.o = symbols.get(AID1.v);
 	  symbols.put(AID1.v, FJ.plus(postIncr.o, FJ.newInt(1))); }
+	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes '++'
+		{  postIncr.o = FJ.subscript(LAstack.top, LAstack.index);
+		   FJ.listEquals(LAstack.top, LAstack.index, FJ.plus(postIncr.o, FJ.newInt(1))); }
 
 preDecr <o: FJTO> ::= '--' AID	
 	{ preDecr.o = FJ.minus(symbols.get(AID1.v), FJ.newInt(1));
 	  symbols.put(AID1.v, preDecr.o); }
+	| '--' AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes
+		{  preDecr.o = FJ.minus(FJ.subscript(LAstack.top, LAstack.index), FJ.newInt(1));
+		   FJ.listEquals(LAstack.top, LAstack.index, preDecr.o); }
 
 postDecr <o: FJTO> ::= AID '--'
 	{ postDecr.o = symbols.get(AID1.v);
 	  symbols.put(AID1.v, FJ.minus(postDecr.o, FJ.newInt(1))); }
-
+	| AID { LAstack.push(symbols.get(AID1.v)); } listAssignRes '--'
+		{  postDecr.o = FJ.subscript(LAstack.top, LAstack.index);
+		   FJ.listEquals(LAstack.top, LAstack.index, FJ.minus(postDecr.o, FJ.newInt(1))); }
 
 operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| walruses { operand.o = walruses1.o; }
@@ -477,7 +519,7 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| listConstruct
 		{ operand.o = listConstruct1.o; }
 	| functionCall { operand.o = functionCall1.o; }
-	| indexAccess { operand.o = indexAccess1.o; }
+	| subscript { operand.o = subscript1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
 		

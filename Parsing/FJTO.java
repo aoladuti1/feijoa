@@ -22,6 +22,10 @@ public class FJTO {
         return this.type == FJTypes.DOUBLE || this.type == FJTypes.INT;
     }
 
+    public boolean isInt() {
+        return this.type == FJTypes.INT;
+    }
+
     public boolean isBoolean() {
         return this.type == FJTypes.BOOLEAN;
     }
