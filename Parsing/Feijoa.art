@@ -61,6 +61,7 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
+rawCompStatements ::= '{' '}' | '{' statements '}' |  statement
 statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | break | continue
 structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
@@ -135,6 +136,40 @@ loopStatement ::= whileExpr< compStatements<
                 artEvaluate(
 					loopStatement.whileExpr1, whileExpr1); 
             }
+		}
+	| 'loop' compStatements< 
+		{ while (true) {
+				try { 
+					artEvaluate(
+						loopStatement.compStatements1, compStatements1); 
+				} catch (FJSigBreak FJBreak) {
+					break;
+				} catch (FJSigContinue FJContinue) {
+					continue;
+				} 
+            }
+		}
+	| 'for' '(' mainExpr< ';' subExprA< ';' subExprA< ')' rawCompStatements< 
+		{ 	symbols.newScope();
+			artEvaluate(
+					loopStatement.mainExpr1, mainExpr1);
+			artEvaluate(
+					loopStatement.subExprA1, subExprA1);
+			while (((boolean) subExprA1.o.obj) == true) {
+				try { 
+					artEvaluate(
+						loopStatement.rawCompStatements1, rawCompStatements1); 
+					artEvaluate(
+						loopStatement.subExprA2, subExprA2);
+				} catch (FJSigBreak FJBreak) {
+					break;
+				} catch (FJSigContinue FJContinue) {
+					artEvaluate(loopStatement.subExprA1, subExprA1);
+					continue;
+				}
+               	artEvaluate(loopStatement.subExprA1, subExprA1);
+            }
+			symbols.oldScope();
 		}
 	| untilExpr< compStatements<
 		{	artEvaluate(
@@ -480,6 +515,21 @@ postDecr <o: FJTO> ::= AID '--'
 		{  postDecr.o = FJ.subscript(ATLstack.top, ATLstack.index);
 		   FJ.listEquals(ATLstack.top, ATLstack.index, FJ.minus(postDecr.o, FJ.newInt(1))); }
 
+ternary <o: FJTO> ::= subExprA '?' subExprA ':' subExprA
+	{ if ((boolean) subExprA1.o.obj) {
+		ternary.o = subExprA2.o;
+	  } else {
+		ternary.o = subExprA3.o;
+	  }
+	}
+	| subExprA 'if' subExprA 'else' subExprA
+	{ if ((boolean) subExprA2.o.obj) {
+		ternary.o = subExprA1.o;
+	  } else {
+		ternary.o = subExprA3.o;
+	  }
+	}
+
 operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| walruses { operand.o = walruses1.o; }
 	| INTEGER
@@ -506,6 +556,7 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| subscript { operand.o = subscript1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
+	| ternary { operand.o = ternary1.o; }
 		
 deref <o: FJTO> ::= AID
 	{ if (AID1.v == null) 
