@@ -1,6 +1,6 @@
 // exponentiation
 x = 7;
-sysout!("The following prints 49.0: ");
+sysout!("The following prints 49: ");
 sysln!(x ** 2);
 
 sysout!("The following prints 5.0: ");
