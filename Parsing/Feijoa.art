@@ -515,6 +515,21 @@ postDecr <o: FJTO> ::= AID '--'
 		{  postDecr.o = FJ.subscript(ATLstack.top, ATLstack.index);
 		   FJ.listEquals(ATLstack.top, ATLstack.index, FJ.minus(postDecr.o, FJ.newInt(1))); }
 
+ternary <o: FJTO> ::= subExprA '?' subExprA ':' subExprA
+	{ if ((boolean) subExprA1.o.obj) {
+		ternary.o = subExprA2.o;
+	  } else {
+		ternary.o = subExprA3.o;
+	  }
+	}
+	| subExprA 'if' subExprA 'else' subExprA
+	{ if ((boolean) subExprA2.o.obj) {
+		ternary.o = subExprA1.o;
+	  } else {
+		ternary.o = subExprA3.o;
+	  }
+	}
+
 operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| walruses { operand.o = walruses1.o; }
 	| INTEGER
@@ -541,6 +556,7 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| subscript { operand.o = subscript1.o; }
 	| '(' mainExpr ')'
 		{ operand.o = mainExpr1.o; }
+	| ternary { operand.o = ternary1.o; }
 		
 deref <o: FJTO> ::= AID
 	{ if (AID1.v == null) 
