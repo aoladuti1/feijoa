@@ -1,33 +1,38 @@
 // list access (works in any dimension)
-x = [[1, 2], 3, 4];
-sysline(x[0][0]); // prints 1
+x = [[null, 2]];
+x[0][0] = 1;
+sysln!(x[0][0]++); // prints 1
+sysln!(x[0][0]); // prints 2
 
 // ranges...
-sysline(1..5); // prints [1, 2, 3, 4]
+sysln!(1..5); // prints [1, 2, 3, 4]
 
 // concat [[1, 2], 3, 4] with the plus operator to [5, 6]
 // concat adds elements from the list, not the list itself
 // use append! or add! to add the list itself
 y = x + [5, 6];
-sysline(y); // prints [[1, 2], 3, 4, 5, 6]
+sysln!(y); // prints [[1, 2], 3, 4, 5, 6]
 
-/* syntax: append!(list, obj)
+/* append!(list, obj)
  * append 4 to [1, 2, 3] */
 one_two_three = [1, 2, 3];
 append!(one_two_three, 4);
-sysline(one_two_three); // prints [1, 2, 3, 4]
+sysln!(one_two_three); // prints [1, 2, 3, 4]
 
-/* syntax: remove!(list, index)
+/* remove!(list, index)
  * remove the first element of a 1-element list 'bye' */
 bye = ["bye"];
 remove!(bye, 0);
-sysline(bye); // prints []
+sysln!(bye); // prints []
 
-/* syntax: add!(list, index, obj)
+/* add!(list, index, obj)
  * insert 'obj' into 'list' at position 'index' */
 story = ["beginning", "end"];
 add!(story, 1, "middle");
     // the following prints 'A story has these elements: [beginning, middle, end]'
-sysline("A story has these elements: " + story);
+sysln!("A story has these elements: " + story);
 
-
+/* len!(list/string) */
+sysln!("the length of the string 'four' is " + len!("four"));
+sysln!("the length of the list [\"f\", \"o\", \"u\", \"r\"] is "
+       + len!(["f", "o", "u", "r"]));

@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.ARTGLLRDTHandle; 
 
 public class FJ {
 	
@@ -83,21 +84,13 @@ public class FJ {
 		return newBoolean(Boolean.parseBoolean(a.obj.toString()));
 	}
 
-	static Integer iv(FJTO o) {
-		return Integer.valueOf(o.obj.toString());
-	}
-	
-	static Double dv(FJTO o) {
-		return Double.valueOf(o.obj.toString());
-	}
-
 	static int numericCompare(FJTO a, FJTO b) {
 		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
-			double ao = (double) a.obj;
-			double bo = (double) b.obj;
-			if (ao > bo) return 1;
-			if (ao == bo) return 0;
-			if (ao < bo) return -1;
+			Double ao = Double.valueOf(a.obj.toString());
+			Double bo = Double.valueOf(b.obj.toString());
+			int ret = ao.compareTo(bo);
+			if (ret < 0) ret = -1;
+			return ret;
 		} else {
 			int ao = (int) a.obj;
 			int bo = (int) b.obj;
@@ -125,31 +118,54 @@ public class FJ {
 
 	static FJTO remove(FJTO a, FJTO b) {
 		return ((FJList) a.obj).remove((int) b.obj);
-	} 
-	
-	static Boolean bv(Object obj) {
-		String s = obj.toString();
-		if (s.equalsIgnoreCase("true"))
-			return true;
-		if (s.equalsIgnoreCase("false"))
-			return false;
-		throw new IllegalArgumentException();
 	}
 
+	static FJTO len(FJTO a) {
+		if (a.isList())
+			return newInt(((FJList) a.obj).size());
+		if (a.isString())
+			return newInt(((String) a.obj).length());
+		else
+			return null; // error
+	}
 	
 	static FJTO gtr(FJTO a, FJTO b) {
-		return newBoolean(safeNumericCompare(a, b) == 1);
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // error
+		else
+			return newBoolean(safeNumericCompare(a, b) == 1);
+	}
+
+	static FJTO geq(FJTO a, FJTO b) {
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // error
+		else
+			return newBoolean(comp == 1 || comp == 0);
 	}
 	
 	static FJTO lss(FJTO a, FJTO b) {
-		return newBoolean(safeNumericCompare(a, b) == -1);
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // error
+		else
+			return newBoolean(safeNumericCompare(a, b) == -1);
+	}
+
+	static FJTO leq(FJTO a, FJTO b) {
+		int comp = safeNumericCompare(a, b);
+		if (comp == -2)
+			return null; // error
+		else
+			return newBoolean(comp == -1 || comp == 0);
 	}
 
 	static FJTO not(FJTO a) {
 		if (a.isBoolean()) {
 			return newBoolean(!((boolean) a.obj));
 		} else {
-			return null; //err
+			return null; // error
 		}
 	}
 
@@ -157,7 +173,7 @@ public class FJ {
 		if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean(((boolean) a.obj) && ((boolean) b.obj));
 		} else {
-			return newBoolean(false);
+			return null; // error
 		}
 	}
 
@@ -169,7 +185,7 @@ public class FJ {
 		} else if (b.isBoolean()) {
 			return newBoolean((boolean) b.obj);
 		} else {
-			return newBoolean(false);
+			return null; // error
 		}
 	}
 
@@ -183,7 +199,7 @@ public class FJ {
 		} else if (a.type == FJTypes.STRING) {
 			return newBoolean(((String) a.obj).equals((String) b.obj));
 		} else {
-			return newBoolean(false);
+			return null; // error
 		}
 	}
 	
@@ -208,7 +224,7 @@ public class FJ {
 			ret.addAll(bl);
 			return newList(ret);
 		} else {
-			return null; //error
+			return null; // error
 		}
 	}
 
@@ -222,7 +238,7 @@ public class FJ {
 		} else if (a.type == FJTypes.STRING && b.type == FJTypes.STRING) {
 			return newString(((String) a.obj).replace((String) b.obj, ""));
 		} else {
-			return null; //err
+			return null; // error
 		}
 	}
 
@@ -232,7 +248,7 @@ public class FJ {
 		} else if (a.type == FJTypes.DOUBLE) {
 			return newDouble(-1 * (double) a.obj);
 		} else {
-			return null; //err
+			return null; // error
 		}
 	}
 	
@@ -244,6 +260,17 @@ public class FJ {
 			return newInt((int) a.obj * (int) b.obj);
 		} else if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean(((boolean) a.obj) && ((boolean) b.obj));
+		} else {
+			return null; // error
+		}
+	}
+
+	static FJTO mod(FJTO a, FJTO b) {
+		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
+			return newDouble(Double.valueOf(a.obj.toString()) 
+						   % Double.valueOf(b.obj.toString()));
+		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
+			return newInt((int) a.obj % (int) b.obj);
 		} else {
 			return null; // error
 		}
@@ -260,14 +287,90 @@ public class FJ {
 		}
 	}
 	
+	// returns a double 
+	// unless two integers are the operands AND the exponent is nonnegative
 	static FJTO exponentiate(FJTO a, FJTO b) {
-		if (a.isNumeric() && b.isNumeric()) {
+		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
 			return newDouble(
 				Math.pow(Double.valueOf(a.obj.toString()), 
 						 Double.valueOf(b.obj.toString())));
+		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
+			int bInt = (int) b.obj;
+			if (bInt > 0)
+				return newInt(
+						(int) Math.pow(Double.valueOf(a.obj.toString()), 
+							Double.valueOf(b.obj.toString())));
+			else if (bInt == 0)
+				return newInt(1);
+			else 
+				return newDouble(
+					Math.pow(Double.valueOf(a.obj.toString()), 
+							Double.valueOf(b.obj.toString())));
 		} else {
 			return null; // error
 		}
 	}
 
-}
+	static FJTO subscript(FJTO a, FJTO b) {
+		if (a.isList() && b.isInt()) {
+			return ((FJList) a.obj).get((Integer) b.obj); 
+		} else if (a.isString() && b.isInt()) {
+			return newString(((String) a.obj).charAt((Integer) b.obj) + "");
+		} else {
+			return null; // error
+		}
+	}
+
+	static void listEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		((FJList) a.obj).set(index, b);
+	}
+
+	static void listPlusEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.plus(list.get(index), b));
+	}
+
+	static void listMinusEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.minus(list.get(index), b));
+	}
+
+	static void listMultiplyEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.multiply(list.get(index), b));
+	}
+
+	static void listDivideEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.divide(list.get(index), b));
+	}
+
+	static void listModEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.mod(list.get(index), b));
+	}
+
+	static void listExponentiateEquals(FJTO a, FJTO i, FJTO b) {
+		Integer index = (Integer) i.obj;
+		FJList list = (FJList) a.obj;
+		list.set(index, FJ.exponentiate(list.get(index), b));
+	}
+	static void defFunc(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack, STable symbols) {
+		FJTO func = constructLambda(procedure, funcStack, callStack);
+		symbols.put(((FJFunction) func.obj).name, func);
+	}
+
+	static FJTO constructLambda(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack) {
+		if (callStack.current() != null) {
+			funcStack.top().setOuterTables(callStack.current().funcVars);
+		}
+		funcStack.top().setProcedure(procedure);
+		return newFunction(funcStack.pop());
+	}
+}	

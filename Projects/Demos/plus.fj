@@ -5,7 +5,7 @@ x = 1.22 + 2.11;
 y = 6 + 0.67;
 combo_string = "hello " + "adrian";
 
-sysline(x); // prints 3.33
-sysline(y); // prints 6.67
-sysline(x + y); // prints 10.0
-sysline(combo_string); // prints hello adrian
+sysln!(x); // prints 3.33
+sysln!(y); // prints 6.67
+sysln!(x + y); // prints 10.0
+sysln!(combo_string); // prints hello adrian

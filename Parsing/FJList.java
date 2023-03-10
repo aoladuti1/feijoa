@@ -21,10 +21,18 @@ public class FJList extends ArrayList<FJTO> {
     public String toString() {
         String ret = "";
         for (int i = 0; i < this.size() - 1; i++) {
-            ret += get(i).obj.toString() + ", ";
+            Object obj = get(i).obj;
+            if (obj != null)    
+                ret += obj.toString() + ", ";
+            else
+                ret = "null, ";
         }
-        if (this.size() > 1) {
-            ret += get(size() - 1).obj.toString();
+        if (this.size() >= 1) {
+            Object obj = get(size() - 1).obj;
+            if (obj != null)   
+                ret += obj.toString();
+            else
+                ret += "null";
         }
         return "[" + ret + "]";
     }
