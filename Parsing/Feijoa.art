@@ -339,7 +339,7 @@ assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
 	| AID { ATLstack.push(symbols.get(AID1.v)); } assignToListRes '=' subExprA
 		{ FJ.listEquals(ATLstack.top, ATLstack.index, subExprA1.o); }
-	| multiAssign 
+	| multiAssign (* aka pythonic list assign *)
 	| plusEquals
 	| minusEquals
 	| multiplyEquals
