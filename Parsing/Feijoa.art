@@ -137,6 +137,18 @@ loopStatement ::= whileExpr< compStatements<
 					loopStatement.whileExpr1, whileExpr1); 
             }
 		}
+	| 'loop' compStatements< 
+		{ while (true) {
+				try { 
+					artEvaluate(
+						loopStatement.compStatements1, compStatements1); 
+				} catch (FJSigBreak FJBreak) {
+					break;
+				} catch (FJSigContinue FJContinue) {
+					continue;
+				} 
+            }
+		}
 	| 'for' '(' mainExpr< ';' subExprA< ';' subExprA< ')' rawCompStatements< 
 		{ 	symbols.newScope();
 			artEvaluate(

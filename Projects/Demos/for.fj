@@ -1,2 +1,0 @@
-sysln!("The following line prints 'OKAY' five times");
-for (z = 0; z < 5; z++) sysln!("OKAY");
