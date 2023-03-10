@@ -61,6 +61,7 @@ whitespace &COMMENT_BLOCK_C
 
 statements ::= statement | statement statements
 compStatements ::= '{' '}' | scopeEnter statements scopeLeave | { symbols.newScope(); } statement { symbols.oldScope(); }
+rawCompStatements ::= '{' '}' | '{' statements '}' |  statement
 statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | break | continue
 structDefinition ::= '{' structStatements '}'
 structStatements ::= structStatement | structStatement structStatements
@@ -135,6 +136,28 @@ loopStatement ::= whileExpr< compStatements<
                 artEvaluate(
 					loopStatement.whileExpr1, whileExpr1); 
             }
+		}
+	| 'for' '(' mainExpr< ';' subExprA< ';' subExprA< ')' rawCompStatements< 
+		{ 	symbols.newScope();
+			artEvaluate(
+					loopStatement.mainExpr1, mainExpr1);
+			artEvaluate(
+					loopStatement.subExprA1, subExprA1);
+			while (((boolean) subExprA1.o.obj) == true) {
+				try { 
+					artEvaluate(
+						loopStatement.rawCompStatements1, rawCompStatements1); 
+					artEvaluate(
+						loopStatement.subExprA2, subExprA2);
+				} catch (FJSigBreak FJBreak) {
+					break;
+				} catch (FJSigContinue FJContinue) {
+					artEvaluate(loopStatement.subExprA1, subExprA1);
+					continue;
+				}
+               	artEvaluate(loopStatement.subExprA1, subExprA1);
+            }
+			symbols.oldScope();
 		}
 	| untilExpr< compStatements<
 		{	artEvaluate(
