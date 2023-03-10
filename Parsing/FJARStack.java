@@ -1,4 +1,7 @@
-public class FJATLStack {
+/***
+ * Stack for assignment resolution of a list ( which [sub]list to assign to? )
+ */
+public class FJARStack {
     
     FJTO top;
     FJTO index;

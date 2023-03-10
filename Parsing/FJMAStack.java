@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/***
+ * Stack for multi-assign a.k.a pythonic list assignment
+ */
 public class FJMAStack {
 
     ArrayList<MAEntry> stack = new ArrayList<>();
