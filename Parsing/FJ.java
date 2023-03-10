@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.ARTGLLRDTHandle; 
 
 public class FJ {
 	
@@ -359,5 +360,17 @@ public class FJ {
 		Integer index = (Integer) i.obj;
 		FJList list = (FJList) a.obj;
 		list.set(index, FJ.exponentiate(list.get(index), b));
+	}
+	static void defFunc(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack, STable symbols) {
+		FJTO func = constructLambda(procedure, funcStack, callStack);
+		symbols.put(((FJFunction) func.obj).name, func);
+	}
+
+	static FJTO constructLambda(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack) {
+		if (callStack.current() != null) {
+			funcStack.top().setOuterTables(callStack.current().funcVars);
+		}
+		funcStack.top().setProcedure(procedure);
+		return newFunction(funcStack.pop());
 	}
 }	
