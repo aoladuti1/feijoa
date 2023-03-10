@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/***
+ * Underlying object for Feijoa lists
+ */
 public class FJList extends ArrayList<FJTO> {
 
     @java.io.Serial
@@ -15,6 +18,26 @@ public class FJList extends ArrayList<FJTO> {
 
     public FJList() {
         super();
+    }
+
+    public FJTO FJequals(FJTO o) {
+        FJList list = (FJList) o.obj;
+        if (!o.isList()) {
+            return FJ.newBoolean(false);    
+        }
+        if (this.size() != list.size()) {
+            return FJ.newBoolean(false);
+        }
+        if (this.isEmpty() && list.isEmpty()) {
+            return FJ.newBoolean(true);
+        }
+        FJTO ret = FJ.newBoolean(true);
+        for (int i = 0; i < this.size(); i++) {
+            if (((boolean) FJ.equ(this.get(i), list.get(i)).obj) == false)
+                ret = FJ.newBoolean(false);
+        }
+        return ret;
+
     }
 
     @Override

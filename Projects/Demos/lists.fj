@@ -4,6 +4,9 @@ x[0][0] = 1;
 sysln!(x[0][0]++); // prints 1
 sysln!(x[0][0]); // prints 2
 
+// list equality
+sysln!([] == []); // prints true
+
 // ranges...
 sysln!(1..5); // prints [1, 2, 3, 4]
 
