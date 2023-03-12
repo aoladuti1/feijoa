@@ -1,6 +1,10 @@
 import java.util.HashMap;
 import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.ARTGLLRDTHandle; 
 
+/***
+ * General factory-style helper class for constructing new objects
+ * out of operators and built-in functions
+ */
 public class FJ {
 	
 	static FJTO newInt(int value) {
@@ -102,6 +106,7 @@ public class FJ {
 		}
 	}
 
+	// returning -2 means there's an error
 	static int numericCompare(FJTO a, FJTO b) {
 		if (doublePresent(a, b)) {
 			Double ao;
