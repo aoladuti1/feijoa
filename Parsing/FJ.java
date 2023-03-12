@@ -117,17 +117,29 @@ public class FJ {
 
 	// append b to a
 	static void append(FJTO a, FJTO b) {
-		((FJList) a.obj).add(b);
+		if (a.isList()) {
+			((FJList) a.obj).add(b);
+		} else {
+			return; // error
+		}
 	} 
 
 	// add c to index b of a
 	static void add(FJTO a, FJTO b, FJTO c) {
-		((FJList) a.obj).add((int) b.obj, c);
+		if (a.isList() & b.isInt()) {
+			((FJList) a.obj).add((int) b.obj, c);
+		} else {
+			return; // error
+		}
 	} 
 
 	// remove the object at index b from a
 	static FJTO remove(FJTO a, FJTO b) {
-		return ((FJList) a.obj).remove((int) b.obj);
+		if (a.isList() && b.isInt()) {
+			return ((FJList) a.obj).remove((int) b.obj);
+		} else {
+			return null; // error
+		}
 	}
 
 	// returns the length of a list or string
