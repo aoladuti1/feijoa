@@ -69,11 +69,25 @@ public class FJ {
 	}
 
 	static FJTO toInt(FJTO a) {
-		return newInt(Integer.parseInt(a.obj.toString()));
+		if (a.isDouble()) {
+			return newInt(((Double) a.obj).intValue());
+		} else if (a.isString()) {
+			return newInt(Integer.parseInt(a.obj.toString()));
+		} else if (a.isInt()) {
+			return a;
+		} else {
+			return null; // error
+		}
 	}
 
 	static FJTO toDouble(FJTO a) {
-		return newDouble(Double.parseDouble(a.obj.toString()));
+		if (a.isInt() || a.isString()) {
+			return newDouble(Double.parseDouble(a.obj.toString()));
+		} else if (a.isDouble()) {
+			return a;
+		} else {
+			return null; // error
+		}
 	}
 
 	static FJTO toString(FJTO a) {
@@ -81,15 +95,33 @@ public class FJ {
 	}
 
 	static FJTO toBoolean(FJTO a) {
-		return newBoolean(Boolean.parseBoolean(a.obj.toString()));
+		if (a.isString()) {
+			return newBoolean(Boolean.parseBoolean(a.obj.toString()));
+		} else {
+			return null; // error
+		}
 	}
 
 	static int numericCompare(FJTO a, FJTO b) {
 		if (doublePresent(a, b)) {
-			Double ao = Double.valueOf(a.obj.toString());
-			Double bo = Double.valueOf(b.obj.toString());
+			Double ao;
+			Double bo;
+			if (a.isDouble()) {
+				ao = ((Double) a.obj);
+			} else if (a.isInt() || a.isString()) {
+				ao = Double.valueOf(a.obj.toString());
+			} else {
+				return -2; // error;
+			}
+			if (b.isDouble()) {
+				bo = ((Double) b.obj);
+			} else if (b.isInt() || b.isString()) {
+				bo = Double.valueOf(b.obj.toString());
+			} else {
+				return -2; // error;
+			}
 			int ret = ao.compareTo(bo);
-			if (ret < 0) ret = -1;
+			if (ret < 0) ret = -1; // future-proofing
 			return ret;
 		} else {
 			int ao = (int) a.obj;
