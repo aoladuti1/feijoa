@@ -24,10 +24,10 @@ sysln!(one_two_three); // prints [1, 2, 3, 4]
 
 /* remove!(list, index)
  * remove the first element of a 1-element list 'bye' */
-bye = ["bye"];
-listName = remove!(bye, 0);
-sysln!(listName); // prints "bye"
-sysln!(bye); // prints []
+byeList = ["bye"];
+byeText = remove!(byeList, 0);
+sysln!(byeText); // prints "bye"
+sysln!(byeList); // prints []
 
 /* add!(list, index, obj)
  * insert 'obj' into 'list' at position 'index' */
