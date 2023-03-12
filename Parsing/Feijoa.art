@@ -121,17 +121,18 @@ optEquals <o: FJTO> ::= # { optEquals.o =  null; }
 	| '=' subExprA { optEquals.o = subExprA1.o; }
 
 argID <v: String> ::= ID ':' AID {argID.v = ID1.v;} | ID { argID.v = ID1.v; }
-optionalAID ::= AID | #
 
-note ::= optionalAID '[' ']'
+note ::= containerOrAID '[' ']'
 	| AID
 	| primitives
-	| optionalAID '[' compNoteArgs ']'
-	| optionalAID '(' compNoteArgs ')'
+	| containerOrAID '[' compNoteArgs ']'
+	| containerOrAID '(' compNoteArgs ')'
 	| #
 
-compNoteArgs ::= AID ',' compNoteArgs
-		| primitives ',' compNoteArgs | note
+containerOrAID ::= AID | containers | #
+
+compNoteArgs ::= note ',' compNoteArgs | note
+
 
 (* loop statements *)
 loopStatement ::= whileExpr< compStatements<
@@ -485,7 +486,8 @@ doubleOrFloat ::= 'double' | 'float'
 booleanOrBool ::= 'boolean' | 'bool'
 stringOrStr ::= 'string' | 'str'
 
-primitives ::= integerOrInt | doubleOrFloat | booleanOrBool | stringOrStr | 'list'
+primitives ::= integerOrInt | doubleOrFloat | booleanOrBool | stringOrStr | containers
+	containers ::= 'list'
 
 
 (* logic operators *)
