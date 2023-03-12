@@ -1,0 +1,4 @@
+// this program prints "mission complete"
+sysout!("mission" if true else "???");
+sysout!(" ");
+sysout!(false ? "???" : "complete"); // prints "complete"
