@@ -188,7 +188,7 @@ And, lastly, the following features were added (in roughly this order):
 -prefix and postfix increment and decrement operators ('++' '--')
 -modulo ('%') operator
 -operator-equals operations: i.e. '+=' '-=' '*=' '/=' '**=' '%='
--multi-assign (python list assignment e.g. x, y = ["x", "y"])
+-pythonic list unpacking (e.g. x, y = ["x", "y"])
 -java-style for loops
 -'loop' keyword (equiv. to while(true) { ... }
 -java-style and python-style ternary operators: (cond '?' true_expr ':' false_expr | true_expr 'if' cond 'else' false_expr)
