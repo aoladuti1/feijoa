@@ -328,7 +328,7 @@ assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
 	| AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes '=' subExprA
 		{ FJ.listEquals(ARstack.top, ARstack.index, subExprA1.o); }
-	| multiAssign (* aka pythonic list assign *)
+	| listUnpack
 	| plusEquals
 	| minusEquals
 	| multiplyEquals
@@ -336,14 +336,14 @@ assign ::= AID '=' subExprA
 	| modEquals
 	| exponentiateEquals
 
-multiAssign ::= multiAssignArgs '=' operand
+listUnpack ::= listUnpackArgs '=' operand
 	{ MAstack.popAssign(operand1.o); }
 
-multiAssignArgs ::= AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes ',' multiAssignArgs 
+listUnpackArgs ::= AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes ',' listUnpackArgs 
 	{ MAstack.push(ARstack.top, ARstack.index, AID1.v); }
 	| AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes
 	{ MAstack.push(ARstack.top, ARstack.index, AID1.v); }
-	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); } ',' multiAssignArgs
+	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); } ',' listUnpackArgs
 	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); }
 	
 assignToListRes <o: FJTO> ::= '[' subExprB ']' { ARstack.index = subExprB1.o; }
