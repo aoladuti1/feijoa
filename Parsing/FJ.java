@@ -399,13 +399,15 @@ public class FJ {
 
 	// returns a[b]
 	static FJTO subscript(FJTO a, FJTO b) {
-		if (a.isList() && b.isInt()) {
-			return ((FJList) a.obj).get((Integer) b.obj); 
+		if (a.isList()) {
+			if (b.isInt())
+				return ((FJList) a.obj).get((Integer) b.obj); 
+			else if (b.isList())
+				return ((FJList) a.obj).getIndices(b);
 		} else if (a.isString() && b.isInt()) {
 			return newString(((String) a.obj).charAt((Integer) b.obj) + "");
-		} else {
-			return null; // error
 		}
+		return null; // error
 	}
 
 	// assign b to a[i]

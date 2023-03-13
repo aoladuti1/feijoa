@@ -593,6 +593,8 @@ ternary <o: FJTO> ::= subExprA '?' subExprA ':' subExprA
 (* subscript operator *)
 listSubscript <o: FJTO> ::= operand '[' subExprB ']' 
 	{ listSubscript.o = FJ.subscript(operand1.o, subExprB1.o); }
+	| operand listConstruct
+	{ listSubscript.o = FJ.subscript(operand1.o, listConstruct1.o); }
 
 
 (* building blocks *)
