@@ -19,7 +19,7 @@ support {
 	FJFuncStack funcStack = new FJFuncStack();
 	FJLCStack LCstack = new FJLCStack();
 	FJARStack ARstack = new FJARStack();
-	FJMAStack MAstack = new FJMAStack(symbols);
+	FJLUStack LUstack = new FJLUStack(symbols);
 
 	@SuppressWarnings("serial")
 	public class FJSigReturn extends ARTException {
@@ -337,14 +337,14 @@ assign ::= AID '=' subExprA
 	| exponentiateEquals
 
 listUnpack ::= listUnpackArgs '=' operand
-	{ MAstack.popAssign(operand1.o); }
+	{ LUstack.popAssign(operand1.o); }
 
 listUnpackArgs ::= AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes ',' listUnpackArgs 
-	{ MAstack.push(ARstack.top, ARstack.index, AID1.v); }
+	{ LUstack.push(ARstack.top, ARstack.index, AID1.v); }
 	| AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes
-	{ MAstack.push(ARstack.top, ARstack.index, AID1.v); }
-	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); } ',' listUnpackArgs
-	| AID { symbols.put(AID1.v, FJ.newNull()); MAstack.push(symbols.get(AID1.v), AID1.v); }
+	{ LUstack.push(ARstack.top, ARstack.index, AID1.v); }
+	| AID { symbols.put(AID1.v, FJ.newNull()); LUstack.push(symbols.get(AID1.v), AID1.v); } ',' listUnpackArgs
+	| AID { symbols.put(AID1.v, FJ.newNull()); LUstack.push(symbols.get(AID1.v), AID1.v); }
 	
 assignToListRes <o: FJTO> ::= '[' subExprB ']' { ARstack.index = subExprB1.o; }
 	| '[' subExprB ']' assignToListRes { ARstack.nextList(subExprB1.o); }

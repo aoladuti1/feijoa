@@ -1,24 +1,24 @@
 import java.util.ArrayList;
 
 /***
- * Stack for multi-assign a.k.a pythonic list assignment
+ * Stack for pythonic list unpacking (e.g. a, b = ["a", "b"])
  */
-public class FJMAStack {
+public class FJLUStack {
 
-    ArrayList<MAEntry> stack = new ArrayList<>();
+    ArrayList<LUEntry> stack = new ArrayList<>();
     
-    class MAEntry{
+    class LUEntry{
 
         FJTO o;
         FJTO index;
         String name;
 
-        public MAEntry(FJTO o, String name) {
+        public LUEntry(FJTO o, String name) {
             this.o = o;
             this.name = name;
         }
 
-        public MAEntry(FJTO o, FJTO index, String name) {
+        public LUEntry(FJTO o, FJTO index, String name) {
             this.o = o;
             this.index = index;
             this.name = name;
@@ -32,16 +32,16 @@ public class FJMAStack {
 
     STable symbols;
 
-    public FJMAStack(STable symbols) {
+    public FJLUStack(STable symbols) {
         this.symbols = symbols;
     }
 
     void push(FJTO o, String name) {
-        stack.add(new MAEntry(o, name));
+        stack.add(new LUEntry(o, name));
     }
 
     void push(FJTO o, FJTO index, String name) {
-        stack.add(new MAEntry(o, index, name));
+        stack.add(new LUEntry(o, index, name));
     }
 
     void popAssign(FJTO list) {
@@ -55,7 +55,7 @@ public class FJMAStack {
             return; // error
         }
         for (int i = 0; i < stack.size(); i++) {
-            MAEntry entry = stack.get(i);
+            LUEntry entry = stack.get(i);
             if (entry.isList()) {
                 FJ.listEquals(entry.o, entry.index, fjlist.get(i));
             } else {
