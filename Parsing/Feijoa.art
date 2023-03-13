@@ -123,7 +123,7 @@ argID <v: String> ::= ID argNote { argID.v = ID1.v; }
 (* ArgNotes -- may be used in definition and/or construction *)
 note ::= containerOrAID '[' ']'
 	| AID
-	| primitives
+	| typenames
 	| containerOrAID '[' compNoteArgs ']'
 	| containerOrAID '(' compNoteArgs ')'
 	| #
@@ -482,6 +482,7 @@ len <o: FJTO> ::= 'len!' '(' subExprA ')'
 
 type <o: FJTO> ::= 'type!' '(' subExprA ')' { type.o = FJ.newString(FJ.type(subExprA1.o)); }
 
+(* typing *)
 toInt <o: FJTO> ::= integerOrInt '(' subExprA ')' { toInt.o = FJ.toInt(subExprA1.o); }
 toDouble <o: FJTO> ::= doubleOrFloat '(' subExprA ')' { toDouble.o = FJ.toDouble(subExprA1.o); }
 toBoolean <o: FJTO> ::= booleanOrBool '(' subExprA ')' { toBoolean.o = FJ.toBoolean(subExprA1.o); }
@@ -491,8 +492,9 @@ doubleOrFloat ::= 'double' | 'float'
 booleanOrBool ::= 'boolean' | 'bool'
 stringOrStr ::= 'string' | 'str'
 
-primitives ::= integerOrInt | doubleOrFloat | booleanOrBool | stringOrStr | containers
-	containers ::= 'list'
+typenames ::= primitives | containers
+primitives ::= integerOrInt | doubleOrFloat | booleanOrBool | stringOrStr
+containers ::= 'list'
 
 
 (* logic operators *)
