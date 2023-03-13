@@ -192,3 +192,18 @@ And, lastly, the following features were added (in roughly this order):
 -java-style for loops
 -'loop' keyword (equiv. to while(true) { ... }
 -java-style and python-style ternary operators: (cond '?' true_expr ':' false_expr | true_expr 'if' cond 'else' false_expr)
+
+Next steps:
+	1 - Test further
+	2 - Write the remainder of the report
+	3 - ???
+
+[13/03/2023]
+Since my last diary entry, I added an 'in' keyword/operator that checks if an object is in a list and 
+returns a Feijoa boolean (e.g. 1 in [1, 2] == true). I also added support for descending ranges e.g. `3..1` and accessing a list
+by a list of indices (e.g. demoList[0..2] would generate a list out of the first and second index of demoList.)
+Even further, negative indices and negative ranges are both supported too, and work for list access by list.
+Typehinting and syntax in the BNF were further stabilised, and some demo programs (esp. lists.fj) were hugely extended.
+
+Next step:
+	! - Write the remainder of the report

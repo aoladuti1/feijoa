@@ -15,7 +15,7 @@ sysln!([] == []); // prints true
 sysln!(1..3 in [[1,2]]); // prints true
 sysln!("rhul" in "rhul.ac.uk"); // prints true
 
-// ranges...
+// ranges... they're just list constructors, really
 oneToFour = 1..5;
 sysln!(oneToFour); // prints [1, 2, 3, 4]
 /* note that `sysln!(1..2 + "X")` gives an error.
