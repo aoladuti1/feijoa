@@ -1,6 +1,6 @@
 foo = 10;
 
-def func(foo: typeHint = 5, bar=2) {
+def func(foo : type[Hint] = 5, bar=2) {
     sysln!(bar);
     return foo; // it will return 5 - see the way the scope is correct?
 }

@@ -1,9 +1,12 @@
-// list / string access (works in any dimension)
+// list / string access and assignment (works in any number dimension)
 x = [[null, 2]];
 x[0][0] = 1;
 sysln!(x[0][0]++); // prints 1
+
 y = "2muchfun";
-sysln!(y[0]); // prints 2
+two = int(y[0]);
+sysln!(two == x[0][0]); // prints true 
+/* note: it is forbidden to assign to string indices. they're immutable. */
 
 // list equality
 sysln!([] == []); // prints true
@@ -15,7 +18,7 @@ sysln!("rhul" in "rhul.ac.uk"); // prints true
 // ranges...
 oneToFour = 1..5;
 sysln!(oneToFour); // prints [1, 2, 3, 4]
-/*** note that sysln!(1..2 + "X") gives an error
+/* note that sysln!(1..2 + "X") gives an error
  * '+' has higher precedence than '..'
  * sysln!((1..2) + "X") would be fine. */
  
