@@ -29,7 +29,7 @@ pyAdd = lambda x, y -> : x + y;
 sysln!("The double of 10 is " + pyDouble(10));
 sysln!(5 + " add " + 5 + " is " + pyAdd(5, 5));
 
-// See nested functions and closures
+// See nested functions
 def printNested() {
     def x() {
         msg = "i was called from a nested function";
@@ -41,10 +41,7 @@ def printNested() {
     return x;
 }
 
-def c (x, y) -> int {
-
-}
-printNested()();
+printNested()(); // prints "i was called from a nested function"
 
 // New and improved type-hinting!
 def ditto1() -> [str] {
@@ -53,7 +50,5 @@ def ditto1() -> [str] {
 ditto2 = () -> [str] { return ["ditto"]; }; // ALT.: ditto2 = () -> [str] return ["ditto"];
 ditto3 = lambda () -> [RANDOM.TEXT[YO]] : ["ditto"]; // ALT.: lambda -> [RANDOM.TEXT[YO]] : ["ditto"];
 
-sysln!(ditto1() + ditto2() + ditto3());
-
-
+sysln!(ditto1() + ditto2() + ditto3()); // prints "[ditto, ditto, ditto]"
 // Note: ALL arguments without a default specified are defaulted to null

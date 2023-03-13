@@ -1,5 +1,9 @@
+/***
+ * This class is a minor abstraction of the Object class
+ * used as the basis of every Feijoan object.
+ */
 public class FJTO {
-    public String typeString; // for structs etc. 
+    public String typeString; // for structs (not primitives) 
     public Object obj;
     public FJTypes type; 
 
@@ -24,6 +28,14 @@ public class FJTO {
 
     public boolean isInt() {
         return this.type == FJTypes.INT;
+    }
+
+    public boolean isDouble() {
+        return this.type == FJTypes.DOUBLE;
+    }
+
+    public boolean isNull() {
+        return this.type == FJTypes.NULL;
     }
 
     public boolean isBoolean() {

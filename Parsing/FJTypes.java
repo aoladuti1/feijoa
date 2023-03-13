@@ -1,3 +1,7 @@
+/***
+ * Feijoa primitives
+ */
+
 public enum FJTypes {
     NULL,
     INT,

@@ -1,5 +1,10 @@
 import java.util.HashMap;
+import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.ARTGLLRDTHandle; 
 
+/***
+ * General factory-style helper class for constructing new objects
+ * out of operators and built-in functions
+ */
 public class FJ {
 	
 	static FJTO newInt(int value) {
@@ -58,7 +63,7 @@ public class FJ {
 			case STRING:
 				return "string";
 			case STRUCT:
-				return "struct";
+				return null; // this line should never run
 			case STRUCT_DEF:
 				return "struct_definition";
 			case LIST:
@@ -68,11 +73,25 @@ public class FJ {
 	}
 
 	static FJTO toInt(FJTO a) {
-		return newInt(Integer.parseInt(a.obj.toString()));
+		if (a.isDouble()) {
+			return newInt(((Double) a.obj).intValue());
+		} else if (a.isString()) {
+			return newInt(Integer.parseInt(a.obj.toString()));
+		} else if (a.isInt()) {
+			return a;
+		} else {
+			return null; // error
+		}
 	}
 
 	static FJTO toDouble(FJTO a) {
-		return newDouble(Double.parseDouble(a.obj.toString()));
+		if (a.isInt() || a.isString()) {
+			return newDouble(Double.parseDouble(a.obj.toString()));
+		} else if (a.isDouble()) {
+			return a;
+		} else {
+			return null; // error
+		}
 	}
 
 	static FJTO toString(FJTO a) {
@@ -80,15 +99,34 @@ public class FJ {
 	}
 
 	static FJTO toBoolean(FJTO a) {
-		return newBoolean(Boolean.parseBoolean(a.obj.toString()));
+		if (a.isString()) {
+			return newBoolean(Boolean.parseBoolean(a.obj.toString()));
+		} else {
+			return null; // error
+		}
 	}
 
+	// returning -2 means there's an error
 	static int numericCompare(FJTO a, FJTO b) {
-		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
-			Double ao = Double.valueOf(a.obj.toString());
-			Double bo = Double.valueOf(b.obj.toString());
+		if (doublePresent(a, b)) {
+			Double ao;
+			Double bo;
+			if (a.isDouble()) {
+				ao = ((Double) a.obj);
+			} else if (a.isInt() || a.isString()) {
+				ao = Double.valueOf(a.obj.toString());
+			} else {
+				return -2; // error;
+			}
+			if (b.isDouble()) {
+				bo = ((Double) b.obj);
+			} else if (b.isInt() || b.isString()) {
+				bo = Double.valueOf(b.obj.toString());
+			} else {
+				return -2; // error;
+			}
 			int ret = ao.compareTo(bo);
-			if (ret < 0) ret = -1;
+			if (ret < 0) ret = -1; // future-proofing
 			return ret;
 		} else {
 			int ao = (int) a.obj;
@@ -107,27 +145,52 @@ public class FJ {
 			return numericCompare(a, b);
 	}
 
-	static void append(FJTO a, FJTO b) {
-		((FJList) a.obj).add(b);
-	} 
-
-	static void add(FJTO a, FJTO b, FJTO c) {
-		((FJList) a.obj).add((int) b.obj, c);
-	} 
-
-	static FJTO remove(FJTO a, FJTO b) {
-		return ((FJList) a.obj).remove((int) b.obj);
+	private static boolean doublePresent(FJTO a, FJTO b) {
+		return a.isDouble() || b.isDouble();
+	}
+	private static boolean bothInts(FJTO a, FJTO b) {
+		return a.isInt() && b.isInt();
 	}
 
-	static FJTO len(FJTO a) {
-		if (a.isList())
-			return newInt(((FJList) a.obj).size());
-		if (a.isString())
-			return newInt(((String) a.obj).length());
-		else
+	// append b to a
+	static void append(FJTO a, FJTO b) {
+		if (a.isList()) {
+			((FJList) a.obj).add(b);
+		} else {
+			return; // error
+		}
+	} 
+
+	// add c to index i of a
+	static void add(FJTO a, FJTO i, FJTO c) {
+		if (a.isList() & i.isInt()) {
+			((FJList) a.obj).add((int) i.obj, c);
+		} else {
+			return; // error
+		}
+	} 
+
+	// remove the object at index b from a
+	static FJTO remove(FJTO a, FJTO b) {
+		if (a.isList() && b.isInt()) {
+			return ((FJList) a.obj).remove((int) b.obj);
+		} else {
 			return null; // error
+		}
+	}
+
+	// returns the length of a list or string
+	static FJTO len(FJTO a) {
+		if (a.isList()) {
+			return newInt(((FJList) a.obj).size());
+		} else if (a.isString()) {
+			return newInt(((String) a.obj).length());
+		} else {
+			return null; // error
+		}
 	}
 	
+	// returns a > b 
 	static FJTO gtr(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
@@ -136,6 +199,7 @@ public class FJ {
 			return newBoolean(safeNumericCompare(a, b) == 1);
 	}
 
+	// returns a >= b
 	static FJTO geq(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
@@ -144,6 +208,7 @@ public class FJ {
 			return newBoolean(comp == 1 || comp == 0);
 	}
 	
+	// returns a < b
 	static FJTO lss(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
@@ -152,6 +217,7 @@ public class FJ {
 			return newBoolean(safeNumericCompare(a, b) == -1);
 	}
 
+	// returns a <= b
 	static FJTO leq(FJTO a, FJTO b) {
 		int comp = safeNumericCompare(a, b);
 		if (comp == -2)
@@ -160,6 +226,7 @@ public class FJ {
 			return newBoolean(comp == -1 || comp == 0);
 	}
 
+	// returns !a
 	static FJTO not(FJTO a) {
 		if (a.isBoolean()) {
 			return newBoolean(!((boolean) a.obj));
@@ -168,6 +235,7 @@ public class FJ {
 		}
 	}
 
+	// returns a && b
 	static FJTO and(FJTO a, FJTO b) {
 		if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean(((boolean) a.obj) && ((boolean) b.obj));
@@ -176,6 +244,7 @@ public class FJ {
 		}
 	}
 
+	// returns a || b
 	static FJTO or(FJTO a, FJTO b) {
 		if (a.isBoolean() && b.isBoolean()) {
 			return newBoolean(((boolean) a.obj) || ((boolean) b.obj));
@@ -188,25 +257,29 @@ public class FJ {
 		}
 	}
 
+	// returns a == b (value equality, not object address)
 	static FJTO equ(FJTO a, FJTO b) {
-		if (a.obj == null || b.obj == null) 
+		if (a.isNull()|| b.isNull()) 
 			return newBoolean(a.obj == b.obj);
 		if (a.type != b.type)
 			return newBoolean(false);
 		if (a.isNumeric() && b.isNumeric()) {
 			return newBoolean(numericCompare(a, b) == 0);
-		} else if (a.type == FJTypes.STRING) {
+		} else if (a.isString()) {
 			return newBoolean(((String) a.obj).equals((String) b.obj));
-		} else {
+		} else if (a.isList()) {
+			return ((FJList) a.obj).FJequals(b);
+		}	else {
 			return null; // error
 		}
 	}
 	
+	// returns a + b
 	static FJTO plus(FJTO a, FJTO b) {
-		if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
+		if (bothInts(a, b)) {
 			return newInt((int) a.obj + (int) b.obj);
-		} else if ((a.type == FJTypes.DOUBLE && b.isNumeric())
-				|| (b.type == FJTypes.DOUBLE && a.isNumeric())) {
+		} else if ((a.isDouble() && b.isNumeric())
+				|| (b.isDouble() && a.isNumeric())) {
 			return newDouble(Double.valueOf(a.obj.toString()) 
 						  +  Double.valueOf(b.obj.toString()));
 		} else if (a.isBoolean() && b.isBoolean()) {
@@ -227,32 +300,35 @@ public class FJ {
 		}
 	}
 
+	// returns a - b
 	static FJTO minus(FJTO a, FJTO b) {
-		if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
+		if (bothInts(a,b)) {
 			return newInt((int) a.obj - (int) b.obj);
-		} else if ((a.type == FJTypes.DOUBLE && b.isNumeric())
-				|| (b.type == FJTypes.DOUBLE && a.isNumeric())) {
+		} else if ((a.isDouble() && b.isNumeric())
+				|| (b.isDouble() && a.isNumeric())) {
 			return newDouble(Double.valueOf(a.obj.toString()) 
 						  -  Double.valueOf(b.obj.toString()));
-		} else if (a.type == FJTypes.STRING && b.type == FJTypes.STRING) {
+		} else if (a.isString() && b.isString()) {
 			return newString(((String) a.obj).replace((String) b.obj, ""));
 		} else {
 			return null; // error
 		}
 	}
 
+	// returns -a
 	static FJTO negate(FJTO a) {
-		if (a.type == FJTypes.INT) {
+		if (a.isInt()) {
 			return newInt(-1 * (int) a.obj);
-		} else if (a.type == FJTypes.DOUBLE) {
+		} else if (a.isDouble()) {
 			return newDouble(-1 * (double) a.obj);
 		} else {
 			return null; // error
 		}
 	}
 	
+	// returns a * b
 	static FJTO multiply(FJTO a, FJTO b) {
-		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
+		if (doublePresent(a, b)) {
 			return newDouble(Double.valueOf(a.obj.toString()) 
 						   * Double.valueOf(b.obj.toString()));
 		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
@@ -264,8 +340,9 @@ public class FJ {
 		}
 	}
 
+	// returns a % b
 	static FJTO mod(FJTO a, FJTO b) {
-		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
+		if (doublePresent(a, b)) {
 			return newDouble(Double.valueOf(a.obj.toString()) 
 						   % Double.valueOf(b.obj.toString()));
 		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
@@ -275,8 +352,9 @@ public class FJ {
 		}
 	}
 	
+	// returns a / b
 	static FJTO divide(FJTO a, FJTO b) {
-		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
+		if (doublePresent(a, b)) {
 			return newDouble(Double.valueOf(a.obj.toString()) 
 						   / Double.valueOf(b.obj.toString()));
 		} else if (a.type == FJTypes.INT && b.type == FJTypes.INT) {
@@ -286,10 +364,11 @@ public class FJ {
 		}
 	}
 	
-	// returns a double 
+	// returns a ** b
+	// return type is a double 
 	// unless two integers are the operands AND the exponent is nonnegative
 	static FJTO exponentiate(FJTO a, FJTO b) {
-		if (a.type == FJTypes.DOUBLE || b.type == FJTypes.DOUBLE) {
+		if (doublePresent(a, b)) {
 			return newDouble(
 				Math.pow(Double.valueOf(a.obj.toString()), 
 						 Double.valueOf(b.obj.toString())));
@@ -310,6 +389,7 @@ public class FJ {
 		}
 	}
 
+	// returns a[b]
 	static FJTO subscript(FJTO a, FJTO b) {
 		if (a.isList() && b.isInt()) {
 			return ((FJList) a.obj).get((Integer) b.obj); 
@@ -320,44 +400,94 @@ public class FJ {
 		}
 	}
 
+	// assign b to a[i]
 	static void listEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		((FJList) a.obj).set(index, b);
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			((FJList) a.obj).set(index, b);
+		} else {
+			return; // error
+		}
 	}
 
+	// assign a[i] + b to a[i]
 	static void listPlusEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		FJList list = (FJList) a.obj;
-		list.set(index, FJ.plus(list.get(index), b));
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			FJList list = (FJList) a.obj;
+			list.set(index, FJ.plus(list.get(index), b));
+		} else {
+			return; // error
+		}
 	}
 
+	// assign a[i] - b to a[i]
 	static void listMinusEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		FJList list = (FJList) a.obj;
-		list.set(index, FJ.minus(list.get(index), b));
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			FJList list = (FJList) a.obj;
+			list.set(index, FJ.minus(list.get(index), b));
+		} else {
+			return; // error
+		}
 	}
 
+	// assign a[i] * b to a[i]
 	static void listMultiplyEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		FJList list = (FJList) a.obj;
-		list.set(index, FJ.multiply(list.get(index), b));
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			FJList list = (FJList) a.obj;
+			list.set(index, FJ.multiply(list.get(index), b));
+		} else {
+			return; // error
+		}
 	}
 
+	// assign a[i] / b to a[i]
 	static void listDivideEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		FJList list = (FJList) a.obj;
-		list.set(index, FJ.divide(list.get(index), b));
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			FJList list = (FJList) a.obj;
+			list.set(index, FJ.divide(list.get(index), b));
+		} else {
+			return; // error
+		}
 	}
 
+	// assign a[i] % b to a[i]
 	static void listModEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		FJList list = (FJList) a.obj;
-		list.set(index, FJ.mod(list.get(index), b));
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			FJList list = (FJList) a.obj;
+			list.set(index, FJ.mod(list.get(index), b));
+		} else {
+			return; // error
+		}
 	}
 
+	// assign a[i] ** b to a[i]
 	static void listExponentiateEquals(FJTO a, FJTO i, FJTO b) {
-		Integer index = (Integer) i.obj;
-		FJList list = (FJList) a.obj;
-		list.set(index, FJ.exponentiate(list.get(index), b));
+		if (a.isList() && i.isInt()) {
+			Integer index = (Integer) i.obj;
+			FJList list = (FJList) a.obj;
+			list.set(index, FJ.exponentiate(list.get(index), b));
+		} else {
+			return; // error
+		}
+	}
+
+	// define a function
+	static void defFunc(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack, STable symbols) {
+		FJTO func = constructLambda(procedure, funcStack, callStack);
+		symbols.put(((FJFunction) func.obj).name, func);
+	}
+
+	// construct a lambda
+	static FJTO constructLambda(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack) {
+		if (callStack.current() != null) {
+			funcStack.top().setOuterTables(callStack.current().funcVars);
+		}
+		funcStack.top().setProcedure(procedure);
+		return newFunction(funcStack.pop());
 	}
 }	

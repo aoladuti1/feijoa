@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/***
+ * Struct definition - underlying Feijoan object
+ */
 public class FJStructDef {
     String name;
     HashMap<String, FJTO> members = new HashMap<>();

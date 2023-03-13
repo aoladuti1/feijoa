@@ -12,7 +12,6 @@ public class FJFuncStack {
         return stack.remove(stack.size() - 1);
     }
 
-
     public FJFunction top() {
         return stack.get(stack.size() - 1);
     }

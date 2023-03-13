@@ -2,7 +2,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class STable {
+/***
+ * The Feijoa symbol table class
+ */
+public class STable {
 
     private ArrayList<HashMap<String, FJTO>> tree = new ArrayList<>();
 
@@ -80,7 +83,7 @@ class STable {
         }
         return found ? symbols : null;
     }
-
+    
     @SuppressWarnings("unchecked")
     private void fullPut(
         String[] splits, FJTO o, HashMap<String, FJTO> table) {

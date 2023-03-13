@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/***
+ * Stack used for struct definition
+ */
 public class FJSDStack {
 
 	private ArrayList<FJStructDef> stack = new ArrayList<>();

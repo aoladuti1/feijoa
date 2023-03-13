@@ -10,7 +10,7 @@ class SAEntry {
     int argCount = 0;
     int maxArgs;
     boolean[] visited;
-    boolean selectingArgs;
+    boolean selectingArgs; // if true, then args are being chosen like: height=5
 
     public SAEntry(FJStructDef structDef) {
         this.structDef = structDef;
@@ -18,14 +18,17 @@ class SAEntry {
         this.selectingArgs = false;
         this.visited = new boolean[maxArgs];
     }
-
 }
-public class FJSAStack {
+
+/***
+ * Stack for struct construction
+ */
+public class FJSCStack {
     ArrayList<SAEntry> stack = new ArrayList<>();
     STable symbols;
     int pos = -1;
 
-    public FJSAStack(STable symbols) {
+    public FJSCStack(STable symbols) {
         this.symbols = symbols;
     }
 

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 
-public class FJLStack {
+/***
+ * List construction stack
+ */
+public class FJLCStack {
 
     ArrayList<FJList> stack = new ArrayList<>();
     
