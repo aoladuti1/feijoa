@@ -15,7 +15,7 @@ sysln!("rhul" in "rhul.ac.uk"); // prints true
 // ranges...
 oneToFour = 1..5;
 sysln!(oneToFour); // prints [1, 2, 3, 4]
-/*** note that sysln!(1..2 + "X") gives an error
+/* note that sysln!(1..2 + "X") gives an error
  * '+' has higher precedence than '..'
  * sysln!((1..2) + "X") would be fine. */
  
