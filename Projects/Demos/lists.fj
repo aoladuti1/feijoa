@@ -2,7 +2,7 @@
 x = [[null, 2]];
 x[0][0] = 1;
 sysln!(x[0][0]++); // prints 1
---
+
 y = "2muchfun";
 two = int(y[0]);
 sysln!(two == x[0][0]); // prints true 

@@ -51,9 +51,8 @@ support {
 
 (* comment types *)
 whitespace &SIMPLE_WHITESPACE
-whitespace &COMMENT_LINE_C
-whitespace &COMMENT_BLOCK_C
-
+whitespace &COMMENT_LINE_C (* // *)
+whitespace &COMMENT_BLOCK_C (* /* */ *)
 
 (* program statements *)
 statements ::= statement | statement statements
@@ -69,7 +68,6 @@ rawCompStatements (* as compStatements, but no scope management *) ::= '{' '}'
 scopeEnter ::= '{' { symbols.newScope(); }
 
 scopeLeave ::= '}' { symbols.oldScope(); }
-
 
 (* struct definition statements *)
 statement ::= defStruct | defFunc | loopStatement | condStatement | mainExpr ';' | returnExpr ';' | break | continue
@@ -120,8 +118,9 @@ defFuncArg <o: FJTO> ::= argID optEquals
 optEquals <o: FJTO> ::= # { optEquals.o =  null; }
 	| '=' subExprA { optEquals.o = subExprA1.o; }
 
-argID <v: String> ::= ID ':' AID {argID.v = ID1.v;} | ID { argID.v = ID1.v; }
+argID <v: String> ::= ID argNote { argID.v = ID1.v; }
 
+(* ArgNotes -- may be used in definition and/or construction *)
 note ::= containerOrAID '[' ']'
 	| AID
 	| primitives
@@ -132,6 +131,8 @@ note ::= containerOrAID '[' ']'
 containerOrAID ::= AID | containers | #
 
 compNoteArgs ::= note ',' compNoteArgs | note
+
+argNote ::= ':' note | #
 
 
 (* loop statements *)
@@ -522,7 +523,6 @@ structArgs <o: FJTO> ::= subExprA argNote { SCstack.processArg(subExprA1.o); } '
 	| ID argNote '=' subExprA { SCstack.processArg(ID1.v, subExprA1.o); } ',' structArgs
 	| subExprA argNote { SCstack.processLastArg(subExprA1.o); }
 	| ID argNote '=' subExprA { SCstack.processLastArg(ID1.v, subExprA1.o); }
-argNote ::= ':' note | # 
 
 
 (* list construction *)
