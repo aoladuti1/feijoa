@@ -49,4 +49,5 @@ public class FJTO {
     public boolean isString() {
         return this.type == FJTypes.STRING;
     }
+
 }

@@ -20,24 +20,35 @@ public class FJList extends ArrayList<FJTO> {
         super();
     }
 
-    public FJTO FJequals(FJTO o) {
+    public boolean booleanEqu(FJTO o) {
         FJList list = (FJList) o.obj;
         if (!o.isList()) {
-            return FJ.newBoolean(false);    
+            return false;    
         }
         if (this.size() != list.size()) {
-            return FJ.newBoolean(false);
+            return false;
         }
         if (this.isEmpty() && list.isEmpty()) {
-            return FJ.newBoolean(true);
+            return true;
         }
-        FJTO ret = FJ.newBoolean(true);
+        boolean ret = true;
         for (int i = 0; i < this.size(); i++) {
-            if (((boolean) FJ.equ(this.get(i), list.get(i)).obj) == false)
-                ret = FJ.newBoolean(false);
+            if (FJ.booleanEqu(this.get(i), list.get(i)) == false)
+                ret = false;
         }
         return ret;
+    }
 
+    public boolean equ(FJTO o) {
+        return booleanEqu(o);
+    }
+
+    public FJTO FJcontains(FJTO o) {
+        for (int i = 0; i < this.size(); i++) {
+            if (FJ.booleanEqu(this.get(i), o) == true)
+                return FJ.newBoolean(true);
+        }
+        return FJ.newBoolean(false);
     }
 
     @Override
@@ -59,5 +70,6 @@ public class FJList extends ArrayList<FJTO> {
         }
         return "[" + ret + "]";
     }
+
 }
 

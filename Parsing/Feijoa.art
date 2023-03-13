@@ -273,6 +273,7 @@ subExprA <o: FJTO> ::= subExprB { subExprA.o = subExprB1.o; }
 	| lss { subExprA.o = lss1.o; }
 	| leq { subExprA.o = leq1.o; }
 	| equ { subExprA.o = equ1.o; }
+	| in  { subExprA.o = in1.o;  }
 	
 subExprB <o: FJTO> ::= subExprC { subExprB.o = subExprC1.o; }
 	| plus { subExprB.o = plus1.o; }
@@ -393,6 +394,9 @@ lss <o: FJTO> ::= subExprB '<' subExprB
 
 leq <o: FJTO> ::= subExprB '<=' subExprB
 	{ leq.o = FJ.leq(subExprB1.o, subExprB2.o); }
+
+in <o: FJTO> ::= operand 'in' operand 
+	{ in.o = FJ.in(operand1.o, operand2.o); }
 
 
 (* arithmetic operators *)
@@ -527,8 +531,8 @@ listConstruct <o: FJTO> ::= { LCstack.push(); } mainListArgs
 
 mainListArgs ::= '[' ']'
 	| '[' listArgs ']'
-	| subExprA '..' subExprA
-		{ LCstack.makeRange(subExprA1.o, subExprA2.o); }
+	| subExprB '..' subExprB
+		{ LCstack.makeRange(subExprB1.o, subExprB2.o); }
 
 listArgs ::= subExprA { LCstack.processArg(subExprA1.o); } ',' listArgs
 	| subExprA { LCstack.processLastArg(subExprA1.o); }

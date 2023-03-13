@@ -259,17 +259,25 @@ public class FJ {
 
 	// returns a == b (value equality, not object address)
 	static FJTO equ(FJTO a, FJTO b) {
+		// note: change ret type to primitive boolean when err handling present
+		Boolean ret = booleanEqu(a, b);
+		return ret == null ? null : newBoolean(ret);
+	}
+	
+	// returns a == b as a Boolean
+	static Boolean booleanEqu(FJTO a, FJTO b) { 
+		// note: change return type to primitive boolean when err handling present
 		if (a.isNull()|| b.isNull()) 
-			return newBoolean(a.obj == b.obj);
+			return a.obj == b.obj;
 		if (a.type != b.type)
-			return newBoolean(false);
+			return false;
 		if (a.isNumeric() && b.isNumeric()) {
-			return newBoolean(numericCompare(a, b) == 0);
+			return numericCompare(a, b) == 0;
 		} else if (a.isString()) {
-			return newBoolean(((String) a.obj).equals((String) b.obj));
+			return ((String) a.obj).equals((String) b.obj);
 		} else if (a.isList()) {
-			return ((FJList) a.obj).FJequals(b);
-		}	else {
+			return ((FJList) a.obj).booleanEqu(b);
+		} else {
 			return null; // error
 		}
 	}
@@ -405,6 +413,9 @@ public class FJ {
 		if (a.isList() && i.isInt()) {
 			Integer index = (Integer) i.obj;
 			((FJList) a.obj).set(index, b);
+		} else if (a.isString()) {
+			System.err.println("String index assignment is not supported.");
+			return; // error
 		} else {
 			return; // error
 		}
@@ -489,5 +500,16 @@ public class FJ {
 		}
 		funcStack.top().setProcedure(procedure);
 		return newFunction(funcStack.pop());
+	}
+
+	// returns true if b exists in string / list a, false otherwise
+	static FJTO in(FJTO a, FJTO b) {
+		if (b.isList()) {
+			return ((FJList) b.obj).FJcontains(a);
+		} else if (b.isString()) {
+			return newBoolean(((String) b.obj).contains(a.obj.toString()));
+		} else {
+			return null; // error
+		}
 	}
 }	
