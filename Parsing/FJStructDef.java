@@ -55,5 +55,9 @@ public class FJStructDef {
         return this.memberOrder.size();
     }
     
+    @Override
+    public String toString() {
+        return this.members.toString();
+    }
     
 }
