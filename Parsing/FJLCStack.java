@@ -35,9 +35,15 @@ public class FJLCStack {
         int start = (int) a.obj;
 		int end = (int) b.obj;
 		FJList list = top();
-		for (int i = start; i < end; i++) {
-			list.add(FJ.newInt(i));
-		}
+        if (start < end) {
+            for (int i = start; i < end; i++) {
+                list.add(FJ.newInt(i));
+            }
+        } else {
+            for (int i = start; i > end; i--) {
+                list.add(FJ.newInt(i));
+            }
+        }
     }
 
 }

@@ -140,3 +140,70 @@ Next steps:
     1 - Add lists
     2 - Store type information in variables to speed up duck typing
     3 - Finish adding operations
+
+[12/03/2023]
+Since my last diary entry, I have vastly extended and stabilised the language, 
+done extensive refactoring and written helpful documentation.
+
+See the following major amendments:
+-the representation for Feijoa objects is no longer just the Java Object class, but the class FJTO
+	strong typing is properly implemented as now variables hold their type information and so
+	duck typing is much faster. Operator interactions are now well-defined.
+-the null type is now formalised
+-all built-in functions now have an exclamation mark at the end, as they aren't true functions (e.g. sysout!())
+-exhaustive bugfixes
+-the exponentiate operator can now return ints if both operands are ints and the output is a whole number
+-major Feijoa.art BNF cleanup and proper organisation
+-general refactoring
+-room made in code for future user error messaging / handling
+-improved and far more frequent documention in both Feijoa.art and the helper classes
+-stabilised the equivalency operator
+-significantly extended and improved the demo programs
+-renamed built-in function sysline to sysln
+-renamed and extended whileUntil.fj into loops.fj
+-renamed FJLStack to FJLCStack (stack for list construction)
+-renamed FJSAStack to FJSCStack (stack for struct construction)
+
+The following helper Java classes were also added:
+-FJARStack (a stack for resolving assignment to a list of a list)
+-FJList (an underlying Java representation of a Feijoa list)
+-FJTypes (an enum class of Feijoa primitives)
+
+And, lastly, the following features were added (in roughly this order):
+-FJTypes.java, an enum class of Feijoa primitive types 
+-vastly improved type-hinting and ArgNotes, now allowing for return hints (even in lambdas)
+	and also types like list[str] or [str] or even list[[str], [int]]
+-sysin!() -> str | built-in function (gets a line of user input)
+-updated Fibonacci program to ask for user input
+-a type!(object) -> str built-in function to return the type of an object as a string
+-typecasting 
+-lists (+ operator concatenates lists)
+-list ranges (1..4 == [1, 2, 3]) 
+-append!(list, object) -> null | built-in function
+-remove!(list, index) -> object | built-in function
+-add!(list, index, object) -> null | built-in function
+-break and continue loop keywords
+-len!(list/str) -> int | built-in function
+-'&&' / 'and' are equivalent keywords. '||' / 'or' are equivalent keywords.
+-prefix and postfix increment and decrement operators ('++' '--')
+-modulo ('%') operator
+-operator-equals operations: i.e. '+=' '-=' '*=' '/=' '**=' '%='
+-multi-assign (python list assignment e.g. x, y = ["x", "y"])
+-java-style for loops
+-'loop' keyword (equiv. to while(true) { ... }
+-java-style and python-style ternary operators: (cond '?' true_expr ':' false_expr | true_expr 'if' cond 'else' false_expr)
+
+Next steps:
+	1 - Test further
+	2 - Write the remainder of the report
+	3 - ???
+
+[13/03/2023]
+Since my last diary entry, I added an 'in' keyword/operator that checks if an object is in a list and 
+returns a Feijoa boolean (e.g. 1 in [1, 2] == true). I also added support for descending ranges e.g. `3..1` and accessing a list
+by a list of indices (e.g. demoList[0..2] would generate a list out of the first and second index of demoList.)
+Even further, negative indices and negative ranges are both supported too, and work for list access by list.
+Typehinting and syntax in the BNF were further stabilised, and some demo programs (esp. lists.fj) were hugely extended.
+
+Next step:
+	! - Write the remainder of the report

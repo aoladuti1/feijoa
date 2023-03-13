@@ -22,6 +22,11 @@ public class FJTO {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return this.obj.toString();
+    }
+
     public boolean isNumeric() {
         return this.type == FJTypes.DOUBLE || this.type == FJTypes.INT;
     }
@@ -49,4 +54,5 @@ public class FJTO {
     public boolean isString() {
         return this.type == FJTypes.STRING;
     }
+
 }
