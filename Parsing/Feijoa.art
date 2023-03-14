@@ -4,11 +4,7 @@
 * computer science dept. @ royal holloway, university of london
 *
 *******************************************************************************)
-prelude {
-	import java.util.HashMap; 
-	import java.util.ArrayList; 
-	import java.util.Scanner; 
-}
+prelude { import java.util.HashMap; import java.util.Scanner; }
 
 support {
 	
