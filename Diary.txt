@@ -190,7 +190,7 @@ And, lastly, the following features were added (in roughly this order):
 -operator-equals operations: i.e. '+=' '-=' '*=' '/=' '**=' '%='
 -pythonic list unpacking (e.g. x, y = ["x", "y"])
 -java-style for loops
--'loop' keyword (equiv. to while(true) { ... }
+-'loop' keyword (equiv. to while(true) { ... })
 -java-style and python-style ternary operators: (cond '?' true_expr ':' false_expr | true_expr 'if' cond 'else' false_expr)
 
 Next steps:
@@ -204,6 +204,14 @@ returns a Feijoa boolean (e.g. 1 in [1, 2] == true). I also added support for de
 by a list of indices (e.g. demoList[0..2] would generate a list out of the first and second index of demoList.)
 Even further, negative indices and negative ranges are both supported too, and work for list access by list.
 Typehinting and syntax in the BNF were further stabilised, and some demo programs (esp. lists.fj) were hugely extended.
+
+Next step:
+	! - Write the remainder of the report
+
+[15/03/2023]
+Since my last diary entry, I removed return-type hints from lambdas due to them creating syntactical oddities.
+I also fixed the misnomer of multiAssign to its actual Pythonic term: list unpacking, and I fixed the elif-else branches of
+an if statement not evaluating properly in certain circumstances. Minor code / BNF cleanup was also done.
 
 Next step:
 	! - Write the remainder of the report
