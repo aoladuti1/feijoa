@@ -106,21 +106,28 @@ public class FJ {
 		}
 	}
 
-	// returning -2 means there's an error
+	/***
+	 * Returns 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
+	 * Returns -2 if there is an error.
+	 * @param a number a
+	 * @param b number b
+	 * @return 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
+	 * Returns -2 if there is an error.
+	 */
 	static int numericCompare(FJTO a, FJTO b) {
 		if (doublePresent(a, b)) {
 			Double ao;
 			Double bo;
 			if (a.isDouble()) {
 				ao = ((Double) a.obj);
-			} else if (a.isInt() || a.isString()) {
+			} else if (a.isInt()) {
 				ao = Double.valueOf(a.obj.toString());
 			} else {
 				return -2; // error;
 			}
 			if (b.isDouble()) {
 				bo = ((Double) b.obj);
-			} else if (b.isInt() || b.isString()) {
+			} else if (b.isInt()) {
 				bo = Double.valueOf(b.obj.toString());
 			} else {
 				return -2; // error;
@@ -135,9 +142,18 @@ public class FJ {
 			if (ao == bo) return 0;
 			if (ao < bo) return -1;
 		}
-		return -2;
+		return -2; // error
 	}
 	
+	/***
+	 * Checks if both arguments are numeric and returns -2 if not.
+	 * Returns 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
+	 * Returns -2 if there is an error.
+	 * @param a number a
+	 * @param b number b
+	 * @return 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
+	 * Returns -2 if there is an error.
+	 */
 	static int safeNumericCompare(FJTO a, FJTO b) {
 		if (!(a.isNumeric() && b.isNumeric())) 
 			return -2;
