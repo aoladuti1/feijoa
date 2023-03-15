@@ -243,7 +243,9 @@ condStatement ::= ifExpr compStatements<
 		}
 	| elifExpr compStatements< 'else' compStatements<
 		{
-			if ((boolean) elifExpr1.o.obj == false) {
+			if ((boolean) elifExpr1.o.obj == true) {
+				artEvaluate(condStatement.compStatements1, compStatements1);
+			} else {
 				artEvaluate(condStatement.compStatements2, compStatements2);
 			}
 		}
