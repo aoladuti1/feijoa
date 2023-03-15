@@ -91,18 +91,15 @@ returnExpr <o: FJTO> ::= 'return' subExprA
 defFunc ::= 'def' ID { funcStack.push(new FJFunction(ID1.v)); } mainDefFuncArgs functionArrow fnStatements< 
 	{ FJ.defFunc(defFunc.fnStatements1, funcStack, callStack, symbols); }
 
-lambdaConstruct <o: FJTO> ::= { funcStack.push(new FJFunction("")); } javaLambdaArgs javaLambdaArrow lambdaStatements< 
+lambdaConstruct <o: FJTO> ::= { funcStack.push(new FJFunction("")); } javaLambdaArgs '->' lambdaStatements< 
 	{ lambdaConstruct.o = FJ.constructLambda(lambdaConstruct.lambdaStatements1, funcStack, callStack); }
 	|   { funcStack.push(new FJFunction("")); } 'lambda' pythonLambdaArgs lambdaReturn<
 	{ lambdaConstruct.o = FJ.constructLambda(lambdaConstruct.lambdaReturn1, funcStack, callStack); }
 
-javaLambdaArrow ::= '->' | noteArrow
-pythonLambdaArrow ::= noteArrow | #
-functionArrow ::= noteArrow | #
-noteArrow ::= '->' note | '->'
+functionArrow ::= '->' note | '->' | #
 
-pythonLambdaArgs ::= mainDefFuncArgs pythonLambdaArrow ':' | defFuncArgs pythonLambdaArrow ':' | pythonLambdaArrow ':'
-javaLambdaArgs ::= mainDefFuncArgs | defFuncArg
+pythonLambdaArgs ::= mainDefFuncArgs ':' | defFuncArgs ':' | ':'
+javaLambdaArgs ::= mainDefFuncArgs | defFuncArgs 
 mainDefFuncArgs ::= '(' ')' | '(' defFuncArgs ')'
 
 defFuncArgs <c:int> ::= defFuncArg ',' defFuncArgs
@@ -246,7 +243,9 @@ condStatement ::= ifExpr compStatements<
 		}
 	| elifExpr compStatements< 'else' compStatements<
 		{
-			if ((boolean) elifExpr1.o.obj == false) {
+			if ((boolean) elifExpr1.o.obj == true) {
+				artEvaluate(condStatement.compStatements1, compStatements1);
+			} else {
 				artEvaluate(condStatement.compStatements2, compStatements2);
 			}
 		}
@@ -423,9 +422,6 @@ functionCall <o: FJTO> ::= voidFunctions { functionCall.o = FJ.newNull(); }
 	{	try {
 			callStack.nextCall();
 			symbols.newScope();
-			if (callStack.topFunction().outerTables != null) {
-				callStack.top().funcVars.addAll(callStack.topFunction().outerTables);
-			}
 			artEvaluate(callStack.topProcedure(), null);
 		} catch (FJSigReturn FJsig) {
 			;
