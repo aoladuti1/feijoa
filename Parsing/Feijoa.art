@@ -10,7 +10,6 @@ support {
 	
 	FJCallStack callStack = new FJCallStack();
 	FJSymbols symbols = new FJSymbols(callStack);
-	FJSDStack SDStack = symbols.SDStack();
 	FJSCStack SCstack = new FJSCStack(symbols);
 	FJFuncStack funcStack = new FJFuncStack();
 	FJLCStack LCstack = new FJLCStack();

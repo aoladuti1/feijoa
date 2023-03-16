@@ -121,6 +121,11 @@ public class FJSymbols {
     }
 
     @SuppressWarnings("unchecked")
+    /***
+     * Returns the second to last whose name delimited by the
+     * member selection operator. For example, ID "a.b.c" would return
+     * the variable with the ID b.
+     */
     private FJTO resolve(String[] splits, HashMap<String, FJTO> table) {
         HashMap<String, FJTO> subTable = table;
         FJTO fetch = null;
