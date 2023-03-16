@@ -1,10 +1,7 @@
 import uk.ac.rhul.cs.csle.art.v3.alg.gll.support.*; 
  
 import java.util.ArrayList; 
-import java.util.HashMap; 
-import java.util.LinkedList; 
- 
- 
+import java.util.HashMap;  
  
 public class FJFunction { 
  
@@ -16,7 +13,7 @@ public class FJFunction {
     ArrayList<HashMap<String, FJTO>> outerTables = null; 
     String name; 
  
-    LinkedList<FJNamedObj> args = new LinkedList<>(); 
+    ArrayList<FJNamedObj> args = new ArrayList<>(); 
  
     public void addArg(String ID) { 
         this.args.add(new FJNamedObj(ID, FJ.newNull())); 
@@ -33,8 +30,6 @@ public class FJFunction {
     public void setOuterTables(ArrayList<HashMap<String, FJTO>> tList) { 
         this.outerTables = tList; 
     } 
- 
- 
  
     /*** 
      * Returns the index of the argument name or -1 if it is not found 
