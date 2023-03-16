@@ -25,10 +25,10 @@ class SAEntry {
  */
 public class FJSCStack {
     ArrayList<SAEntry> stack = new ArrayList<>();
-    STable symbols;
+    FJSymbols symbols;
     int pos = -1;
 
-    public FJSCStack(STable symbols) {
+    public FJSCStack(FJSymbols symbols) {
         this.symbols = symbols;
     }
 

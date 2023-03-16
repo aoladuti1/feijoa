@@ -30,9 +30,9 @@ public class FJLUStack {
         
     }
 
-    STable symbols;
+    FJSymbols symbols;
 
-    public FJLUStack(STable symbols) {
+    public FJLUStack(FJSymbols symbols) {
         this.symbols = symbols;
     }
 

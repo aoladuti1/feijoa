@@ -506,7 +506,7 @@ public class FJ {
 	}
 
 	// define a function
-	static void defFunc(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack, STable symbols) {
+	static void defFunc(ARTGLLRDTHandle procedure, FJFuncStack funcStack, FJCallStack callStack, FJSymbols symbols) {
 		FJTO func = constructLambda(procedure, funcStack, callStack);
 		symbols.put(((FJFunction) func.obj).name, func);
 	}
