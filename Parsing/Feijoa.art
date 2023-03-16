@@ -9,7 +9,7 @@ prelude { import java.util.HashMap; import java.util.Scanner; }
 support {
 	
 	FJCallStack callStack = new FJCallStack();
-	STable symbols = new STable(callStack);
+	FJSymbols symbols = new FJSymbols(callStack);
 	FJSDStack SDStack = symbols.SDStack();
 	FJSCStack SCstack = new FJSCStack(symbols);
 	FJFuncStack funcStack = new FJFuncStack();
@@ -308,7 +308,7 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| structConstruct '.' AID 
 		{ @SuppressWarnings("unchecked")
 		 HashMap<String, FJTO> hm = (HashMap<String, FJTO>) structConstruct1.o.obj;
-		 operand.o = symbols.fullGet(AID1.v.split(STable.selectOp), hm); }
+		 operand.o = symbols.fullGet(AID1.v.split(FJSymbols.selectOp), hm); }
 	| listConstruct
 		{ operand.o = listConstruct1.o; }
 	| functionCall { operand.o = functionCall1.o; }

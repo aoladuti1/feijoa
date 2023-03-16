@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /***
  * The Feijoa symbol table class
  */
-public class STable {
+public class FJSymbols {
 
     private ArrayList<HashMap<String, FJTO>> tree = new ArrayList<>();
 
@@ -35,7 +35,7 @@ public class STable {
         return tree.get(level);
     }
 
-    public STable(FJCallStack callStack) {
+    public FJSymbols(FJCallStack callStack) {
         this.callStack = callStack;
         tree.add(new HashMap<>());
     }
