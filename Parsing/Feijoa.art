@@ -10,7 +10,6 @@ support {
 	
 	FJCallStack callStack = new FJCallStack();
 	FJSymbols symbols = new FJSymbols(callStack);
-	FJSDStack SDStack = symbols.SDStack();
 	FJSCStack SCstack = new FJSCStack(symbols);
 	FJFuncStack funcStack = new FJFuncStack();
 	FJLCStack LCstack = new FJLCStack();
@@ -321,8 +320,8 @@ operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 (* assignment operators *)
 assign ::= AID '=' subExprA
 		{ symbols.put(AID1.v, subExprA1.o); }
-	| AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes '=' subExprA
-		{ FJ.listEquals(ARstack.top, ARstack.index, subExprA1.o); }
+	| operand '[' subExprB ']' '=' subExprA
+		{ FJ.listEquals(operand1.o, subExprB1.o, subExprA1.o); }
 	| listUnpack
 	| plusEquals
 	| minusEquals
@@ -335,11 +334,11 @@ listUnpack ::= listUnpackArgs '=' operand
 	{ LUstack.popAssign(operand1.o); }
 
 listUnpackArgs ::= AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes ',' listUnpackArgs 
-	{ LUstack.push(ARstack.top, ARstack.index, AID1.v); }
+	{ LUstack.push(AID1.v, ARstack.index, ARstack.top); }
 	| AID { ARstack.push(symbols.get(AID1.v)); } assignToListRes
-	{ LUstack.push(ARstack.top, ARstack.index, AID1.v); }
-	| AID { symbols.put(AID1.v, FJ.newNull()); LUstack.push(symbols.get(AID1.v), AID1.v); } ',' listUnpackArgs
-	| AID { symbols.put(AID1.v, FJ.newNull()); LUstack.push(symbols.get(AID1.v), AID1.v); }
+	{ LUstack.push(AID1.v, ARstack.index, ARstack.top); }
+	| AID { symbols.put(AID1.v, FJ.newNull()); LUstack.push(AID1.v, symbols.get(AID1.v)); } ',' listUnpackArgs
+	| AID { symbols.put(AID1.v, FJ.newNull()); LUstack.push(AID1.v, symbols.get(AID1.v)); }
 	
 assignToListRes <o: FJTO> ::= '[' subExprB ']' { ARstack.index = subExprB1.o; }
 	| '[' subExprB ']' assignToListRes { ARstack.nextList(subExprB1.o); }
@@ -529,7 +528,7 @@ mainListArgs ::= '[' ']'
 		{ LCstack.makeRange(subExprB1.o, subExprB2.o); }
 
 listArgs ::= subExprA { LCstack.processArg(subExprA1.o); } ',' listArgs
-	| subExprA { LCstack.processLastArg(subExprA1.o); }
+	| subExprA { LCstack.processArg(subExprA1.o); }
 
 
 (* walrus-like operators *)

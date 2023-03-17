@@ -27,10 +27,6 @@ public class FJLCStack {
         top().add(o);
     }
 
-    void processLastArg(FJTO o) {
-        processArg(o);
-    }
-
     void makeRange(FJTO a, FJTO b) {
         int start = (int) a.obj;
 		int end = (int) b.obj;

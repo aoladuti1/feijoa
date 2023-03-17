@@ -22,10 +22,6 @@ public class FJStructDef {
         this.members.put(ID, o);    
     }
 
-    public void addStructDef(String ID, FJTO o) {
-        this.members.put(ID, o);
-    }
-
     public FJTO getMember(String ID) {
         return this.members.get(ID);
     }
