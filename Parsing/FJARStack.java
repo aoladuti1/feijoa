@@ -10,6 +10,7 @@ public class FJARStack {
         top = o;
     }
 
+    // set the current list to the the list stored at index
     void nextList(FJTO index) {
         top = FJ.subscript(top, index);
     }

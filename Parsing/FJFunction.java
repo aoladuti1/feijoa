@@ -9,10 +9,9 @@ public class FJFunction {
         this.name = name; 
     } 
  
+    String name;
     ARTGLLRDTHandle procedure = null; 
     ArrayList<HashMap<String, FJTO>> outerTables = null; 
-    String name; 
- 
     ArrayList<FJNamedObj> args = new ArrayList<>(); 
  
     public void addArg(String ID) { 

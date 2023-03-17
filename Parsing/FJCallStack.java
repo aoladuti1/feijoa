@@ -35,12 +35,28 @@ public class FJCallStack {
     public void setLastValue(FJTO o) { 
         current().output = o; 
     } 
- 
+
+    /***
+     * Return the stack entry for the currently running function.
+     * If there is no currently running function, null is returned.
+     * @return the stack entry for the currently running function, or null if there
+     * is none
+     */
     public CSEntry current() { 
         if (pos != -1) 
             return stack.get(pos); 
         else  
             return null; 
+    }
+
+    /***
+     * Return the stack entry for the most recent function call with arguments still
+     * unprocessed.
+     * @return the stack entry for the most recent function call with arguments still
+     * unprocessed
+     */
+    public CSEntry top() { 
+        return stack.get(stack.size() - 1); 
     } 
  
     public FJTO getLastValue() { 
@@ -67,21 +83,31 @@ public class FJCallStack {
         } 
         return argc > top.maxArgs; 
     } 
- 
-    public void putVar(int argc, FJTO o) { 
-        FJNamedObj fvar = topFunction().getArg(argc); 
+
+    /** 
+     * Initialises the function variable at index argIndex to value o. 
+     * @param argIndex (current) argument index
+     * @param o value to store in the argument at argIndex
+     */ 
+    public void putVar(int argIndex, FJTO o) { 
+        FJNamedObj fvar = topFunction().getArg(argIndex); 
         topTable().put(fvar.name, o); 
     } 
  
     /** 
-     * Declares function variables with their default value. 
-     * @param argc current arg count 
+     * Initialise function variable at index argIndex to their default value. 
+     * @param argIndex (current) argument index 
      */ 
-    public void putVar(int argc) { 
-        FJNamedObj fvar = topFunction().getArg(argc); 
+    public void putVar(int argIndex) { 
+        FJNamedObj fvar = topFunction().getArg(argIndex); 
         topTable().put(fvar.name, fvar.ftjo); 
     } 
  
+    /** 
+     * Assigns / initialises the function variable named ID to value o. 
+     * @param ID function symbol name
+     * @param o value to store in the function variable
+     */ 
     public void putVar(String ID, FJTO o) { 
         try { 
             top().visited[topFunction().getArgIndex(ID)] = true; 
@@ -99,11 +125,12 @@ public class FJCallStack {
     public HashMap<String, FJTO> topTable() { 
         return top().funcVars.get(0); 
     } 
- 
+    
     public HashMap<String, FJTO> currentTable() { 
         return current().funcVars.get(0); 
     } 
- 
+    
+    // returns true if the function has a variable named ID
     public boolean containsID(String ID) { 
         CSEntry cur = current(); 
         if (cur == null) { 
@@ -114,7 +141,7 @@ public class FJCallStack {
         } 
         return false; 
     } 
- 
+
     public HashMap<String, FJTO> findCurTable(String firstID) { 
         if (stack.isEmpty()) { 
             return null; 
@@ -138,11 +165,12 @@ public class FJCallStack {
     public boolean isEmpty() { 
         return stack.isEmpty(); 
     } 
- 
+    
     public void nextCall() { 
         pos++; 
     } 
- 
+    
+    // set the next argument variable to o
     public void processArg(FJTO o) { 
         CSEntry top = top(); 
         if (top().selectingArgs) { 
@@ -152,16 +180,17 @@ public class FJCallStack {
             return; 
         } 
         top.selectingArgs = false; 
-        int argc = ++top.argIndex; 
-        top.visited[argc] = true; 
+        int argIndex = ++top.argIndex; 
+        top.visited[argIndex] = true; 
         if (tooManyArgs()) { 
             System.err.println("Too many args"); 
             return; 
         } else if (top.maxArgs > 0){ 
-            putVar(argc, o); 
+            putVar(argIndex, o); 
         } 
     } 
- 
+    
+    // set the function variable named ID to o
     public void processArg(String ID, FJTO o) { 
         CSEntry top = top(); 
         top.visited[topFunction().getArgIndex(ID)] = true; 
@@ -173,7 +202,8 @@ public class FJCallStack {
             putVar(ID, o); 
         } 
     } 
- 
+    
+    // set all unset arguments to their defaults (if defaults exist)
     public void fillArgs() { 
         CSEntry top = top(); 
         if (!top.selectingArgs) { 
@@ -188,7 +218,7 @@ public class FJCallStack {
  
         } 
     } 
- 
+    
     public void processLastArg(FJTO o) { 
         processArg(o); 
         fillArgs(); 
@@ -197,11 +227,6 @@ public class FJCallStack {
     public void processLastArg(String ID, FJTO o) { 
         processArg(ID, o); 
         fillArgs(); 
-    } 
-     
- 
-    public CSEntry top() { 
-        return stack.get(stack.size() - 1); 
     } 
  
     public CSEntry pop() { 

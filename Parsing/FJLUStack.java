@@ -11,17 +11,18 @@ public class FJLUStack {
 
         FJTO o;
         FJTO index;
-        String name;
+        String ID;
 
-        public LUEntry(FJTO o, String name) {
+        public LUEntry(String ID, FJTO o) {
+            this.ID = ID;
             this.o = o;
-            this.name = name;
         }
 
-        public LUEntry(FJTO o, FJTO index, String name) {
+        public LUEntry(String ID, FJTO index, FJTO o) {
+            this.ID = ID;
             this.o = o;
             this.index = index;
-            this.name = name;
+ 
         }
 
         boolean isList() {
@@ -36,22 +37,29 @@ public class FJLUStack {
         this.symbols = symbols;
     }
 
-    void push(FJTO o, String name) {
-        stack.add(new LUEntry(o, name));
+    // push a normal variable to receive list elements
+    void push(String ID, FJTO o) {
+        stack.add(new LUEntry(ID, o));
     }
 
-    void push(FJTO o, FJTO index, String name) {
-        stack.add(new LUEntry(o, index, name));
+    // push the list ID to assign o to
+    // index ID[index]
+    void push(String ID, FJTO index, FJTO o) {
+        stack.add(new LUEntry(ID, index, o));
     }
 
+    /***
+     * Unpacks the list.
+     * @param list
+     */
     void popAssign(FJTO list) {
         if (!list.isList()) {
-            System.err.println("List assignment attempted without a list for " + stack.get(0).name);
+            System.err.println("List assignment attempted without a list for " + stack.get(0).ID);
             return; // error
         }
         FJList fjlist = ((FJList) list.obj);
         if (((FJList) list.obj).size() < stack.size()) {
-            System.err.println("Too many variables for multi-assignment, starting with " + stack.get(0).name);
+            System.err.println("Too many variables for multi-assignment, starting with " + stack.get(0).ID);
             return; // error
         }
         for (int i = 0; i < stack.size(); i++) {
@@ -59,7 +67,7 @@ public class FJLUStack {
             if (entry.isList()) {
                 FJ.listEquals(entry.o, entry.index, fjlist.get(i));
             } else {
-                symbols.put(entry.name, fjlist.get(i));
+                symbols.put(entry.ID, fjlist.get(i));
             }
         }
     }

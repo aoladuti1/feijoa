@@ -171,27 +171,4 @@ public class FJSymbols {
         fullPut(splits, o, table);
     }
 
-    public boolean containsGlobal(String ID) {
-        return getTable(0).containsKey(ID);
-    }
-
-    public HashMap<String, FJTO> globalTable() {
-        return getTable(0);
-    }
-
-    // search and destroy. will look on all levels for the variable
-    @SuppressWarnings("unchecked")
-    public Object remove(String ID) {
-        String[] splits = ID.split(selectOp);
-        HashMap<String, FJTO> table = findTable(ID);
-        if (splits.length == 1) {
-            return table.remove(ID);
-        } else if (table != null) {
-            HashMap<String, FJTO> subTable 
-                = ((HashMap<String, FJTO>) resolve(splits, table).obj);
-            return subTable.remove(splits[splits.length - 1]);
-        }
-        return null;
-    }
-
 }
