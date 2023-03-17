@@ -528,7 +528,7 @@ mainListArgs ::= '[' ']'
 		{ LCstack.makeRange(subExprB1.o, subExprB2.o); }
 
 listArgs ::= subExprA { LCstack.processArg(subExprA1.o); } ',' listArgs
-	| subExprA { LCstack.processLastArg(subExprA1.o); }
+	| subExprA { LCstack.processArg(subExprA1.o); }
 
 
 (* walrus-like operators *)

@@ -166,6 +166,9 @@ public class FJCallStack {
         return stack.isEmpty(); 
     } 
     
+    /***
+     * Signify the processing of the current call arguments is done.
+     */
     public void nextCall() { 
         pos++; 
     } 
