@@ -106,6 +106,18 @@ public class FJ {
 		}
 	}
 
+	// convert Feijoa object a to a Double
+	// return null if a is not a double or int
+	private static Double doublefy(FJTO a) {
+		if (a.isDouble()) {
+			return ((Double) a.obj);
+		} else if (a.isInt()) {
+			return Double.valueOf(a.obj.toString());
+		} else {
+			return null; // error
+		}
+	}
+
 	/***
 	 * Returns 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
 	 * Returns -2 if there is an error.
@@ -116,25 +128,8 @@ public class FJ {
 	 */
 	static int numericCompare(FJTO a, FJTO b) {
 		if (doublePresent(a, b)) {
-			Double ao;
-			Double bo;
-			if (a.isDouble()) {
-				ao = ((Double) a.obj);
-			} else if (a.isInt()) {
-				ao = Double.valueOf(a.obj.toString());
-			} else {
-				return -2; // error;
-			}
-			if (b.isDouble()) {
-				bo = ((Double) b.obj);
-			} else if (b.isInt()) {
-				bo = Double.valueOf(b.obj.toString());
-			} else {
-				return -2; // error;
-			}
-			int ret = ao.compareTo(bo);
-			if (ret < 0) ret = -1; // future-proofing
-			return ret;
+			int ret = doublefy(a).compareTo(doublefy(b));
+			return (ret >= 0) ? ret : -1; // future-proofing
 		} else {
 			int ao = (int) a.obj;
 			int bo = (int) b.obj;
@@ -283,12 +278,12 @@ public class FJ {
 	// returns a == b as a Boolean
 	static Boolean booleanEqu(FJTO a, FJTO b) { 
 		// note: change return type to primitive boolean when err handling present
-		if (a.isNull()|| b.isNull()) 
+		if (a.isNull() || b.isNull()) 
 			return a.obj == b.obj;
-		if (a.type != b.type)
-			return false;
 		if (a.isNumeric() && b.isNumeric()) {
 			return numericCompare(a, b) == 0;
+		} else if (a.type != b.type) {
+			return false;
 		} else if (a.isString()) {
 			return ((String) a.obj).equals((String) b.obj);
 		} else if (a.isList()) {
