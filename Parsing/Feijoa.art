@@ -234,10 +234,10 @@ condStatement ::= ifExpr compStatements<
 		}
 	| ifExpr compStatements< 'else' compStatements<
 		{
-			if ((boolean) ifExpr1.o.obj == false) {
-				artEvaluate(condStatement.compStatements2, compStatements2);
-			} else {
+			if ((boolean) ifExpr1.o.obj == true) {
 				artEvaluate(condStatement.compStatements1, compStatements1);
+			} else {
+				artEvaluate(condStatement.compStatements2, compStatements2);
 			}
 		}
 	| elifExpr compStatements< 'else' compStatements<
@@ -282,12 +282,10 @@ subExprC <o: FJTO> ::= subExprD { subExprC.o = subExprD1.o; }
 subExprD <o: FJTO> ::= subExprE { subExprD.o = subExprE1.o; }
 	| exponentiate { subExprD.o = exponentiate1.o; }
 	
-subExprE <o: FJTO> ::= subExprF { subExprE.o = subExprF1.o; }
+subExprE <o: FJTO> ::= operand { subExprE.o = operand1.o; }
 	| not { subExprE.o = not1.o; }
 	| negate { subExprE.o = negate1.o; }
 	
-subExprF <o: FJTO> ::= operand { subExprF.o = operand1.o; }
-
 operand <o: FJTO> ::= deref { operand.o = deref1.o; }
 	| walruses { operand.o = walruses1.o; }
 	| INTEGER
