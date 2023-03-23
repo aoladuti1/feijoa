@@ -274,6 +274,13 @@ public class FJ {
 		Boolean ret = booleanEqu(a, b);
 		return ret == null ? null : newBoolean(ret);
 	}
+
+	// returns a != b (value equality, not object address)
+	static FJTO neq(FJTO a, FJTO b) {
+		// note: change ret type to primitive boolean when err handling present
+		Boolean ret = !booleanEqu(a, b);
+		return ret == null ? null : newBoolean(ret);
+	}
 	
 	// returns a == b as a Boolean
 	static Boolean booleanEqu(FJTO a, FJTO b) { 
@@ -288,6 +295,8 @@ public class FJ {
 			return ((String) a.obj).equals((String) b.obj);
 		} else if (a.isList()) {
 			return ((FJList) a.obj).booleanEqu(b);
+		} else if (a.isBoolean()) {
+			return ((Boolean) a.obj).equals((Boolean) b.obj);
 		} else {
 			return null; // error
 		}
