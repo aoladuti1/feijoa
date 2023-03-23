@@ -1,6 +1,6 @@
 // exponentiation
 x = 7;
-sysout!("The following prints 49.0: ");
+sysout!("The following prints 49: ");
 sysln!(x ** 2);
 
 sysout!("The following prints 5.0: ");
@@ -45,7 +45,7 @@ sysln!(T * F + T);
 
 // or 	
 sysout!("Prints false: ");
-sysln!(true || false && false);
+sysln!(true || false && false); // equiv syntax: sysln!(true or false and false)
 
 
 // equals

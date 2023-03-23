@@ -1,14 +1,14 @@
 x = 0;
 sysln!("> x = 0");
-sysout!("> sysln!(x++)"); sysln!(" // outputs " + x++); // postfix incr.
-sysout!("> sysln!(x)"); sysln!(" // outputs " + x);
+sysout!("> sysln!(x++)"); sysln!(" outputs: " + x++); // postfix incr. (outputs 0)
+sysout!("> sysln!(x)"); sysln!(" outputs: " + x); // outputs 1
 
 sysln!("-----------------");
 
 y = 0;
 sysln!("> y = 0");
-sysout!("> sysln!(++y)"); sysln!(" // outputs " + ++y); // prefix incr.
+sysout!("> sysln!(++y)"); sysln!(" outputs: " + ++y); // prefix incr. // outputs 1
 
 sysln!("-----------------");
 
-sysln!("Equivalent decrement operations exist (e.g. x--)");
+sysln!("Equivalent decrement operations exist (e.g. x-- or --x)");

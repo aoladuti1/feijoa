@@ -2,7 +2,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class STable {
+/***
+ * The Feijoa symbol table class
+ */
+public class FJSymbols {
 
     private ArrayList<HashMap<String, FJTO>> tree = new ArrayList<>();
 
@@ -32,7 +35,7 @@ class STable {
         return tree.get(level);
     }
 
-    public STable(FJCallStack callStack) {
+    public FJSymbols(FJCallStack callStack) {
         this.callStack = callStack;
         tree.add(new HashMap<>());
     }
@@ -80,7 +83,7 @@ class STable {
         }
         return found ? symbols : null;
     }
-
+    
     @SuppressWarnings("unchecked")
     private void fullPut(
         String[] splits, FJTO o, HashMap<String, FJTO> table) {
@@ -118,6 +121,11 @@ class STable {
     }
 
     @SuppressWarnings("unchecked")
+    /***
+     * Returns the second to last whose name delimited by the
+     * member selection operator. For example, ID "a.b.c" would return
+     * the variable with the ID b.
+     */
     private FJTO resolve(String[] splits, HashMap<String, FJTO> table) {
         HashMap<String, FJTO> subTable = table;
         FJTO fetch = null;
@@ -161,29 +169,6 @@ class STable {
         }
         if (table == null) { table = currentTable(); }
         fullPut(splits, o, table);
-    }
-
-    public boolean containsGlobal(String ID) {
-        return getTable(0).containsKey(ID);
-    }
-
-    public HashMap<String, FJTO> globalTable() {
-        return getTable(0);
-    }
-
-    // search and destroy. will look on all levels for the variable
-    @SuppressWarnings("unchecked")
-    public Object remove(String ID) {
-        String[] splits = ID.split(selectOp);
-        HashMap<String, FJTO> table = findTable(ID);
-        if (splits.length == 1) {
-            return table.remove(ID);
-        } else if (table != null) {
-            HashMap<String, FJTO> subTable 
-                = ((HashMap<String, FJTO>) resolve(splits, table).obj);
-            return subTable.remove(splits[splits.length - 1]);
-        }
-        return null;
     }
 
 }

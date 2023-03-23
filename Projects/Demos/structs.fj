@@ -1,14 +1,17 @@
 struct X {
-	a = "1"; // to show that structs can hold different types
+	num = "i want to be an int!";
 
 	struct Y {
-		b = 6;
+		dummy = 0;
 		// err = new X(); --- returns an error - you can't construct the containing struct
-		def c() { sysout!("max"); } // c is added as a member variable
+		def msg() { sysout!("omega"); } // c is added as a member variable
 	}
 }
 
-a = new X.Y(7).b; // accessing r-values is possible, alongside nested structs
-b = new X.Y(7, c=8); // see functions = first class variables, and arg selection
-callC = new X.Y();
-callC.c(); // prints "max"
+a = new X(9999).num; // accessing r-values is possible, alongside nested structs
+sysln!(a); // prints '9999'
+b = new X.Y(7, msg="alpha"); // see functions = first class variables, and arg selection
+sysln!(b.msg); // prints 'alpha'
+c = new X.Y();
+c.msg(); // prints 'omega'
+

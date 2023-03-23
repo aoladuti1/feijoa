@@ -1,3 +1,7 @@
+/***
+ * Used to represent function arguments
+ */
+
 public class FJNamedObj { 
   public final String name; 
   public final FJTO ftjo;

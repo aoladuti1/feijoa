@@ -1,3 +1,4 @@
+
 sysln!("x was set to the string 'true'.");
 x = "true";
 if (bool(x)) {
@@ -5,11 +6,13 @@ if (bool(x)) {
 }
 
 typeOfx = type!(x);
-sysln!("the result of type() on x is: " + typeOfx);
+// prints the result of type!() on x is: string
+sysln!("the result of type!() on x is: " + typeOfx);
 sysln!("see: typecasts make new variables instead of changing data.");
 
 struct Dummy { _ = null; }
 dummy = new Dummy();
+// prints 'For a Dummy construct variabled named dummy, type!(dummy) is Dummy'
 sysln!("\ntype(_) called on structs gives their type. 
     For a Dummy construct variabled named dummy, type!(dummy) is " + type!(dummy));
     

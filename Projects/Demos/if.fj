@@ -37,4 +37,7 @@ if (x > 0) {
 
 if x > 10 {} 
 	elif x > 10 {}
-	else { sysout!("adrian!"); }
+	else { sysout!("adrian"); }
+
+sysout!(x < 10 ? "!" : "ERROR");
+// pythonic syntax is an option: >sysout!("!" if x < 10 else "ERROR");

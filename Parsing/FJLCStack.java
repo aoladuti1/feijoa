@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 
-public class FJLStack {
+/***
+ * List construction stack
+ */
+public class FJLCStack {
 
     ArrayList<FJList> stack = new ArrayList<>();
     
@@ -24,17 +27,19 @@ public class FJLStack {
         top().add(o);
     }
 
-    void processLastArg(FJTO o) {
-        processArg(o);
-    }
-
     void makeRange(FJTO a, FJTO b) {
         int start = (int) a.obj;
 		int end = (int) b.obj;
 		FJList list = top();
-		for (int i = start; i < end; i++) {
-			list.add(FJ.newInt(i));
-		}
+        if (start < end) {
+            for (int i = start; i < end; i++) {
+                list.add(FJ.newInt(i));
+            }
+        } else {
+            for (int i = start; i > end; i--) {
+                list.add(FJ.newInt(i));
+            }
+        }
     }
 
 }

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/***
+ * Struct definition - underlying Feijoan object
+ */
 public class FJStructDef {
     String name;
     HashMap<String, FJTO> members = new HashMap<>();
@@ -17,10 +20,6 @@ public class FJStructDef {
             }
         }
         this.members.put(ID, o);    
-    }
-
-    public void addStructDef(String ID, FJTO o) {
-        this.members.put(ID, o);
     }
 
     public FJTO getMember(String ID) {
@@ -52,5 +51,9 @@ public class FJStructDef {
         return this.memberOrder.size();
     }
     
+    @Override
+    public String toString() {
+        return this.members.toString();
+    }
     
 }
