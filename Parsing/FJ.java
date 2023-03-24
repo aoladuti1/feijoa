@@ -149,11 +149,15 @@ public class FJ {
 	 * @return 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
 	 * Returns -2 if there is an error.
 	 */
-	static int safeNumericCompare(FJTO a, FJTO b) {
-		if (!(a.isNumeric() && b.isNumeric())) 
-			return -2;
-		else
+	static int anyCompare(FJTO a, FJTO b) {
+		if ((a.isNumeric() && b.isNumeric()))  {
 			return numericCompare(a, b);
+		} else if (a.isString() && b.isString()) {
+			int ret = ((String) a.obj).compareTo((String) b.obj);
+			return ret < 0 ? -1 : ret;
+		} else {
+			return -2;
+		}
 	}
 
 	private static boolean doublePresent(FJTO a, FJTO b) {
@@ -203,16 +207,16 @@ public class FJ {
 	
 	// returns a > b 
 	static FJTO gtr(FJTO a, FJTO b) {
-		int comp = safeNumericCompare(a, b);
+		int comp = anyCompare(a, b);
 		if (comp == -2)
 			return null; // error
 		else
-			return newBoolean(safeNumericCompare(a, b) == 1);
+			return newBoolean(anyCompare(a, b) == 1);
 	}
 
 	// returns a >= b
 	static FJTO geq(FJTO a, FJTO b) {
-		int comp = safeNumericCompare(a, b);
+		int comp = anyCompare(a, b);
 		if (comp == -2)
 			return null; // error
 		else
@@ -221,16 +225,16 @@ public class FJ {
 	
 	// returns a < b
 	static FJTO lss(FJTO a, FJTO b) {
-		int comp = safeNumericCompare(a, b);
+		int comp = anyCompare(a, b);
 		if (comp == -2)
 			return null; // error
 		else
-			return newBoolean(safeNumericCompare(a, b) == -1);
+			return newBoolean(anyCompare(a, b) == -1);
 	}
 
 	// returns a <= b
 	static FJTO leq(FJTO a, FJTO b) {
-		int comp = safeNumericCompare(a, b);
+		int comp = anyCompare(a, b);
 		if (comp == -2)
 			return null; // error
 		else
