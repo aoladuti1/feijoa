@@ -215,3 +215,10 @@ an if statement not evaluating properly in certain circumstances. Minor code / B
 
 Next step:
 	! - Write the remainder of the report
+
+[24/03/2023]
+Since my last diary entry, I implemented a myriad of bug fixes and syntax tightening, along with
+lexicographic string ordering (with comparison operators) and a not equals (!=) operator.
+
+Next step:
+	! - Edit and submit report
