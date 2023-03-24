@@ -158,7 +158,7 @@ loopStatement ::= whileExpr< compStatements<
 				} 
             }
 		}
-	| 'for' '(' mainExpr< ';' subExprA< ';' subExprA< ')' rawCompStatements< 
+	| 'for' '(' mainExpr< ';' subExprA< ';' mainExpr< ')' rawCompStatements< 
 		{ 	symbols.newScope();
 			artEvaluate(
 					loopStatement.mainExpr1, mainExpr1);
@@ -169,7 +169,7 @@ loopStatement ::= whileExpr< compStatements<
 					artEvaluate(
 						loopStatement.rawCompStatements1, rawCompStatements1); 
 					artEvaluate(
-						loopStatement.subExprA2, subExprA2);
+						loopStatement.mainExpr2, mainExpr2);
 				} catch (FJSigBreak FJBreak) {
 					break;
 				} catch (FJSigContinue FJContinue) {
@@ -240,6 +240,16 @@ condStatement ::= ifExpr compStatements<
 				artEvaluate(condStatement.compStatements2, compStatements2);
 			}
 		}
+	| ifExpr compStatements< elifExpr compStatements< 'else' compStatements<
+		{
+			if ((boolean) ifExpr1.o.obj == true) {
+				artEvaluate(condStatement.compStatements1, compStatements1);
+			} else if ((boolean) elifExpr1.o.obj == true) {
+				artEvaluate(condStatement.compStatements2, compStatements2);
+			} else {
+				artEvaluate(condStatement.compStatements3, compStatements3);
+			}
+		}
 	| elifExpr compStatements< 'else' compStatements<
 		{
 			if ((boolean) elifExpr1.o.obj == true) {
@@ -268,6 +278,7 @@ subExprA <o: FJTO> ::= subExprB { subExprA.o = subExprB1.o; }
 	| lss { subExprA.o = lss1.o; }
 	| leq { subExprA.o = leq1.o; }
 	| equ { subExprA.o = equ1.o; }
+	| neq { subExprA.o = neq1.o; }
 	| in  { subExprA.o = in1.o;  }
 	
 subExprB <o: FJTO> ::= subExprC { subExprB.o = subExprC1.o; }
@@ -375,6 +386,9 @@ exponentiateEquals ::= AID '**=' subExprB
 (* comparison operators *)
 equ <o: FJTO> ::= subExprB '==' subExprB
 	{ equ.o = FJ.equ(subExprB1.o, subExprB2.o); }
+
+neq <o: FJTO> ::= subExprB '!=' subExprB
+	{ neq.o = FJ.neq(subExprB1.o, subExprB2.o); }
 
 gtr <o: FJTO> ::= subExprB '>' subExprB
 	{ gtr.o = FJ.gtr(subExprB1.o, subExprB2.o); }
