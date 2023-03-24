@@ -141,11 +141,10 @@ public class FJ {
 	}
 	
 	/***
-	 * Checks if both arguments are numeric and returns -2 if not.
 	 * Returns 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
 	 * Returns -2 if there is an error.
-	 * @param a number a
-	 * @param b number b
+	 * @param a FJTO str/double/int a
+	 * @param b FJTO str/double/int b
 	 * @return 0 if a == b. Returns 1 if a > b. Returns -1 if a < b.
 	 * Returns -2 if there is an error.
 	 */
